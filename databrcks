@@ -1,0 +1,188 @@
+Data lake ek digital talab hai, jahan saara data – raw, kaccha-pakka, structured, unstructured – store hota hai
+Kaise Kaam Karta Hai?
+Alag-alag sources se data aata hai (website, apps, sensors, social media), aur jaisa hai waisa hi dump ho jata hai.
+Baad mein tools (Hadoop, Spark, AWS) se process karke insights nikaalte hain.
+Data Lake vs Data Warehouse?
+Data lake = Kaccha-pakka mix, flexible, raw data ke liye.
+Data warehouse = Fully pakka, structured, business reporting ke liye.
+
+Fayde Kya Hain?
+Flexible – koi bhi data store karo (text, images, videos).
+Scalable – cloud mein easily bada karo.
+Sasta – raw data store karna costly nahi.
+Advanced analytics – AI, machine learning ke liye best.
+Challenges Kya Hain?
+Data swamp – agar manage nahi kiya toh ganda talab ban jata hai.
+Security – sensitive data leak ka risk.
+Skills chahiye – big data tools, programming ka knowledge zaroori.
+Use Kahan Hota Hai?
+E-commerce (recommendations), healthcare (AI models), finance (fraud detection), social media (ads targeting).
+Future Kya Hai?
+Bright hai, kyunki data badh raha hai, aur cloud + AI ke saath powerful ho raha hai.
+*********
+What is Control Plane and Data Plane in Databricks?
+Control Plane:
+Ek manager ya control room jo Databricks ke cloud account mein hota hai.
+Backend services manage karta hai – UI, notebooks, clusters, security, user management.
+Data processing nahi karta, sirf instructions deta hai.
+Data Plane:
+Ek kaam ka maidan jo customer ke cloud account mein hota hai.
+Yahan data processing hota hai – clusters banate hain, data analyze karte hain.
+Do types:
+Classic Compute: Customer ke account mein, customer manage karta hai.
+Serverless Compute: Databricks ke account mein, Databricks manage karta hai.
+Connection:
+Control plane aur data plane secure network (HTTPS, private tunnels) se baat karte hain.
+******
+2. What is High-Level Architecture of Databricks?
+
+Control Plane (Databricks ka Area):
+Databricks ke cloud account mein hota hai.
+Services: Web UI, cluster manager, workflow manager, Unity Catalog, notebook storage.
+Customer ka data touch nahi karta, sirf manage karta hai.
+Data Plane (Customer ka Area):
+Customer ke cloud account mein hota hai.
+Parts:
+Clusters: Data processing ke liye compute resources (classic ya serverless).
+Storage: Customer ka data (S3, ADLS, Google Cloud Storage) store hota hai.
+Networking aur Security:
+Secure communication HTTPS ya private tunnels (AWS PrivateLink, Azure Service Endpoints) ke through.
+Security features: Encryption, access control (RBAC), network isolation.
+Example: Control plane = Restaurant ka manager, data plane = Kitchen jahan kaam hota hai.
+*********
+3. What are the Different Roles Available in Databricks?
+Account-Level Roles:
+Account Owner: Super boss – poore account ko control karta hai (workspaces, users, billing, security).
+Account Admin: Owner ka helper – users, workspaces, settings manage karta hai.
+Workspace-Level Roles:
+Workspace Admin: Ek workspace ka manager – users, clusters, permissions manage karta hai.
+Workspace User: Normal kaamgaar – notebooks, queries, data analysis ka kaam karta hai (limited permissions).
+Workspace Contributor: Limited role – specific objects (notebooks, jobs) pe kaam karta hai.
+Data-Level Roles (Unity Catalog):
+Owner: Data objects (tables, schemas) ka poora control.
+Read/Write: Data ko read ya modify kar sakta hai.
+Execute: Jobs ya queries run kar sakta hai.
+Service Principals:
+Automated tools, scripts ke liye role – humans ke liye nahi.
+Example: Account owner = School principal, workspace admin = Class teacher, workspace user = Student.
+
+*****
+4. What is Databricks Workspace?
+Workspace Kya Hai?:
+Ek shared office jahan teams kaam karte hain – data analysis, ML, ETL, dashboards.
+Workspace Mein Kya Hota Hai?:
+Notebooks: Code likhne aur run karne ke liye (Python, SQL, Scala, R).
+Clusters: Data processing ke liye compute resources.
+Jobs: Scheduled ya automated tasks (daily data processing).
+Libraries: External code ya packages.
+Dashboards: Data visualizations aur reports.
+Experiments: ML models track karne ke liye.
+Features:
+Folders mein assets organize kar sakte hain.
+Access control – admin decide karta hai kaun kya kar sakta hai.
+Apna storage bucket – system data (logs, revisions) store karne ke liye.
+Example: Workspace = Office, jahan desks (notebooks, clusters) hote hain, aur manager (admin) decide karta hai kaun kya karega.
+5. What is the Relation Between Databricks Account and Workspace?
+Databricks Account:
+Ek top-level entity – company ya organization ka poora setup.
+Multiple workspaces manage karta hai.
+Billing, user management, security, governance account level pe hota hai.
+Workspace:
+Account ke andar ek specific environment jahan teams kaam karte hain.
+Apna URL, storage bucket, aur resources hota hai.
+Relation:
+Ek account mein multiple workspaces ho sakte hain (jaise production, development, testing).
+Ek workspace sirf ek account ka part hota hai.
+Unity Catalog account level pe data governance deta hai – saare workspaces ke data ka metadata ek jagah.
+Example: Account = School, workspaces = Classrooms. Principal (account owner) decide karta hai kitne classrooms honge, aur har classroom ka apna teacher (workspace admin) hota hai.
+******************
+
+
+why is data relability and performance important in data enginerring
+
+Why Data Reliability is Important?
+Sahi Decisions: Unreliable data se galat business decisions hote hain, aur loss hota hai.
+Consistency: Alag-alag systems ka data match karna zaroori hai, warna confusion hota hai.
+Trustworthy Analytics: Galat data se reports aur ML models galat hote hain.
+Compliance: Laws (GDPR, HIPAA) ke liye reliable data zaroori hai, warna legal trouble hota hai.
+Customer Trust: Galat data se customer experience kharab hota hai, aur trust toot jata hai.
+***********
+Why Performance is Important?
+Real-Time Insights: Slow pipelines se data late milta hai, aur decisions delay hote hain.
+Big Data Handling: Bade data volumes ko jaldi process karna zaroori hai, warna bottlenecks bante hain.
+Cost Efficiency: Slow systems se zyada cloud resources use hote hain, aur bill badhta hai.
+User Experience: Slow queries ya dashboards se productivity kam hoti hai.
+Scalability: Performant systems easily scale karte hain jab data volume badhta hai
+******************
+Problems Encountered When Using Data Lake
+Data Swamp: Data lake messy ho jata hai – no metadata, duplicates, inconsistent formats – use karna mushkil hota hai.
+Security Risks: Sensitive data leak ho sakta hai agar access control aur encryption strong nahi hai.
+Poor Data Quality: Raw data mein errors, missing values, ya inconsistent formats se analytics galat hota hai.
+Slow Performance: Bade data volumes aur small files se queries slow ho jati hain, real-time insights nahi milte.
+Business Misalignment: Business goals ke saath align nahi hota, toh data lake sirf storage ban jata hai.
+Complexity in Data Processing
+Problem: Data lake mein raw data process karna complex hota hai, especially streaming data aur batch data ko combine karna
+Kyun Hota Hai: Traditional data lakes ACID transactions (atomicity, consistency, isolation, durability) support nahi karte, toh data processing mein errors aate hain.
+Lack of Schema Enforcement
+
+*******
+
+Main Features of Delta Lake
+ACID Transactions: Data writes, updates, deletes reliable hote hain, multiple users safely kaam kar sakte hain.
+Schema Enforcement: Data store karte time schema enforce karta hai, data quality improve hoti hai.
+Schema Evolution: Schema mein changes (jaise new columns) add kar sakte ho bina data break kiye.
+Time Travel: Data ke purane versions access ya restore kar sakte ho, recovery easy hota hai.
+Performance Optimization: Data skipping, Z-Order indexing, caching, file compaction se queries fast hoti hain.
+Unified Processing: Batch aur streaming data ek hi table mein handle kar sakta hai.
+******
+data science, data enginerring data scence  (Ek field hai jo data se insights nikaalne ke liye math, stats, aur programming ka use karta hai)
+|
+data intelligence engine  (Business teams ko real-time decisions lene mein help karta hai, jaise customer behavior samajhna ya sales improve karna.)
+|
+unity catalog(governance)(Databricks ka data governance tool hai jo metadata manage karta hai, taaki data discoverable aur secure rahe)
+|
+delta lake(core dl)  (Data lakes ke upar ek storage layer hai jo reliability (ACID transactions) aur performance (indexing, caching) deta hai.)
+
+|
+clouddatalake  (Cloud mein bada data storage hai jahan raw, structured, aur unstructured data store hota hai)
+*********
+
+delta lake integrate with all the major analalytic tool
+A. Apache Spark (Core Integration)
+B. SQL-Based Query Engines(Apache Hive)
+C. Cloud-Native Analytic Tools(AWS Athena,Snowflake,Google BigQuery)
+Business Intelligence (BI) Tools
+**
+Photon ka main kaam hai SQL queries aur data processing tasks ko optimize karna
+
+Vectorized Execution:ek baar mein ek row process karne ke bajaye, ye ek saath thousands of rows process karta hai
+Compatibility: Photon Spark SQL aur DataFrame APIs ke saath compatible hai.bas Photon enable karo aur speed boost milta hai.
+Cost Efficiency: Kam compute resources use hote hain, toh cloud costs kam ho jate hain.
+Photon Ka Use Kahan Hota Hai?
+E-commerce: Real-time inventory management, sales analytics, customer recommendations.
+IoT: Sensor data processing, predictive maintenance, anomaly detection.
+*******
+Data lakes mein governance ek badi problem hai kyunki:
+(alag-alag systems mein bikhra hua), toh discoverability aur access control mushkil hota hai.
+AI models ke liye governance nahi hota, toh model versioning, auditing, aur compliance track karna mushkil hota hai.
+(data kahan se aaya, kaise use hua) track karna hard hota hai.
+****
+2. How Databricks Lakehouse Solves Governance Challenges
+Unity Catalog: Ek centralized governance layer jo data (tables, files) aur AI assets (models, notebooks) ko ek hi jagah manage karta hai, discoverability, access control, lineage, aur auditing deta hai.
+Data Quality: Delta Lake ke schema enforcement, ACID transactions, aur time travel se data reliable hota hai
+Databricks Notebooks, SQL, aur Delta Sharing se teams ek hi platform pe kaam kar sakte hain,
+***********
+Databricks ek unified data analytics platform hai jo data engineering, data science, machine learning (ML), aur business intelligence (BI) ko ek hi jagah pe laata hai.
+Databricks ka main idea hai Lakehouse Architecture
+data lake aur data warehouse ke benefits ko combine karna
+– Databricks dono ko ek platform pe laata hai.
+
+Databricks Ke Main Features
+Unified Platform
+Lakehouse Architecture:
+Scalability:
+Cloud-based hone ki wajah se Databricks petabyte-scale data handle kar sakta hai, aur auto-scaling clusters ke saath resources adjust ho jate hain
+Governance:
+High Performance:
+Photon engine
+***********
