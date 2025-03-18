@@ -185,4 +185,120 @@ Cloud-based hone ki wajah se Databricks petabyte-scale data handle kar sakta hai
 Governance:
 High Performance:
 Photon engine
-***********
+***********************************************************************************************************************
+dbutils.fs.ls()
+What is Serverless Compute in Databricks?
+Serverless Compute ek feature hai jahan Databricks compute resources ko automatically manage karta hai – no manual cluster setup ya maintenance.
+
+Benefits of Serverless Compute
+No Management: Databricks sab handle karta hai, tension-free.
+Fast: Instant startup (seconds mein), Photon se high performance.
+Cost-Saving: Pay-as-you-go, no idle costs, 20-40% savings.
+******
+SQL warehouse
+Scaling happens on warehouse level, allows you to add or remove clusters. It means number of cluster are increased or decreased as per definition of Warehouse size.
+******
+Databricks SQL (DBSQL) ek tool hai jo Databricks Lakehouse mein SQL-based analytics aur reporting ke liye banaya gaya hai.
+******
+Query Profile ek tool hai Databricks SQL mein jo query performance ko analyze karne mein help karta hai. Ye batata hai ki query kyun slow hai aur kaise improve ho sakti hai.
+***
+5. How to Monitor SQL Query Performance?
+Query History:
+DBSQL ke “Query History” section mein har query ka record hota hai – execution time, status (success/failed), aur resource usage
+
+*******
+In Apache Spark, yeh cluster has one boss called "master" and kai saare workers called "nodes" that do kaam together
+********
+ Spark ka Core Architecture
+Spark ka architecture Master-Slave model pe based hota hai. Matlab ek Driver Program hota hai jo Executors ko kaam assign karta hai.
+
+🖥 Driver Program:
+
+Ye main process hota hai jo job ko initiate karta hai.
+Iske andar ek SparkContext hota hai jo pura execution manage karta hai.
+⚡ Cluster Manager:
+
+Ye resources allocate karta hai.
+Spark ke cluster manager YARN, Mesos ya Standalone mode me ho sakte hain.
+🖥 Executors:
+
+Ye worker nodes hote hain jo actual computation karte hain.
+Driver inko kaam assign karta hai aur ye tasks execute karte hain.
+
+
+Spark ke Major Components
+🚀 Spark Core:
+
+Isme RDDs (Resilient Distributed Datasets) hote hain jo distributed processing ka main part hain.
+Task scheduling, Memory Management, Fault tolerance yahi handle karta hai.
+📊 Spark SQL:
+
+Ye structured data ke liye hota hai.
+Isme DataFrames and Datasets hote hain jo SQL queries ko optimize karte hain.
+🔥 Spark Streaming:
+
+Ye real-time data processing ke liye hota hai.
+Kafka, Flume, socket streams se data le sakta hai.
+
+
+Apache Spark Workflow
+1️⃣ Data Load: Data kisi bhi source se aa sakta hai (HDFS, S3, DB).
+2️⃣ RDD Creation: Spark Core RDDs create karta hai.
+3️⃣ Transformations: Operations perform hote hain jaise map(), filter(), reduce().
+4️⃣ Actions: Jab hum result chahiye toh actions like collect(), count() use hote hain.
+5️⃣ Execution & Optimization: Spark DAG (Directed Acyclic Graph) banata hai jo efficient execution karta hai.
+6️⃣ Results: Data ko visualize kar sakte hain ya kisi DB me store kar sakte hain.
+
+
+Spark Execution Model
+Transformations → Lazy execution hoti hai, jab tak action call na ho.
+Actions → Actual computation hoti hai.
+DAG Scheduler → Task ko optimize karta hai.
+Task Execution → Executors tasks execute karte hain aur results bhejte hain.
+
+
+
+*******
+
+Delta Table Merge Kya Hai?
+Merge is like ek smart operation jo Delta Table mein data ko update, insert, ya delete karne ka kaam ek saath karta hai. Matlab, agar tumhare paas ek purani Delta Table hai aur ek nayi data ka source hai (jaise koi file ya table), toh tum dono ko "merge" kar sakte ho – jahan chahiye wahan update karo, jahan naya data hai wahan add karo, aur jahan remove karna hai wahan delete karo
+
+MERGE INTO students AS purani_table
+USING nayi_data AS nayi_table
+ON purani_table.id = nayi_table.id
+WHEN MATCHED THEN 
+  UPDATE SET purani_table.marks = nayi_table.marks
+WHEN NOT MATCHED THEN 
+  INSERT (id, marks) VALUES (nayi_table.id, nayi_table.marks);
+*******
+How to do soft delete of Incremental data using Merge Statement?
+
+MERGE INTO target_table AS tgt
+USING staging_table AS src
+ON tgt.id = src.id  -- Matching condition based on primary key
+WHEN MATCHED AND src.id IS NOT NULL THEN
+    UPDATE SET 
+        tgt.name = src.name,
+        tgt.updated_at = CURRENT_TIMESTAMP,
+        tgt.is_deleted = 0  -- Reactivate if it was marked deleted
+WHEN NOT MATCHED THEN
+    INSERT (id, name, created_at, is_deleted)
+    VALUES (src.id, src.name, CURRENT_TIMESTAMP, 0)
+WHEN NOT MATCHED BY SOURCE THEN
+    UPDATE SET 
+        tgt.is_deleted = 1,  -- Soft delete records not in incremental data
+        tgt.updated_at = CURRENT_TIMESTAMP;
+
+
+If the record is in target_table but not in staging_table (NOT MATCHED BY SOURCE case):
+Mark is_deleted = 1 (Soft delete).
+
+**********
+Slowly Changing Dimension Type 1 (SCD1) using MERGE in Delta Tables
+
+SCD Type 1 (SCD1) overwrites existing records with new data, without maintaining historical records. Delta Tables in Databricks or Apache Spark support MERGE operations efficiently.
+**********
+
+
+
+
