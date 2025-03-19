@@ -1,0 +1,47 @@
+Sequential File Stage kya hai?
+
+Sequential File Stage ek important stage hai IBM DataStage mein jo flat files (simple text files jaise .txt ya .csv) se data ko read (padhna) ya write (likhna) karne ke liye use hota ha
+
+
+Kaam kaise karta hai?
+
+Yeh stage data ko sequentially (ek ke baad ek) process karta hai, matlab line-by-line padhta ya likhta hai.
+Agar aap multiple files read kar rahe ho, toh yeh parallel mode mein kaam kar sakta hai (ek saath kaam karta hai different nodes pe). Lekin agar ek hi file hai, toh sequential mode mein chalta hai.
+
+Basic Purpose:
+
+Read karna: Source file se data ko DataStage job mein laana.
+Write karna: Processed data ko ek file mein save karna.
+
+
+Sequential File Stage ka Flow
+Job Design: DataStage Designer mein ek job banate ho.
+Stage Add Karna: Palette se Sequential File Stage ko drag karke canvas pe daalte ho.
+Link Karna:
+Read ke liye: Sequential File Stage se kisi processing stage (jaise Transformer) tak link.
+Write ke liye: Kisi processing stage se Sequential File Stage tak link.
+Properties Set Karna: Double-click karke stage ke properties mein file details aur format daalte ho.
+Run Karna: Job compile aur run karte ho.
+
+*********************
+Hashed File Stage ek special stage hai jo DataStage Server Jobs mein hashed files banane ya update karne ke liye use hota hai. Hashed file ek tarah ka data structure hai jo key-value pair ke basis pe data store karta hai.
+Ye stage sequential files se different hai kyunki ye data ko hash algorithm ke through buckets mein divide karta hai, jisse retrieval super fast ho jata hai.
+*******
+Kaise Kaam Karta Hai?
+Hashed File Stage data ko process karte waqt ek hashing algorithm use karta hai:
+
+Key Define Karna: Aap ek column (ya columns) ko key ke roop mein chunte ho (e.g., emp_id).
+Hashing: Ye key ke basis pe ek hash value generate hota hai.
+Buckets Mein Store: Data ko hash value ke according buckets mein rakha jata hai. Har bucket mein woh records hote hain jo same hash key share karte hain.
+Access: Jab aapko data chahiye, bas key do, aur hashed file us bucket se data instantly fetch kar deta hai.
+**********
+Features of Hashed File Stage
+Fast Lookups: Key-based retrieval ke wajah se speed bohot high hai.
+Temporary Storage: Job ke andar data store karne ke liye perfect hai; job khatam hone ke baad ye files delete bhi ho sakte hain.
+Input/Output: Ek input link se data le sakta hai aur ek output link se data de sakta hai.
+Server Job Specific: Ye stage mainly DataStage Server Jobs mein hi use hota hai, Parallel Jobs mein nahi (parallel mein Dataset stage hota hai)
+
+
+
+*******
+ /FileStore/tables/BigMart_Sales.csv
