@@ -1,0 +1,201 @@
+how to import pyspark and check its version
+
+
+import pyspark
+print(pyspark.__version__)
+
+****
+
+how to convert index of pyspark dataframe into column
+
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import row_number
+from pyspark.sql.window import Window
+
+# Create SparkSession
+spark = SparkSession.builder.appName("IndexExample").getOrCreate()
+
+# Sample DataFrame
+data = [("Alice", 23), ("Bob", 30), ("Charlie", 35)]
+df = spark.createDataFrame(data, ["name", "age"])
+
+# Define window
+windowSpec = Window.orderBy("name")
+
+# Add index column
+df_with_index = df.withColumn("index", row_number().over(windowSpec) - 1)
+
+df_with_index.show()
+*********
+combine many list to form a pyspark dataframe
+
+
+
+# Combine lists
+data = list(zip(names, ages, cities))
+
+# Create DataFrame with column names
+df = spark.createDataFrame(data, ["name", "age", "city"])
+
+***********
+how to get the item of list a not present in list b 
+through pyspark
+#Lists
+a = ["apple", "banana", "cherry", "mango"]
+b = ["banana", "mango"]
+
+# Convert lists to DataFrames
+df_a = spark.createDataFrame([(item,) for item in a], ["item"])
+df_b = spark.createDataFrame([(item,) for item in b], ["item"])
+
+# Items in a but not in b
+diff = df_a.subtract(df_b)
+*************************************************
+https://www.machinelearningplus.com/pyspark/pyspark-exercises-101-pyspark-exercises-for-data-analysis/
+
+**************************
+How to get the items not common to both list A and list B?  
+*******
+# Sample lists
+a = ["apple", "banana", "cherry", "mango"]
+b = ["banana", "mango", "grape"]
+
+# Create DataFrames
+df_a = spark.createDataFrame([(x,) for x in a], ["item"])
+df_b = spark.createDataFrame([(x,) for x in b], ["item"])
+
+# Get items only in A
+only_in_a = df_a.subtract(df_b)
+
+# Get items only in B
+only_in_b = df_b.subtract(df_a)
+
+# Combine both
+not_common = only_in_a.union(only_in_b)
+
+**********
+How to get the minimum, 25th percentile, median, 75th, and max of a numeric column
+
+df.summary("min","25%","50%","75%","max")
+
+******************
+
+# Sample data
+data = [("apple",), ("banana",), ("apple",), ("cherry",), ("banana",), ("apple",)]
+df = spark.createDataFrame(data, ["fruit"])
+
+# Get frequency counts
+freq_df = df.groupBy("fruit").count()
+
+***********************************************
+ How to keep only top 2 most frequent values as it is and replace everything else as ‘Other’? 
+
+
+data = [("apple",), ("banana",), ("apple",), ("cherry",), ("banana",), ("apple",), ("grape",), ("kiwi",)]
+df = spark.createDataFrame(data, ["fruit"])
+
+top_n = df.groupBy("fruit") \
+          .count() \
+          .orderBy(col("count").desc()) \
+          .limit(2) \
+          .select("fruit") \
+          .rdd.flatMap(lambda x: x) \
+          .collect()
+
+df_transformed = df.withColumn(
+    "fruit_transformed",
+    when(col("fruit").isin(top_n), col("fruit")).otherwise(lit("Other"))
+)
+
+***********
+
+How to Drop rows with NA values specific to a particular column?
+
+
+df_clean = df.dropna(subset=["price"])
+
+********
+How to rename columns of a PySpark DataFrame using two lists – one containing the old column names and the other containing the new column names?
+ 
+df = spark.createDataFrame([(1, "apple", 10.5)], ["id", "fruit", "price"])
+
+# Old and new column name lists
+old_cols = ["id", "fruit", "price"]
+new_cols = ["product_id", "product_name", "product_price"]
+
+# Rename columns using a loop
+for old, new in zip(old_cols, new_cols):
+    df = df.withColumnRenamed(old, new)
+
+********************************************
+
+df_split = df.withColumn("Hobby", explode(split("Hobbies", ",")))
+
+# Drop the original Hobbies column if not needed
+df_result = df_split.drop("Hobbies")
+
+
+***********
+| city1 | city2 | city3 |
+| ----- | ----- | ----- |
+| Goa   |       | AP    |
+|       | AP    | null  |
+| null  |       | bglr  |
+
+
+df_flattened = df.withColumn("city", explode(array("city1", "city2", "city3")))
+
+# Filter out null and empty string values
+df_result = df_flattened.filter((col("city").isNotNull()) & (col("city") != ""))
+
+# Select only the new column
+df_result.select("city").show()
+
+
++------+
+| city |
++------+
+|  Goa |
+|   AP |
+|   AP |
+| bglr |
++------+
+
+**************************************************************
+from pyspark.sql.functions import col, avg, count, sum, when
+
+# Sample data
+student_data = [(1, "Steve"), (2, "David"), (3, "Aryan")]
+marks_data = [
+    (1, "pyspark", 90),
+    (1, "sql", 100),
+    (2, "sql", 70),
+    (2, "pyspark", 60),
+    (3, "sql", 30),
+    (3, "pyspark", 20)
+]
+
+student_df = spark.createDataFrame(student_data, ["Student_id", "Student_name"])
+marks_df = spark.createDataFrame(marks_data, ["Student_id", "Subject_Name", "Marks"])
+
+# Step 1: Calculate percentage
+marks_summary = marks_df.groupBy("Student_id").agg(
+    (sum("Marks") / count("Subject_Name")).alias("Percentage")
+)
+
+# Step 2: Join with student info
+result_df = student_df.join(marks_summary, "Student_id")
+
+# Step 3: Assign result based on percentage
+result_df = result_df.withColumn(
+    "Result",
+    when(col("Percentage") >= 70, "Distinction")
+    .when((col("Percentage") >= 60) & (col("Percentage") < 70), "First Class")
+    .when((col("Percentage") >= 50) & (col("Percentage") < 60), "Second Class")
+    .when((col("Percentage") >= 40) & (col("Percentage") < 50), "Third Class")
+    .otherwise("Fail")
+)
+
+result_df.show()
+***************************************
