@@ -176,4 +176,36 @@ ADLS Gen2 Blob + Hadoop APIs support karta hai, lekin older tools ya legacy syst
 “ADLS Gen2 is great for enterprise data lakes, but you must plan for metadata cataloging, avoid small file problems, manage ACL complexity, implement cost governance with tiering,
 check regional feature availability, and ensure tool compatibility. With proper governance and architecture, these limitations can be minimized
 ___________________________________________________________________________________________________________________
-11)
+Strategies to Optimize Performance in a Petabyte-Scale Data Lake
+1️⃣ **Partitioning & Folder Structure** –
+Data ko ek hi jagah dump karne ke bajay, usse logically partition karo. Jaise:
+`/year/month/day/` ya `/region/customer/`.
+Isse query sirf relevant partition scan karegi, pura data nahi. Result – faster queries aur cost saving.
+
+2️⃣ **Optimized File Format (Parquet/Delta)** –
+
+* **Parquet** ek columnar format hai jo sirf required columns read karta hai, pura row nahi.
+* **Delta Lake** Parquet ke upar hai, aur extra features deta hai jaise **ACID transactions, schema evolution, aur data versioning**.
+
+3️⃣ **Avoid Small Files** –
+Agar data lake mein hazaaron chhote chhote files hain, toh har read operation mein overhead badh jata hai.
+Solution: Azure Data Factory ya Databricks se chhote files ko **compact karke 100MB–1GB** ke files banao.
+
+4️⃣ **Caching** –
+Frequently used tables ya intermediate data ko cache karo. Jaise Databricks mein cache karne se bar-bar lake se read nahi karna padta.
+
+5️⃣ **Hierarchical Namespace (ADLS Gen2 Feature)** –
+Ye directory-level operations (move, rename) ko fast banata hai aur atomic banata hai. Matlab file system ka performance improve hota hai.
+
+6️⃣ **Monitoring & Tuning** –
+Azure Monitor ya Log Analytics use karke query logs analyze karo. Dekho kaunse queries slow hain, kitna data scan ho raha hai, bottleneck kahan hai. Uske hisaab se data layout aur queries optimize karo.
+
+7️⃣ **Curated Data Layers** –
+Sabko raw data access mat do. Cleaned, aggregated aur curated datasets provide karo. Isse unnecessary scans avoid honge aur cost bhi kam hogi.
+
+--
+🎤 **Interview line (ready to speak):**
+*"To optimize a petabyte-scale data lake, I would focus on partitioning, using Parquet or Delta formats, compacting small files, leveraging caching and ADLS Gen2 features, monitoring performance, and providing curated datasets. This ensures both query performance and cost efficiency."*
+
+___________________________________________________________________________________________---
+
