@@ -28,4 +28,6 @@ Isse performance aur cost dono optimize hote hain aur mujhe manually monitor kar
 Interview Line:
 "Auto-scaling ka matlab hai ki Databricks cluster automatically workload ke hisaab se nodes increase ya decrease karega.
 Ye feature overprovisioning aur underprovisioning dono se bachata hai aur cost aur performance ko optimize karta hai."
+______________________________________________________________
+
 
