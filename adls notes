@@ -208,4 +208,5 @@ Sabko raw data access mat do. Cleaned, aggregated aur curated datasets provide k
 *"To optimize a petabyte-scale data lake, I would focus on partitioning, using Parquet or Delta formats, compacting small files, leveraging caching and ADLS Gen2 features, monitoring performance, and providing curated datasets. This ensures both query performance and cost efficiency."*
 
 ___________________________________________________________________________________________---
+12)
 
