@@ -208,5 +208,96 @@ Sabko raw data access mat do. Cleaned, aggregated aur curated datasets provide k
 *"To optimize a petabyte-scale data lake, I would focus on partitioning, using Parquet or Delta formats, compacting small files, leveraging caching and ADLS Gen2 features, monitoring performance, and providing curated datasets. This ensures both query performance and cost efficiency."*
 
 ___________________________________________________________________________________________---
-12)
+12)Scenario: You need to monitor storage capacity trends and forecast usage in ADLS. 
+What tools and metrics would you use?
+Aapko ADLS (Azure Data Lake Storage) ka storage usage monitor karna hai aur future usage forecast karna hai. Uske liye aapko mainly ye tools aur metrics use karne honge:
+🔧 Tools
+Azure Monitor – Ye aapko built-in metrics deta hai (jaise storage use kitna ho raha hai, kitna data aa raha hai/jaa raha hai, transactions, errors).
+Azure Cost Management & Billing – Ye aapko usage ka cost trend aur forecasting dikhata hai. Budget set kar sakte ho aur alerts bhi milte hain.
+Log Analytics + KQL Queries – Agar detailed analysis chahiye toh diagnostic settings se ADLS ko Log Analytics se connect karke custom queries aur dashboards bana sakte ho.
+Power BI – Agar visualization aur reporting detailed chahiye toh Power BI connect karke achhe dashboards bana sakte ho.
+📊 Important Metrics
+Used Capacity – Abhi kitna data ADLS mein store hai. (total space usage)
+Ingress / Egress – Kitna data read aur write ho raha hai (data in/out).
+Transaction Count – Kitni baar access ho raha hai data.
+Success / Failure Rate – Requests sahi chal rahe hain ya error aa rahe hain.
+⚡ Steps
+Azure Monitor enable karo → storage metrics dekhne ke liye.
+Alerts set karo → jaise agar storage usage 80% cross kare toh turant notification mile.
+Metrics Explorer use karo → historical data dekhne ke liye (monthly ya weekly growth patterns).
+Cost Management use karo → usage trend aur budget forecast ke liye.
+Advanced logging (optional) → Storage Analytics ya Log Analytics enable karke aur detailed analysis kar sakte ho.
+____________________________________________________________________
+13)
+Scenario: You want to apply transformations on incoming data (e.g., cleansing, masking) before writing to ADLS. How would you architect this using Azure services
+apko data ko ADLS me store karne se pehle uspar kuch transformations (jaise cleansing ya masking) lagani hain. Uske liye aap 3 main Azure services use kar sakte ho – Azure Data Factory (ADF), Azure Stream Analytics (ASA), aur Azure Databricks.
 
+1. Batch Data (file ya DB se aane wala data) – Use Azure Data Factory
+Ingestion: ADF ka Copy Activity use karke data source (SQL DB, API, file, etc.) se data pull kar lo.
+Transformation: ADF ka Mapping Data Flow use karke cleansing aur masking lagao.
+Example:
+Null records remove karna
+Formatting fix karna
+Sensitive data mask karna → maskFirstN(customerName, 3)
+Sink: Transform hua data ADLS me write kar do in Parquet/CSV format.
+2. Streaming Data (real-time, jaise IoT devices, Event Hub se data) – Use Azure Stream Analytics
+Input: Data aayega Event Hub / IoT Hub se.
+Transformation: SQL jaise queries likh kar transformation + masking apply kar sakte ho.
+Example:
+SELECT 
+  deviceId, 
+  temperature, 
+  '****' AS customerId 
+INTO 
+  [ADLSOutput] 
+FROM 
+  [EventHubInput]
+Output: Transformed data directly ADLS me store ho jayega.
+3. Complex / Heavy Transformations (large datasets ya ML logic ke liye) – Use Azure Databricks
+Read Data: Spark ka use karke data read karo from source.
+Apply Transformations: PySpark ya Scala me custom logic likho.
+Example:
+df = df.withColumn("masked_email", regexp_replace("email", ".*@", "xxx@"))
+Write Data: Final output ko ADLS me write kar do (Parquet/CSV/Delta format).
+______________________________________________________________________________________________________
+
+2)You are working on a multi-region architecture where data needs to be replicated across geographies using ADLS. How would you approach this and ensure consistency
+
+1)Quick passive option — use Azure’s built-in geo-replication
+Use: GRS (Geo-Redundant Storage) ya GZRS/RA-GZRS (Geo-Zone-Redundant / Read-Access).
+Kya hota hai: Azure automatically primary region se secondary region mein block-level copy bana deta hai.
+When to choose: Jab aapko passive DR chahiye (failover only) aur active-active access nahi chahiye.
+Limitations: Control kam hota hai — replication zaroori hai par aap file-level workflows ya custom conflict resolution control nahi kar paoge.
+
+2) Active / Controlled replication — custom solution (recommended for active-active or selective control)
+Use Azure Data Factory (ADF) / Synapse Pipelines / Databricks to move & validate data between region ADLS accounts.
+Flow (high level):
+Per-region ADLS accounts — har region ka apna ADLS account.
+Ingestion / Trigger: ADF pipeline ko schedule ya event (Event Grid / Storage events) se trigger karo.
+Incremental detection:
+Use LastModified filter in ADF OR
+Maintain a watermark (metadata table) jisme last replicated timestamp/file list ho.
+Copy activity: ADF Copy activity se only changed/new files copy karo.
+Validate checksum: Source pe MD5/CRC nikal kar target file ka checksum compare karo — mismatch aaye to retry/alert.
+Metadata tracking: Ek tracking store banao (Azure SQL / Cosmos / Delta table) jisme replication status, version, checksum, timestamp store ho.
+Retries & DLQ: Failed copies ke liye retry policy + dead-letter queue (logs) rakho.
+Versioning: Agar overwrite avoid karna ho to folder path me yyyyMMddHHmmss ya version=<n> include karo.
+
+3)
+Ensuring consistency (details)
+File-level checksums: Source me MD5/ETag store karo; after copy validate target MD5.
+Atomic rename pattern: Write temp file first (e.g., .inprogress), verify checksum, phir rename to final name — consumers read only final names.
+Idempotency: Pipelines should be idempotent — same file dobara run karein to duplicate na bane. Use file name + checksum to detect duplicates.
+Conflict resolution (active-active):
+Use last-writer-wins with synchronized clocks (use UTC and NTP).
+Ya merge strategy — keep both versions with region tag and resolve at application layer.
+Consistency model note: ADLS / Blob replication may be eventually consistent for some geo scenarios — plan so that your application tolerates eventual consistency or use controlled copying for stronger guarantees.
+4) Performance & cost optimizations
+Incremental copy only (watermarks) to save egress and time.
+Compression / Parquet / Delta format to reduce size.
+Parallel copy in ADF and tune DPU / throughput.
+Avoid frequent small files — aggregate into larger files for efficient transfer.
+______________________________________________________________________________________________________________________________________________________________________
+
+
+_
