@@ -12,3 +12,20 @@ Aur ye easily integrate hota hai Azure ke aur services ke sath, jaise Azure Data
 ✔ Security & Integration: Azure ki security (RBAC, VNet, Managed Identity) use karta hai aur Azure Data Lake, Blob Storage, Synapse, Power BI ke sath seamlessly connect hota hai.
 ✔ Multiple Languages Support: Python, SQL, Scala, R sabhi supported hote hain.
 __________________________________________________________________________________
+Why is it necessary for us to use the DBU Framework?
+DBU ka matlab hai Databricks Unit – ye basically ek billing unit hai jo batata hai ki aap Databricks resources kitna use kar rahe ho per hour. Har workload (jaise standard, premium, ya jobs) alag-alag rate pe DBU consume karta hai, cluster type aur size ke hisaab se.
+DBU framework ka main fayda hai ki ye aapko cost transparency aur control deta hai. Matlab aap easily estimate kar sakte ho ki ek job chalane pe kitna kharcha aayega. Isse budgeting aur planning easy ho jati hai.
+Aur ek important baat ye hai ki DBU cost aur VM cost alag hoti hai. Matlab aap easily track kar sakte ho ki actual compute (VM) pe kitna kharch ho raha hai aur Databricks services ke liye kitna. Ye separation cost optimization ke liye bahut useful hai.
+Interview Line:
+"DBU framework hume cost transparency aur flexibility deta hai. Iske through hum job ka cost pehle se estimate kar sakte hain, aur kyunki DBU usage VM cost se separate hota hai,
+isse compute aur Databricks services ke kharche ko alag track karke optimize kar paate hain."
+
+_____________________________________________________________
+Auto-scaling ka matlab hai ki Databricks cluster automatically apne nodes ko workload ke hisaab se increase ya decrease karega.
+Agar job heavy hai to extra worker nodes add ho jayenge taaki workload fast process ho. Agar load kam hai to extra nodes remove ho jayenge taaki unnecessary cost na lage.
+Example: Agar maine cluster set kiya hai 2 se 8 nodes ke beech me, to initially wo 2 nodes se start karega. Agar workload zyada ho gaya to wo 6 ya 8 tak scale up karega, aur jab load kam hoga to automatically 2 par aa jayega.
+Isse performance aur cost dono optimize hote hain aur mujhe manually monitor karna nahi padta.
+Interview Line:
+"Auto-scaling ka matlab hai ki Databricks cluster automatically workload ke hisaab se nodes increase ya decrease karega.
+Ye feature overprovisioning aur underprovisioning dono se bachata hai aur cost aur performance ko optimize karta hai."
+
