@@ -1,0 +1,13 @@
+What is Azure Databricks? (HinEnglish Explanation)
+Azure Databricks ek cloud-based data platform hai jo Apache Spark par bana hai aur Microsoft Azure ke sath fully integrated hai. Ye mainly use hota hai big data analytics, data engineering, aur machine learning ke liye.
+Isme aapko ek collaborative environment milta hai jaha aap Python, SQL, Scala, ya R me code likh kar large data process kar sakte ho. Spark ki wajah se data multiple machines par distribute hota hai aur processing bahut fast hoti hai.
+Sabse badi baat ye hai ki Azure Databricks aapko infrastructure manage karne ki tension nahi deta – setup, configuration, scaling sab automatically hota hai. Aap sirf data pipeline aur ML model pe focus kar sakte ho.
+Aur ye easily integrate hota hai Azure ke aur services ke sath, jaise Azure Data Lake, Azure Synapse, Azure Machine Learning, Power BI, etc. Matlab ek end-to-end data solution bana sakte ho.
+🔹 Interview Line:
+"Azure Databricks ek cloud-based platform hai jo Apache Spark par built hai. Ye hume ek collaborative environment deta hai jaha hum large-scale data processing aur ML kar sakte hain bina infrastructure manage ki tension ke, aur ye easily integrate hota hai Azure ke dusre services ke sath."
+2. Advantages of Azure Databricks (HinEnglish Explanation)
+✔ Fast Processing: Spark-based hone ki wajah se ye huge data ko parallel machines me process karta hai, isliye processing fast hoti hai.
+✔ Scalability: Workload ke hisaab se automatically scale up/down ho jata hai – cost aur performance dono optimized rehte hain.
+✔ Easy Collaboration: Interactive notebooks hote hain jaha data engineers, data scientists, aur analysts ek hi workspace me milke kaam kar sakte hain.
+✔ Security & Integration: Azure ki security (RBAC, VNet, Managed Identity) use karta hai aur Azure Data Lake, Blob Storage, Synapse, Power BI ke sath seamlessly connect hota hai.
+✔ Multiple Languages Support: Python, SQL, Scala, R sabhi supported hote hain.
