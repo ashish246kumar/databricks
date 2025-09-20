@@ -61,3 +61,15 @@ ______________________________
 how is data stored (sql server, aws)
 what are the integration capability (api , kafka , file extract)
 
+extract and load
+_______________________
+incremental and full load
+data scope and historical needs
+what is the expacted size of the data extract 
+are there any volume limitations
+how to avoid impacting the source system proformance
+authentication and authorization
+
+
+
+
