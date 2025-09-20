@@ -1,0 +1,6 @@
+Transformation----->data enrichment,data integration,derived column, data normalization and standardziation, bushiness rule and logic and data aggregations
+data cleaning-------->removes duplicates,outlier detection, data filtering,data type casting,handling unwanted space, handling invalid values,handling missing data,data filtering
+extract technique--------> manual data extraction, database querying,file parsing, api calls, event based straming, cdc , web scraping
+load----->processing types------>batch pprocessing, straming process
+load----->full load and incremental load
+full load-------->truncate and inseert ,  upsert,  drop create and insert
