@@ -7,4 +7,28 @@ full load-------->truncate and inseert ,  upsert,  drop create and insert
 incremental load----------->upsert, append and merge
 slowly changing dimension--------->scd0 (no historization), scd1 (overwrite)  , scd2 (historization) 
 data architecture-----> data warehouse, data lake, data lakehouse, data mesh
+Bronze laayer------->Raw, unprocessed data as is from sources ,  
+      objective------------->tracedulity and debugging
+      object type---------------------->tables
+     data transformation------------------>none
+    data modeling-------------->none
+   target audience------------> data engineer
 
+
+Silver laayer------->clean and standarize data  
+objective------------->prepare data for analysis
+object type------------------>tables
+data transformation------------------>data cleaning, data standardziation,data normalization, derived columns and data enrichment
+data modeling-------------->none
+target audience------------> data engineer, data analyst
+
+
+
+Gold laayer------->bushiness ready data  
+objective--------->provide data to be consumed  for reporting and analytics
+object type----------------->views
+data transformation------------>data integration , data aggregation , bushiness logic and rules
+data modeling-------------->start schema , aggregated objects and flat tables
+target audience------------> data analyst and bushines users
+
+naming convention---------> <source system>_<entity>
