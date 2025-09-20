@@ -4,3 +4,7 @@ extract technique--------> manual data extraction, database querying,file parsin
 load----->processing types------>batch pprocessing, straming process
 load----->full load and incremental load
 full load-------->truncate and inseert ,  upsert,  drop create and insert
+incremental load----------->upsert, append and merge
+slowly changing dimension--------->scd0 (no historization), scd1 (overwrite)  , scd2 (historization) 
+data architecture-----> data warehouse, data lake, data lakehouse, data mesh
+
