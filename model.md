@@ -18,4 +18,11 @@ problem we are going to face whhen i am going to bushiness key as surogate key
 suppose when two comapny merge then bushinekkey key can not be used as primary key because here in dmart bushiness key is made from 2 letter of name and reliance it is 4 letter
 
 <br>
+<img width="470" height="344" alt="5" src="https://github.com/user-attachments/assets/82809c35-3381-49d0-9d3f-fcf99a0c01ec" />
+<br>
+<img width="440" height="205" alt="6" src="https://github.com/user-attachments/assets/9175f7e7-55e7-400d-8883-cfa75a75ef67" />
+<br>
+<img width="525" height="212" alt="7" src="https://github.com/user-attachments/assets/d0c696ae-bbc2-4d2b-9992-7865f13cbb41" />
+<br>
+
 
