@@ -25,4 +25,11 @@ suppose when two comapny merge then bushinekkey key can not be used as primary k
 <img width="525" height="212" alt="7" src="https://github.com/user-attachments/assets/d0c696ae-bbc2-4d2b-9992-7865f13cbb41" />
 <br>
 
+dimension  table mostly not chsnge frequently with time
+<img width="421" height="206" alt="9" src="https://github.com/user-attachments/assets/06f09872-b8bc-4630-916b-b19f8202322a" />
+
+<br>
+<img width="581" height="287" alt="10" src="https://github.com/user-attachments/assets/d7703937-b67c-41a1-92d9-8193ce0d2332" />
+scd2
+
 
