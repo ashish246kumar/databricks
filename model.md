@@ -15,4 +15,8 @@ problem we are going to face whhen i am going to bushiness key as surogate key
 
 <img width="485" height="289" alt="4" src="https://github.com/user-attachments/assets/a9380e40-a1af-4e66-b1cb-3ed5e3826092" />
 <br>
-suppose when two comapny merge then bushinekkey key can used as primary key because when 
+suppose when two comapny merge then bushinekkey key can not be used as primary key because here in dmart bushiness key is made from 2 letter of product and reliance it is 4 letter
+
+<br>
+
+
