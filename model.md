@@ -19,4 +19,3 @@ suppose when two comapny merge then bushinekkey key can not be used as primary k
 
 <br>
 
-
