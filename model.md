@@ -5,7 +5,7 @@
 
 
 <img width="433" height="251" alt="2" src="https://github.com/user-attachments/assets/5605ea88-6461-4c8d-98d2-adc9e38412a8" />
-
+<br>
 Bushiness key or natural key (how it is made (sug4025--->sug indicate suger    40------> indicate per kg price and    25 ------>indicate expiry)
 
 
@@ -14,4 +14,5 @@ problem we are going to face whhen i am going to bushiness key as surogate key
 
 
 <img width="485" height="289" alt="4" src="https://github.com/user-attachments/assets/a9380e40-a1af-4e66-b1cb-3ed5e3826092" />
+<br>
 suppose when two comapny merge then bushinekkey key can used as primary key because when 
