@@ -31,7 +31,7 @@ dimension  table mostly not chsnge frequently with time
 <br>
 <img width="581" height="287" alt="10" src="https://github.com/user-attachments/assets/d7703937-b67c-41a1-92d9-8193ce0d2332" />
 scd2
-
+<br>
 <img width="355" height="276" alt="11" src="https://github.com/user-attachments/assets/d1e04ec4-4caa-4729-bb99-d358f2c3cdec" />
 
 
