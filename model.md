@@ -11,7 +11,7 @@ Bushiness key or natural key (how it is made (sug4025--->sug indicate suger    4
 
 <img width="466" height="300" alt="3" src="https://github.com/user-attachments/assets/21b78a33-304c-4df5-a8f0-76d70b2a1075" />
 problem we are going to face whhen i am going to bushiness key as surogate key
-
+<br>
 
 <img width="485" height="289" alt="4" src="https://github.com/user-attachments/assets/a9380e40-a1af-4e66-b1cb-3ed5e3826092" />
 <br>
