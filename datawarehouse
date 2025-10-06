@@ -1,0 +1,95 @@
+Data Warehouse (DW) — ek central storage hota hai jahan company ka saara data ek jagah rakha jata hai, taaki usko analyze karke better business decisions liye ja sake.
+
+Main points yaad rakhne ke liye (Inmon’s rules):
+
+🧩 Integrated – Different sources ka data ek saath.
+
+📚 Subject-oriented – Topic-wise data (like Sales, Customer).
+
+⏳ Time-variant – Old + New data dono (for trend analysis).
+
+🧱 Non-volatile – Data stable hota hai; change nahi hota analysis ke time.
+
+Use: Fast reporting, analysis, aur decision-making ke liye.
+Data: Copy hota hai (move nahi hota) from source systems
+_______________________________________________________________________________________________________
+  Why Data Warehouse is needed:
+📊 Data-driven decision making:
+– Companies can take better and smarter decisions using real data instead of guess or experience.
+🏬 One-stop data store:
+– It collects data from multiple systems (sales, finance, marketing, etc.) into one place, making it easy to access and analyze.
+🔍 Full business view:
+– Gives a complete picture of company performance — past, present, and future trends.
+🤖 BI & Analytics support:
+– Helps find hidden patterns, trends, and forecasts using Business Intelligence tools.
+
+  Data Warehouse = Central data + Easy access + Better insights + Smart decisions ✅
+  _________________________________________________________________________________________________
+  Data Warehouse vs Data Lake – Quick Study Notes
+🏢 Data Warehouse
+Built on relational databases (like SQL Server, Oracle, IBM DB2).
+Stores structured data in a fixed schema (schema-on-write).
+Used mainly for Business Intelligence (BI), reporting, and analytics.
+Data is cleaned and processed before storage.
+Used by business analysts and executives.
+High performance for SQL queries.
+High data quality (validated and consistent).
+Higher storage cost because data is processed and structured.
+Example tools: 🧰 Snowflake, Redshift, BigQuery.
+
+🌊 Data Lake
+Built on big data platforms (not traditional RDBMS).
+Handles raw data — structured, semi-structured, and unstructured.
+Used for Big Data, Machine Learning (ML), and advanced analytics.
+Data is stored as-is (processed later when needed) → schema-on-read.
+Used by data scientists and engineers.
+Optimized for large-scale data processing (not just SQL).
+Data quality varies (may include raw or dirty data).
+Lower storage cost (raw format, no preprocessing).
+Example tools: ⚙️ Hadoop, Spark, Azure Data Lake.
+
+  _____________________________________________________________________________________________________
+4. Simple End-to-End Data Warehouse Environment 
+
+  A Data Warehouse Environment mainly includes:
+Data Sources
+ETL Process (Extract, Transform, Load)
+Data Warehouse
+Data Marts
+End Users / BI Tools
+Process Flow:
+
+1. Data Sources (Suppliers):
+– Data comes from different systems (CRM, ERP, flat files, APIs, etc.).
+– These act like suppliers providing raw data.
+
+2. ETL Process (Middleman):
+– E (Extract): Get data from multiple sources.
+– T (Transform): Clean, filter, and convert into a standard format.
+– L (Load): Store the processed data into the data warehouse.
+🧠 ETL = Bridge between data sources and data warehouse.
+
+3. Data Warehouse (Wholesaler):
+– Central storage that collects all the transformed data.
+– Provides a single, organized, historical view of company data.
+
+4. Data Marts (Retailers):
+– Smaller sections of the data warehouse, focused on specific business domains (like Sales, HR, Finance).
+– Users access these data marts for analysis and reporting.
+
+  Types of Data Marts:
+
+Dependent Data Mart:
+– Gets data from the central data warehouse (already processed).
+
+Independent Data Mart:
+– Gets data directly from external sources (without depending on a warehouse).
+
+Hybrid Data Mart:
+– Uses data from both warehouse and external sources
+  __________________________________________________
+
+  
+
+
+  
