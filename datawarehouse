@@ -193,6 +193,37 @@ advantage of data waarehouse
 | **5️⃣ Improves Data Security**                     | Data warehouses come with **strong security controls** to protect sensitive business and customer information.                                       | Reduces the risk of data breaches or unauthorized access.              |
 
 __________________________________________________________________________________
+oltp vs olap
+
+| **Feature**           | **OLTP (Online Transaction Processing)**                                   | **OLAP (Online Analytical Processing)**                                 |
+| --------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Purpose**           | Handles **real-time operational transactions** like orders, payments, etc. | Supports **complex analytics and reporting** like trends and forecasts. |
+| **Data Type**         | **Current, detailed, and frequently updated** (short-term).                | **Historical, aggregated, and read-only** (long-term).                  |
+| **Database Design**   | **Normalized (3NF)** to reduce redundancy.                                 | **Denormalized (Star/Snowflake schema)** for faster query performance.  |
+| **Query Complexity**  | **Simple and frequent** (INSERT, UPDATE, DELETE).                          | **Complex and read-heavy** (multi-table joins, aggregations).           |
+| **Performance Focus** | Optimized for **fast writes** and **low-latency transactions**.            | Optimized for **fast reads** and **large dataset analysis**.            |
+| **User Base**         | **Operational users** – cashiers, clerks, front-line staff.                | **Analytical users** – analysts, executives, data scientists.           |
+| **Example Systems**   | POS systems, banking, e-commerce order systems.                            | Data warehouses, BI tools (Power BI, Tableau, dashboards).              |
+| **Backup Needs**      | **Frequent backups** – live data changes constantly.                       | **Less frequent backups** – data is mostly historical.                  |
+| **Storage Size**      | **Smaller** – stores current operational data only.                        | **Larger** – stores years of historical data.                           |
+
+_______________________________________________________________________________________
+19. Data Warehousing Storage Layouts: Row vs. Column vs. Hybrid Stores 
+(example see from notes)
+
+
+| **Feature**              | **Row-Store (Row-Oriented)**                                                  | **Column-Store (Column-Oriented)**                                                    | **Hybrid Store (Row + Column)**                                    |
+| ------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **How It Works**         | Stores data **row by row** — all columns of a record are stored together.     | Stores data **column by column** — all values of a single column are stored together. | Combines **row and column storage** in a single system.            |
+| **Optimized For**        | **OLTP (Transactional systems)**                                              | **OLAP (Analytical systems)**                                                         | **Mixed workloads** (both OLTP + OLAP).                            |
+| **Performance Strength** | Fast for **INSERT, UPDATE, DELETE** and retrieving full rows.                 | Fast for **aggregations and analytical queries** on few columns.                      | Balances both **transaction and analytics** performance.           |
+| **Weakness**             | Slow for analytical queries (scans full rows even if few columns are needed). | Slow for transactional updates (updating one record rewrites multiple columns).       | More **complex** and **higher storage overhead**.                  |
+| **Compression**          | Poor compression (redundant column data).                                     | Excellent compression (similar column data compresses well).                          | Moderate — depends on system implementation.                       |
+| **When to Use**          | Transaction-heavy systems (e.g., banking, e-commerce).                        | Data warehousing, reporting, analytics.                                               | Systems needing **real-time analytics** on transactional data.     |
+| **Example Systems**      | MySQL, PostgreSQL, Oracle (row format).                                       | Snowflake, Amazon Redshift, Google BigQuery.                                          | SQL Server (with Columnstore Indexes), Oracle In-Memory, SAP HANA. |
+| **Example Query Type**   | `SELECT * FROM customers WHERE id=100;`                                       | `SELECT SUM(revenue) FROM sales;`                                                     | Both transactional + analytical queries together.                  |
+___________________________________________________________________________________
+
 
 
 
