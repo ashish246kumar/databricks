@@ -161,6 +161,7 @@ Database: Data is continuously updated in real time by users or applications
 
 _____
 _____________________________________________________________________________________________________________________
+types of data ware house
 
 | **Type of Data Warehouse**              | **Description (Easy Explanation)**                                                                                                          | **Key Points / Use Case**                                                                                                                                                                                             |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -223,6 +224,59 @@ ________________________________________________________________________________
 | **Example Systems**      | MySQL, PostgreSQL, Oracle (row format).                                       | Snowflake, Amazon Redshift, Google BigQuery.                                          | SQL Server (with Columnstore Indexes), Oracle In-Memory, SAP HANA. |
 | **Example Query Type**   | `SELECT * FROM customers WHERE id=100;`                                       | `SELECT SUM(revenue) FROM sales;`                                                     | Both transactional + analytical queries together.                  |
 ___________________________________________________________________________________
+ETL VS ELT
+
+| **Feature**                 | **ETL (Extract, Transform, Load)**                            | **ELT (Extract, Load, Transform)**                                  |
+| --------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Processing Order**        | Data is transformed **before** loading into the target system | Data is loaded **first**, then transformed inside the target system |
+| **Transformation Location** | Happens in a **separate ETL engine/tool**                     | Happens **within the target database** (like Snowflake, BigQuery)   |
+| **Data Volume Handling**    | Suitable for **small to medium datasets**                     | Ideal for **large-scale or big data**                               |
+| **Flexibility**             | Follows **schema-on-write** (structure fixed before loading)  | Follows **schema-on-read** (structure applied when querying)        |
+| **Implementation**          | Requires a **staging area** for transformations               | **No staging area** needed                                          |
+| **Latency**                 | **Higher latency**, as data is processed before loading       | **Lower latency**, as raw data loads quickly                        |
+| **Cost**                    | **Higher**, needs separate ETL infrastructure                 | **Lower**, uses target system’s compute power                       |
+| **Use Cases**               | Traditional **data warehousing**                              | Modern **data lakes** and **cloud data platforms**                  |
+| **Common Tools**            | Informatica, SSIS, Talend                                     | Snowflake, BigQuery, Databricks                                     |
+|                                      |
+______________________________
+FULL LOAD VS UPSET VS INCREMENTAL LOAD
+
+
+| **Feature**                | **Full Load**                                                                          | **Upsert (Merge Load)**                                                                                                   | **Incremental (Delta) Load**                                                                         |
+| -------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Definition**             | Replaces **all existing data** in the target with fresh data from the source           | **Updates** existing records and **inserts** new ones                                                                     | Loads **only new or changed** records since last load                                                |
+| **How It Works**           | 1. Truncate target table <br> 2. Load all source data                                  | 1. Compare source & target on key <br> 2. Update matches <br> 3. Insert non-matches                                       | 1. Identify changes via timestamp, CDC, or logs <br> 2. Load only delta records                      |
+| **Data Volume Processed**  | Processes **all data** every time                                                      | Processes **changed + new** data                                                                                          | Processes **only new/changed** data                                                                  |
+| **Performance**            | ⏳ **Slowest** (full reload each time)                                                  | ⚖️ **Moderate**                                                                                                           | ⚡ **Fastest** (minimal data movement)                                                                |
+| **Complexity**             | 🟢 Simplest                                                                            | 🟡 Moderate                                                                                                               | 🔴 Most complex                                                                                      |
+| **Storage Impact**         | Replaces entire dataset                                                                | Updates existing + adds new                                                                                               | Adds only incremental changes                                                                        |
+| **Risk Factors**           | Data loss if job fails mid-way                                                         | Logic errors in merge condition                                                                                           | Missed changes if tracking fails                                                                     |
+| **Best For**               | Small/static datasets, initial loads                                                   | Slowly changing dimensions, medium data                                                                                   | Large/dynamic datasets, frequent loads                                                               |
+| **Change Tracking Needed** | ❌ No                                                                                   | ✅ Yes (keys)                                                                                                              | ✅ Yes (timestamp, CDC, logs)                                                                         |
+| **Example SQL**            | `TRUNCATE TABLE customers;`<br>`INSERT INTO customers SELECT * FROM source_customers;` | `MERGE INTO customers USING source_customers ON id=src.id WHEN MATCHED THEN UPDATE ... WHEN NOT MATCHED THEN INSERT ...;` | `INSERT INTO sales SELECT * FROM source_sales WHERE sale_date > (SELECT MAX(sale_date) FROM sales);` |
+
+_____________________________________
+
+advantages of cloud
+
+| **Feature**                          | **Explanation**                                                                                                                        | **Interview Tip**                                                  |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **1. Low Total Cost of Ownership**   | Cloud warehouses eliminate the need for costly on-premises hardware, upgrades, and maintenance. You pay only for what you use.         | “It reduces capital expenditure and simplifies scaling.”           |
+| **2. High Performance & Speed**      | Easily integrates with new data sources and scales on demand. Optimized infrastructure delivers faster queries and better performance. | “Cloud warehouses handle large data volumes efficiently.”          |
+| **3. Enhanced Security**             | Cloud providers implement strong security like encryption, access control, and MFA to protect data during storage and transfer.        | “Security is continuously updated by expert cloud teams.”          |
+| **4. Improved Disaster Recovery**    | Cloud systems automatically back up and replicate data across multiple regions/nodes, ensuring data availability during failures.      | “No physical recovery setup — recovery is instant and automated.”  |
+| **5. Scalability & Flexibility**     | Compute and storage scale independently based on need. Ideal for varying workloads.                                                    | “You can scale up during peak demand and scale down to save cost.” |
+
+
+_________________________________________________________________
+
+
+| **Architecture Type**        | **Description**                                                                                                                                                             | **Layers / Components**                                                                                                                                                                       | **Advantages**                                                                                         | **Disadvantages / Limitations**                                                       | **Use Case**                                              |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Single-Tier Architecture** | Aims to minimize data storage by eliminating redundant data. Combines all components (data source, storage, and presentation) into a single layer. Rarely used in practice. | Single hardware and software layer                                                                                                                                                            | • Simplifies system design <br> • Reduces data redundancy                                              | • Poor performance <br> • Not scalable <br> • Difficult for analytics                 | Mostly theoretical — not used in real-world systems       |
+| **Two-Tier Architecture**    | Separates data warehouse (server) and client (presentation) layers. Client directly interacts with the data warehouse for analysis and reporting.                           | 1️⃣ Data Warehouse (Database Server) <br> 2️⃣ Client Layer (OLAP / Reporting Tools)                                                                                                           | • Faster data access <br> • Simple architecture <br> • Easy to implement                               | • Limited scalability <br> • High network load <br> • Poor performance for many users | Small or medium organizations with moderate data          |
+| **Three-Tier Architecture**  | Most common and modern architecture. Adds a middle **OLAP / Application Layer** between client and database for efficient processing.                                       | 1️⃣ **Bottom Tier** – Data Warehouse Database (ETL + Storage) <br> 2️⃣ **Middle Tier** – OLAP Server (ROLAP / MOLAP) <br> 3️⃣ **Top Tier** – Front-End Tools (Reports, Dashboards, Analytics) | • Highly scalable <br> • Better performance <br> • Supports large data volumes <br> • Easy maintenance | • Slightly complex to design <br> • Higher setup cost                                 | Large enterprises and modern cloud data warehouse systems |
+
 
 
 
