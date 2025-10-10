@@ -1,3 +1,43 @@
+1. What is Azure Databricks and advantages
+
+Azure Databricks is a cloud-based big data and machine learning platform built on Apache Spark and integrated with Microsoft Azure.
+It provides an interactive and collaborative environment where I can use Python, SQL, or Scala to process large datasets efficiently.
+What I like most is that it handles cluster setup and scaling automatically, integrates well with services like Azure Data Lake, Synapse, and Power BI, 
+and provides strong security using Azure’s RBAC.
+For example, I can read raw customer data from Azure Data Lake, clean and transform it in Databricks, train a machine learning model, and then visualize 
+the results in Power BI — all within one environment.
+
+4. Built-in Security and Integration
+  You can connect Databricks securely to:
+Azure Data Lake (for raw data)
+Azure Key Vault (for secrets)
+
+Azure Synapse (for analytics)
+without exposing passwords or tokens.
+
+5. Supports Multiple Languages
+6. Job Orchestration
+Why: You can schedule, monitor, and automate data workflows directly in Databricks
+
+
+___________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+___________________________________________________________________________________________________________________________________
+
 Data lake ek digital talab hai, jahan saara data – raw, kaccha-pakka, structured, unstructured – store hota hai
 Kaise Kaam Karta Hai?
 Alag-alag sources se data aata hai (website, apps, sensors, social media), aur jaisa hai waisa hi dump ho jata hai.
