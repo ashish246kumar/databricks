@@ -1,5 +1,65 @@
 
 
+___________________________________________________________________________________________________________________________
+Autoloader
+
+Auto Loader is a Databricks feature that simplifies incremental, scalable, and schema-aware ingestion of new data files from cloud storage like ADLS or S3. It supports both streaming and batch workloads
+File detection: Automatically monitors a cloud directory for new files.
+Schema inference & evolution: Detects the structure of incoming data and adapts to changes.
+Streaming support: Works with Spark Structured Streaming to process files in real-time as they arrive.
+Checkpointing: Tracks processed files so data isn’t ingested twice.
+
+File detection: Automatically monitors a cloud directory for new files.
+Schema inference & evolution: Detects the structure of incoming data and adapts to changes.
+Streaming support: Works with Spark Structured Streaming to process files in real-time as they arrive.
+Batch-like behavior: Can run in trigger once mode to process all available data and then stop.
+Checkpointing: Tracks processed files so data isn’t ingested twice
+
+__________________________________________________________________________________________________
+
+coalesce() reduces partitions without shuffle, making it fast and efficient for writing data. repartition() can increase or decrease partitions, but triggers a full shuffle to evenly distribute data. The drawback of coalesce() is that it can create uneven partitions, cause skew, or underutilize cluster resources if used excessively
+
+coalesce() — Merging Buckets Without Moving Water Too Much
+You want fewer buckets (e.g., 4 buckets instead of 10).
+You merge adjacent buckets: pour some water from one bucket into a nearby bucket.
+No shaking or redistributing water across all buckets.
+✅ Fast and efficient
+⚠ But some buckets may end up bigger than others → uneven workload
+
+
+repartition() — Shuffling Water Across All Buckets
+You want evenly distributed buckets (e.g., 4 buckets from 10).
+You shake and redistribute water so each bucket has roughly the same amount.
+✅ Balanced workload
+⚠ Slower because all the water (data) moves across buckets
+
+Drawbacks of coalesce():
+Uneven partition sizes — can cause skew and slower tasks.
+Can only reduce partitions — cannot increase partitions reliably.
+Small file problem — too few or too many partitions can affect storage efficiency.
+Potential bottleneck — reducing to very few partitions may hurt parallelism.
+Usage tip:
+“I use coalesce() when I want to shrink partitions quickly and efficiently, like before writing output, and repartition() when I need to balance data across partitions, such as before joins or groupBy operations
+
+
+___________________________________________________________________________
+Out-of-memory (OOM) issues in Spark occur when an executor or driver runs out of available memory, causing tasks to fail or even the application to crash
+
+Too much data in one partition — a single executor tries to process a very large partition.
+Improper caching — caching unnecessary data or forgetting to unpersist.
+Large shuffles — operations like joins, groupBy, or aggregations that move lots of data across nodes.
+
+Resolutions:
+Repartition/coalesce to balance partitions.
+Increase executor or driver memory via spark.executor.memory and spark.driver.memory.
+Use efficient file formats like Parquet or Delta, with column pruning and early filters.
+Avoid .collect() on large datasets; use .show() or .limit() instead.
+Broadcast only small datasets in joins
+________________________________________________________________________
+
+41. What is data skewness and how does it impact Spark performance?
+
+
 Data skewness occurs when data is unevenly distributed across partitions in Spark — for example, during a join or groupBy when certain keys have much more data than others.
 Impact on performance:
 Some tasks process large partitions and take much longer, while others finish quickly.
