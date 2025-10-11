@@ -1,3 +1,23 @@
+
+
+Data skewness occurs when data is unevenly distributed across partitions in Spark — for example, during a join or groupBy when certain keys have much more data than others.
+Impact on performance:
+Some tasks process large partitions and take much longer, while others finish quickly.
+This causes job delays, idle executors, and sometimes out-of-memory errors.
+As a result, Spark loses parallelism and the overall performance drops.
+
+Salting: Add a random suffix to skewed keys to spread them across more partitions.
+from pyspark.sql.functions import col, concat, lit, rand
+df = df.withColumn("salted_key", concat(col("key"), lit("_"), (rand() * 10).cast
+
+Enable Skew Join Optimization:
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+
+Repartition: Repartition on key columns to rebalance data.
+df = df.repartition(10, "key")
+
+
+_____________________________________________________________________________________________________
 What is the name of the platform that enables the execution of Databricks applications
 
 The platform that actually executes Databricks applications is Apache Spark.
@@ -49,10 +69,16 @@ Delta format improves performance through indexing, caching, and ACID capabiliti
 
 Use Efficient File Formats:
 Prefer Parquet or Delta over CSV/JSON for better compression and faster read/write.
+from pyspark.sql.functions import broadcast
+df_joined = large_df.join(broadcast(small_df), "customer_id")
+_______________________________________
+The dataset had too many small partitions, so I optimized it:
+large_df = large_df.repartition(8, "customer_region")
+______________________________________________________
+df_joined.cache()
 
 
-
-__________________________________________________________________________________________
+_____________________________________________________________________________________________________________________________________________________________________
 When referring to Azure Databricks, what exactly does it mean to "auto-scale" a cluster
 
 Auto-scaling in Azure Databricks means that the cluster can automatically increase or decrease the number of worker nodes based on the workload. For example, if I run a heavy job that needs more processing power, Databricks will automatically add more nodes. When the workload reduces, it will remove the extra nodes to save cost.
