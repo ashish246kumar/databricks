@@ -1,3 +1,95 @@
+What is the name of the platform that enables the execution of Databricks applications
+
+The platform that actually executes Databricks applications is Apache Spark.
+Azure Databricks is built on top of Spark, which is a powerful open-source distributed computing engine. 
+Spark processes large amounts of data in parallel across a cluster of machines, which makes it very fast and scalable
+Databricks enhances Spark by adding features like Delta Lake integration, and easy connectivity with Azure services. But underneath all that, Spark is the core engine that executes all the code
+_____________________________________________________________________________
+43. How do you mount Azure Data Lake Storage to Databricks?
+    To connect Azure Data Lake to Databricks, I mount the storage using the dbutils.fs.mount() command. This links ADLS to the Databricks File System (DBFS), making the data available like a local directory
+
+Here's how I usually do it: 
+Get the storage credentials — this includes the storage account name, container name, and authentication details (like service principal credentials or managed identity).
+Use the dbutils.fs.mount() command to mount ADLS to a mount point in DBFS. For example:
+configs = {
+  "fs.azure.account.auth.type": "OAuth",
+  "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+  "fs.azure.account.oauth2.client.id": "<application-id>",
+  "fs.azure.account.oauth2.client.secret": "<application-secret>",
+  "fs.azure.account.oauth2.client.endpoint": "https://login.microsoftonline.com/<tenant-id>/oauth2/token"
+}
+
+dbutils.fs.mount(
+  source = "abfss://<container-name>@<storage-account-name>.dfs.core.windows.net/",
+  mount_point = "/mnt/<mount-name>",
+  extra_configs = configs)
+
+Access the files just like local files, for example:
+spark.read.csv("/mnt/<mount-name>/data.csv")
+
+______________________________________________________
+
+4. What are the various optimization techniques in Spark?
+
+Partitioning Optimization:
+ There are several techniques I use to optimize Spark jobs for better performance and lower resource usage
+   Use repartition() or coalesce() to control the number of partitions, and partition data by key columns to reduce shuffling
+
+Caching and Persistence:
+Cache intermediate DataFrames that are reused and unpersist() them when no longer needed   
+Broadcast Joins:
+Broadcast smaller DataFrames to avoid large shuffles in joins.
+Adaptive Query Execution (AQE):
+Enable AQE (spark.sql.adaptive.enabled=true) so Spark can optimize execution plans at runtime
+
+Filter and select only the required data early on. File formats like Parquet and Delta support this efficiently
+
+Delta Lake Optimization:
+Delta format improves performance through indexing, caching, and ACID capabilities.
+
+Use Efficient File Formats:
+Prefer Parquet or Delta over CSV/JSON for better compression and faster read/write.
+
+
+
+__________________________________________________________________________________________
+When referring to Azure Databricks, what exactly does it mean to "auto-scale" a cluster
+
+Auto-scaling in Azure Databricks means that the cluster can automatically increase or decrease the number of worker nodes based on the workload. For example, if I run a heavy job that needs more processing power, Databricks will automatically add more nodes. When the workload reduces, it will remove the extra nodes to save cost.
+
+So basically, I don’t have to manually adjust the cluster size — Databricks takes care of it for me. This helps improve performance when needed and also keeps costs under control. For instance, if my cluster is set to auto-scale between 2 and 8 workers, it might start with 2, scale up to 8 during peak load, and then go back down to 2 when the job finishes
+
+
+______________________________________________________________________________________________________________
+Why is it necessary for us to use the DBU Framework? D
+
+DBU stands for Databricks Unit. It’s basically a unit that measures the processing power used per hour in Azure Databricks.
+Using the DBU framework is important because it helps track and control the cost of running workloads. 
+Different workloads and cluster types consume different amounts of DBUs, so it gives a clear idea of how much a job will cost before running it.
+It also separates the Databricks cost from the underlying VM cost, which makes budgeting and cost management much easier and more transparent
+
+
+_______________________________________________________________________________________________________
+What is the function of the Databricks filesystem? 
+
+The Databricks File System, or DBFS, is a distributed file system built on top of cloud storage.
+It acts like a bridge between Databricks and the underlying cloud storage, such as Azure Blob Storage.
+For example, I can upload a CSV file to DBFS and read it using a path like /dbfs/FileStore/mydata.csv.
+The main functions of DBFS are:
+Storing input and output data used in Spark jobs or ML models.
+Serving as a temporary workspace for intermediate files.
+____________________________________________________________________
+ What is a delta table in Databricks? 
+ 
+A Delta table is a Databricks table built on Delta Lake. 
+It adds features like ACID transactions, version control, and schema enforcement to data lakes — so I can manage big data with the reliability of a traditional database
+think of it as a smart version of a data lake table that supports both batch and streaming data efficiently.
+
+ACID Transactions: Ensures data consistency even with concurrent reads and writes.
+Schema Evolution: Allows adding or modifying columns easily.
+Efficient Updates & Deletes: Supports SQL operations like UPDATE, DELETE, and MERGE.
+High Performance: Uses indexing and caching for faster queries.
+_______________________________________________________________________________________________________________________________________
 1. What is Azure Databricks and advantages
 
 Azure Databricks is a cloud-based big data and machine learning platform built on Apache Spark and integrated with Microsoft Azure.
