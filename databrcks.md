@@ -1,4 +1,16 @@
+“Delta Live Tables (DLT) in Databricks lets you build automated, reliable ETL pipelines using simple declarative code. It manages table dependencies, incremental processing, data quality checks, and logging, producing production-ready Delta tables that are easier to monitor and maintain
 
+It simplifies ETL by managing table dependencies, orchestration, incremental processing, and data quality checks
+
+Declarative pipeline definition: Use SQL or Python with decorators like @dlt.table to define transformations.
+
+Automatic orchestration: DLT detects dependencies between tables and runs them in the correct order.
+
+Incremental processing & reliability: Handles retries, logging, and incremental data automatically.
+
+Data quality checks: Define expectations to validate data as it flows through the pipeline.
+
+Managed Delta tables & lineage: Automatically creates tables, tracks metadata, and logs lineage for easier monitoring and debugging
 
 ___________________________________________________________________________________________________________________________
 Autoloader
