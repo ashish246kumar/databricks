@@ -1,4 +1,24 @@
 
+__________________________________________________________________________________
+ What is an unmanaged table in Databricks?
+An unmanaged table (also called an external table) is a table where Databricks only manages the metadata, and the actual data lives outside the default Databricks storage — for example, in a mounted ADLS folder or external storage location.
+I usually use unmanaged tables when:
+Data is shared across multiple platforms.
+I want full control over the storage location.
+I don’t want to risk losing data by dropping the table
+Databricks manages only the metadata. Dropping the table doesn’t delete the data.
+
+_____________________________________________________________________________________________________________
+How do you configure the number of cores in a worker in Databricks?
+
+In Databricks, we don’t directly set the number of cores per worker.
+Instead, each worker node comes from a cloud instance type (like Standard_D4s_v3 or i3.xlarge), which has a fixed number of vCPUs (cores) and memory.
+To configure cores per worker, I:
+Go to the cluster configuration page.
+Select the worker node type.
+Pick an instance with the desired number of cores.
+For more parallelism, I can either increase the number of worker nodes or choose larger instances with more cores.
+Additionally, I can tune Spark settings like spark.default.parallelism or spark.sql.shuffle.partitions to control how Spark uses these cores efficiently.
 
 
 ________________________________________________________
