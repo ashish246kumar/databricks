@@ -1,3 +1,105 @@
+
+
+
+________________________________________________________
+How do you handle bad records in Databricks during ingestion?
+
+bad records — for example, corrupted rows, missing fields, or data type mismatche
+Using badRecordsPath:
+spark.read.option("badRecordsPath", "/mnt/errorRecords").csv("/mnt/input")
+
+Using the mode option:
+PERMISSIVE (default): Keeps good records and puts null for bad ones.
+DROPMALFORMED: Drops the corrupt records.
+FAILFAST: Stops immediately on the first bad record.
+spark.read.option("mode", "DROPMALFORMED").csv("/mnt/input")
+
+Schema validation
+I define an explicit schema instead of letting Spark infer it — this helps detect mismatches and ensures consistent data types
+
+Logging and alerting:
+
+
+____________________________________________________________________
+map() → applies a function to each element individually.
+it returns a new RDD with transformed values
+rdd = sc.parallelize([1, 2, 3])
+rdd2 = rdd.map(lambda x: x * 2)
+# Output: [2, 4, 6]
+
+mapPartitions() → applies a function to each partition (batch-wise), not element by element.
+Used when you want better performance or resource reuse per partition.
+def process_partition(iterator):
+    return (x * 2 for x in iterator)
+rdd2 = rdd.mapPartitions(process_partition)
+
+________________________________________________________________________
+63. What is an accumulator in Spark and how is it used? 
+
+An accumulator in Spark is a variable used to collect information like counts or sums across tasks
+It’s mainly used for monitoring or debugging, like counting how many records meet a condition or how many errors occurred —
+A key point to remember is that accumulators aren’t reliable for logic, because Spark may re-run tasks if there’s a failure or retry — which can cause the count to increase multiple times.
+______________________________________________________________________________
+broadcast variable
+
+A broadcast variable in Spark is a read-only shared variable that’s sent to all executors only once, instead of sending a copy with every task.
+It’s mainly used when we have a small lookup table or reference data that needs to be used across multiple tasks.
+
+broadcastVar = sc.broadcast({"CA": "California", "NY": "New York"})
+def map_state(abbr):
+    return broadcastVar.value.get(abbr, "Unknown")
+rdd.map(map_state)
+
+___________________________________________________________________________
+What is the default number of shuffle partitions in Spark?
+
+The default number of shuffle partitions in Spark is 200.
+This means whenever a wide transformation occurs — like groupBy, join, or reduceByKey — Spark divides the shuffled data into 200 partitions by default.
+This default value works fine for small to medium datasets, but for large datasets, I usually increase it to improve parallelism.
+spark.conf.set("spark.sql.shuffle.partitions", 100)
+So, tuning this value is an important part of Spark performance optimization, especially for shuffle-heavy operations.
+___________________________________________________________________________
+What is the default partition size in Spark, and how is it calculated? 
+
+Spark targets around 128 MB per partition when reading data — this comes from the Hadoop block size
+
+So, if I have a 1 GB file, Spark will create roughly 8 partitions (1 GB ÷ 128 MB).
+This helps distribute the data evenly across executors for parallel processing.
+spark.conf.set("spark.sql.files.maxPartitionBytes", 134217728)  # 128 MB
+
+The actual number of partitions also depends on factors like:
+Number of available cores
+File format and block size
+Manual repartitioning using .repartition() or .coalesce()
+
+______________________________________________________________________________________
+How are zip files distributed across nodes in Spark? 
+
+
+Spark can’t split most compressed files like ZIP or GZIP across multiple nodes because these formats are not splittable.
+So, if I have one large ZIP file, it will be processed by a single executor instead of being distributed.
+This reduces performance since Spark can’t parallelize the reading.
+Or, if compression is needed, I use splittable formats like bzip2 or, better yet, use Parquet, which is optimized for parallel reads.
+
+______________________________________________________________________________________________
+Databricks widgets make notebooks interactive.
+They let us pass inputs like dates or file paths using text boxes or dropdowns instead of hardcoding values.
+For example, we can create a text widget and fetch its value using dbutils.widgets.get().
+They’re very useful for parameterizing notebooks when running in different environments or through Databricks Jobs.
+
+dbutils.widgets.text("input_date", "2024-01-01", "Date")
+date_value = dbutils.widgets.get("input_date")
+
+______________________________________________________________________________
+Q How can you combine data into a single output file in Databricks?
+By default, Spark. writes multiple files — one for each partition.
+If I want a single output file, I use coalesce(1) before writing.
+df.coalesce(1).write.mode("overwrite").csv("/mnt/output")
+This merges all partitions into one and creates a single file.
+But I use it only for small or medium datasets — for large data, it’s better to keep multiple files and combine them later using tools like Azure Data Factory or a script.
+
+
+_________________________________________________________________________________________________________________________________
 “Delta Live Tables (DLT) in Databricks lets you build automated, reliable ETL pipelines using simple declarative code. It manages table dependencies, incremental processing, data quality checks, and logging, producing production-ready Delta tables that are easier to monitor and maintain
 
 It simplifies ETL by managing table dependencies, orchestration, incremental processing, and data quality checks
