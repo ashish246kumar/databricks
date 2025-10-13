@@ -1,3 +1,18 @@
+ Q: What is lazy evaluation in Spark and how does it benefit performance?
+ Lazy evaluation means Spark doesn’t execute transformations immediately. Instead, it builds a logical plan of all the transformations.
+ Spark only executes the plan when an action is triggered, such as show(), count(), or collect().
+ The benefit is that Spark can optimize the execution plan before running it — it can combine operations, rearrange them, or skip unnecessary work
+______________________________________________________________________________
+SQL Endpoints in Databricks are compute resources specifically designed for running SQL queries.
+They are part of Databricks SQL, which is aimed at analysts and BI tools for querying data in the Lakehouse.
+Key points:
+Optimized for SQL workloads rather than general-purpose processing.
+Supports auto-scaling, query caching, and fast performance.
+Integrates with BI tools like Power BI and Tableau.
+use SQL Endpoints when I want to run pure SQL queries, especially from dashboards or BI tools, rather than using notebooks or job clusters
+ ______________________________________________________
+ What is the difference between a Databricks job cluster and an interactive cluster?
+
 Job clusters are temporary clusters used for scheduled jobs and shut down automatically after completion
 Used for scheduled or automated tasks like ETL pipelines or production jobs.
 Interactive clusters stay alive for development and testing, allowing users to run code and see results immediately.
