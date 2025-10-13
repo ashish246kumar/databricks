@@ -1,3 +1,5 @@
+
+ __________________________________________________________________________________
  Q: What is lazy evaluation in Spark and how does it benefit performance?
  Lazy evaluation means Spark doesn’t execute transformations immediately. Instead, it builds a logical plan of all the transformations.
  Spark only executes the plan when an action is triggered, such as show(), count(), or collect().
