@@ -1,3 +1,12 @@
+Job clusters are temporary clusters used for scheduled jobs and shut down automatically after completion
+Used for scheduled or automated tasks like ETL pipelines or production jobs.
+Interactive clusters stay alive for development and testing, allowing users to run code and see results immediately.
+I develop on interactive clusters and deploy production jobs on job clusters.
+ ______________________________________________________________________
+ What is an managed table in Databricks?
+A managed table in Databricks is a table where both the metadata and the actual data are managed by Databricks.
+When I create a managed table (using CREATE TABLE or saveAsTable() without specifying a location), Spark automatically stores the data in the default Databricks-managed storage.
+Dropping the table deletes everything, which is ideal when you want Databricks to control the data lifecycle.
 
 __________________________________________________________________________________
  What is an unmanaged table in Databricks?
