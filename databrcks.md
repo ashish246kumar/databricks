@@ -1,4 +1,43 @@
+“Databricks Unity Catalog is a centralized governance solution for all data and AI assets in Databricks. It provides a single place to manage metadata, enforce fine-grained access controls at table, row, or column level, and track data lineage automatically. It supports Delta tables, ML models, notebooks, and files, while logging all access for auditing and compliance. Essentially, it makes managing, securing, and sharing data across teams much easier and more reliable.”
 
+__________________________________________________________
+47. What are persistence levels in Spark and how do you choose between them? 
+
+In Spark, persistence levels define how and where data is stored — whether in memory, on disk, or both — so that we don’t have to recompute it again and again.
+
+The main levels are defined in the StorageLevel class —
+• MEMORY_ONLY: keeps data in memory as Java objects, fastest but can recompute missing partitions.
+• MEMORY_AND_DISK: stores in memory and spills to disk if it doesn’t fit — it’s the most commonly used.
+• DISK_ONLY: stores only on disk, slower but safe for large data.
+• MEMORY_ONLY_SER and MEMORY_AND_DISK_SER: store serialized data to save memory.
+• OFF_HEAP: stores data outside the JVM heap for better GC performance.
+
+I generally use MEMORY_AND_DISK for iterative workloads like ML, and switch to serialized or disk options when memory is tight.
+
+So, the idea is — choose the level based on your memory availability, recomputation cost, and performance needs
+____________________________________________________
+“Shuffle in Spark means redistributing data across partitions or nodes when an operation needs data from multiple partitions.
+Shuffling is expensive because it involves disk I/O, data serialization, and network transfer, which can slow down jobs and even cause memory issues if not handled properly
+Expensive because	Disk + Network + Serialization overhead
+_______________________________________________
+Wide transformations in Spark are the operations where data needs to be shuffled across partitions or nodes — meaning one input partition can contribute to multiple output partitions.
+This shuffle makes these transformations slower and more resource-intensive compared to narrow ones.
+groupByKey(), reduceByKey(), join(), distinct(), and repartition().
+groupByKey(): Groups data by key and brings values with the same key together from 
+different partitions
+ join(): Combines rows from two datasets based on a common key. Spark needs to move 
+data so matching keys are on the same partition.
+__________________________________
+What are narrow transformations in Spark?
+
+Narrow transformations in Spark are operations where each input partition contributes to only one output partition, so there’s no data shuffling across the cluster.
+These are very efficient because all processing happens within the same partition — Spark doesn’t need to move data over the network.
+🔹 “Narrow = No Network Shuffle.”
+if I apply a filter() to keep only active customers, Spark just filters rows within each partition — it doesn’t need to reshuffle data.
+• map(): Applies a function to each row without changing the partitioning. 
+• union(): Combines two datasets without shuffling. 
+
+So, in short, narrow transformations = no shuffle = faster performance.”
 ______________________________________________
 
 What is the difference between sort() and orderBy() in Spark?
