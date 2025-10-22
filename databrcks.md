@@ -1,4 +1,20 @@
 
+______________________________________________
+
+What is the difference between sort() and orderBy() in Spark?
+
+Both sort() and orderBy() are used to sort data in Spark, but the key difference is how they handle shuffling and performance.
+orderBy() always guarantees a global sort — it performs a full shuffle across all partitions to make sure the entire DataFrame is perfectly sorted.
+sort() can behave more flexibly — it can do a local or global sort depending on the context. If I’ve already repartitioned my data, sort() can skip the full shuffle and be more optimized.
+So in short, if I need final globally sorted output, I use orderBy(). But if I just need local sorting within partitions or want to save performance, I prefer sort().”
+df.sort("col1")     // Same as
+df.orderBy("col1")  // This
+Syntactically, they are aliases — sort() calls orderBy() under the hood.
+But semantically and in execution, there are key differences depending on context.
+Feature,sort(),orderBy()
+Global Ordering,Not guaranteed by default,Always guarantees global order
+Shuffling,Can avoid full shuffle in certain cases,Always triggers full shuffle
+Use Case,"Local sorting, within partitions, or post-repartition optimization","Final sorted output (e.g., top-N globally)"
 ________________________________________________________________________________________
 What is the difference between distinct() and dropDuplicates() in Spark?
 
