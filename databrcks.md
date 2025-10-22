@@ -1,4 +1,7 @@
-
+distinct() and dropDuplicates() are used to remove duplicates in Spark, but the main difference is flexibility.
+distinct() removes duplicates by comparing all columns — meaning two rows have to be exactly the same to be considered duplicates.
+dropDuplicates(), on the other hand, lets us specify which columns to check for duplicates.
+so i use dropDuplicates() when I want to remove duplicates based on business keys
  __________________________________________________________________________________
  Q: What is lazy evaluation in Spark and how does it benefit performance?
  Lazy evaluation means Spark doesn’t execute transformations immediately. Instead, it builds a logical plan of all the transformations.
