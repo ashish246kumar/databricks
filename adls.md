@@ -1,3 +1,32 @@
+
+_________________________________________________________________
+How do you classify and tag sensitive or PII data in ADLS for compliance and discoverability?
+
+I use Microsoft Purview to classify and tag PII in ADLS.
+Purview automatically scans data, identifies PII like emails or credit cards, and applies labels such as “Confidential” or “Contains PII.”
+I also add business tags like “Customer Data” for clarity.
+These tags support compliance (e.g., GDPR) and access control, so only authorized users can view sensitive data.
+These tags help in compliance checks — for example, during GDPR or HIPAA audits, I can easily filter all datasets labeled as PII.
+
+___________________________________________________________________________________________
+What governance challenges are unique to data lakes and lakehouses compared to traditional databases?
+
+In data lakes and lakehouses, governance is more complex compared to traditional databases.
+First, there’s no strict schema enforcement
+Second, access control is harder — unlike databases that support row- or column-level security, data lakes often rely on file or folder-level permissions, which need extra setup.
+Third, data lineage is difficult to trace because data moves between many tools and file systems, not just SQL tables
+Finally, auditing and compliance are more challenging because data exists in various formats and locations.
+To handle these, we use centralized governance tools like Unity Catalog or Purview, and automate metadata management to maintain control
+________________________________________________________________
+What is the role of a data catalog in a cloud-based data lake, and how does it help data engineers and analysts?
+
+A data catalog in a cloud-based data lake works like a library catalog for data — it stores metadata about all datasets so users can easily find, understand, and trust their data.
+For data engineers, it gives a single view of all datasets with details like schema, format, and location — which helps them design pipelines and avoid duplication.
+For analysts, it allows them to search data using business terms, view descriptions, and sample data — reducing their dependency on engineers
+It also tracks data lineage for transparency and trust.
+In short, it makes data organized, discoverable, and reliable in the cloud.
+
+_________________________________________________________________________________
 What are the considerations when restoring a large ADLS dataset from backup or archive during a disaster scenario?
 
 When restoring large ADLS datasets, I first consider data availability — if the data is archived, I plan for rehydration delays and restore critical partitions first.
