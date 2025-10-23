@@ -1,3 +1,31 @@
+
+When restoring large ADLS datasets, I first consider data availability — if the data is archived, I plan for rehydration delays and restore critical partitions first.
+I ensure backups are geo-redundant across regions and validate dataset completeness, including all partitions and metadata.
+I also plan for cost during rehydration and test the full restore process regularly to meet our RTO and RPO targets
+
+Simply
+🧱 1️⃣ Rehydration from Archive Tier
+If your backup is stored in Azure Blob Archive tier, it’s not instantly accessible.
+You need to rehydrate (move data from Archive → Hot or Cool tier).
+This can take hours depending on data size (typically 1–15 hours).
+So, always plan prioritization:
+Restore critical datasets first (e.g., last 7 days or critical tables).
+Less critical or older data can wait.
+
+Validation of Dataset Integrity
+Before restoring, verify:
+All partitions exist (e.g., every date= folder).
+All metadata files are present (like _delta_log for Delta, or manifest files for Parquet).
+Missing or partial partitions can break Spark/ADF pipelines.
+
+Cost and Performance Planning
+Large-scale rehydration and reads can be costly, especially from the Archive tier.
+You can minimize cost by:
+Restoring incrementally (critical partitions first).
+Using Cool tier for medium-term backups instead of Archive.
+Monitoring data egress costs if restoring across regions.
+
+____________________________________________________________________________________________________________________
 How do you ensure backup consistency and completeness when dealing with large, partitioned datasets in ADLS? 
 
 “To ensure backup consistency in ADLS, I take a snapshot or checkpoint-based backup after confirming ingestion jobs are complete, avoiding partial writes.
