@@ -1,3 +1,4 @@
+What are the considerations when restoring a large ADLS dataset from backup or archive during a disaster scenario?
 
 When restoring large ADLS datasets, I first consider data availability — if the data is archived, I plan for rehydration delays and restore critical partitions first.
 I ensure backups are geo-redundant across regions and validate dataset completeness, including all partitions and metadata.
