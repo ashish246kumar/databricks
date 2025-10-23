@@ -1,3 +1,5 @@
+
+_______________________________________________________________________________________________
 “Databricks Unity Catalog is a centralized governance solution for all data and AI assets in Databricks. It provides a single place to manage metadata, enforce fine-grained access controls at table, row, or column level, and track data lineage automatically. It supports Delta tables, ML models, notebooks, and files, while logging all access for auditing and compliance. Essentially, it makes managing, securing, and sharing data across teams much easier and more reliable.”
 
 __________________________________________________________
