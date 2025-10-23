@@ -1,4 +1,13 @@
 
+__________________________________________________________
+How do you design a backup and disaster recovery (DR) strategy for data stored in Azure Data Lake Storage across regions?
+
+My DR strategy for ADLS combines replication, backups, and testing.
+I use Geo-redundant or Geo-zone-redundant storage to replicate data across regions.
+
+First, I enable Geo-redundant (GRS) or Geo-zone-redundant (GZRS) storage so data is automatically replicated to a paired secondary region. This ensures protection against regional outages.
+Next, I set up periodic backups of critical data using Azure Data Factory or scripts, storing them in separate containers or even separate regions for added safety. I also store metadata with backups to simplify restoration.
+For disaster recovery, I define RTO (Recovery Time Objective) and RPO (Recovery Point Objective) and maintain runbooks that document step-by-step recovery and failover procedures — like switching pipelines or pointing analytics workloads to backup locations
 _________________________________________________________________
 How do you classify and tag sensitive or PII data in ADLS for compliance and discoverability?
 
