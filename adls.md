@@ -1,4 +1,25 @@
+How do you ensure backup consistency and completeness when dealing with large, partitioned datasets in ADLS? 
 
+“To ensure backup consistency in ADLS, I take a snapshot or checkpoint-based backup after confirming ingestion jobs are complete, avoiding partial writes.
+I use manifest files to track all partitions and files, and validate backups by comparing counts, file sizes, or checksums.
+For critical datasets, I rely on Delta Lake’s versioning to restore data to a specific snapshot.
+
+Snapshot / Checkpoint-Based Backup
+******
+Take the backup only after the ingestion pipeline finishes.
+For Delta tables → use Delta snapshots (_delta_log) to get a consistent version.
+
+Use Manifest Files for Validation
+********
+Maintain a manifest (index) file that lists:
+All expected partitions (like date=2025-10-23/region=IN/)
+File names, sizes, and checksums (MD5/SHA).
+During or after backup:
+Compare the source manifest vs backup manifest.
+Flag any missing or mismatched files.
+
+Monitoring and Logging
+Enable ADF pipeline logging, Databricks job monitoring, and alerting for failures.
 _________________________________________________________________________
 What are the key performance optimization techniques you use when querying large datasets in a data lake or lakehouse? 
 
