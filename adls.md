@@ -1,3 +1,59 @@
+
+_________________________________________________________________________
+What are the key performance optimization techniques you use when querying large datasets in a data lake or lakehouse? 
+
+Use Columnar Formats (Parquet / Delta)
+🧭 2️⃣ Partition Data by Common Filter Columns (Organize data into folders like /sales/date=2025-10-01/.)
+Use Data Skipping / Statistics (Delta Feature)
+Delta Lake stores min/max values per file
+Use larger clusters or autoscaling for heavy workloads.
+___________________________________________________
+How do partitioning and file sizing impact performance in ADLS-based analytics platforms like Databricks or Synapse?
+
+
+In cloud analytics platforms like Databricks or Azure Synapse, your data usually lives in ADLS (Azure Data Lake Storage) — basically, a big distributed file system.
+Partitioning means splitting your dataset into subfolders or logical groups based on one or more columns
+
+
+Partitioning organizes data in ADLS into folders based on key columns like date or region. It enables partition pruning, so queries only scan relevant data.
+File sizing is equally important — too many small files slow down performance due to overhead, and very large files reduce parallelism.
+I usually target file sizes between 100 MB and 1 GB and use Delta’s OPTIMIZE command to compact files
+
+The Problem: Over-partitioning
+If you partition by a column with too many unique values (e.g., user_id or transaction_id), you’ll end up with millions of small partitions/files.
+This leads to:
+Too much metadata overhead (too many files to track).
+Increased task scheduling time
+
+Databricks and Synapse work by distributing files across parallel executors.
+Too many small files → lots of overhead (many tasks, less computation).
+Too few huge files → limited parallelism (some nodes idle).
+
+OPTIMIZE sales_data
+This command compacts small files into larger, optimized ones.
+____________________________________________________________________________________________
+
+
+How does caching (e.g., Delta caching in Databricks) improve performance in repeated queries over ADLS data?
+
+
+When working with large datasets stored in ADLS, every query involves reading data from cloud storage, which can be slow and costly.
+(This is slow, because cloud storage (like ADLS) has higher latency and lower throughput compared to local disk or memory.)
+Databricks provides Delta caching, which keeps frequently accessed data on the cluster’s local SSD or memory.
+The first query reads from ADLS and stores the data locally, and subsequent queries use this cached copy — eliminating repeated reads from storage.
+This reduces I/O, network latency, and cost, and can improve performance dramatically, especially for BI dashboards or repeated analyses
+
+(Delta caching is Databricks’ built-in caching mechanism.
+👉 When you enable caching (e.g., using df.cache() or spark.catalog.cacheTable("table_name")), Databricks:)
+
+The Delta Cache stores data in an optimized binary format.
+It works best for Parquet and Delta files (columnar formats).
+
+ Avoid caching when:
+The dataset is too large to fit in cluster memory/disk.
+The data is frequently updated, which invalidates the cache.
+
+________________________________________________________________________________________________
 Azure Data Lake Storage (ADLS) ek cloud-based storage solution hai.
 Ye structured data (tables, CSV, etc.) aur unstructured data (logs, images, videos, IoT sensor data, social media feeds) dono ko store karne ke liye design kiya gaya hai.
 Ye Azure Blob Storage ke upar build hai, lekin analytics workloads ke liye optimized hai.
