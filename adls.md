@@ -25,6 +25,7 @@ Restoring incrementally (critical partitions first).
 Using Cool tier for medium-term backups instead of Archive.
 Monitoring data egress costs if restoring across regions.
 
+
 ____________________________________________________________________________________________________________________
 How do you ensure backup consistency and completeness when dealing with large, partitioned datasets in ADLS? 
 
