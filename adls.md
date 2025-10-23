@@ -5,12 +5,12 @@ I use manifest files to track all partitions and files, and validate backups by 
 For critical datasets, I rely on Delta Lake’s versioning to restore data to a specific snapshot.
 
 Snapshot / Checkpoint-Based Backup
-******
+
 Take the backup only after the ingestion pipeline finishes.
 For Delta tables → use Delta snapshots (_delta_log) to get a consistent version.
 
 Use Manifest Files for Validation
-********
+
 Maintain a manifest (index) file that lists:
 All expected partitions (like date=2025-10-23/region=IN/)
 File names, sizes, and checksums (MD5/SHA).
