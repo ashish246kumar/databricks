@@ -1,5 +1,6 @@
 Why are data lakes critical to modern big data analytics, and what types of workloads 
 do they best support?
+
 Data lakes are essential for modern analytics because they store massive volumes of structured and unstructured data from diverse sources at low cost.
 They support workloads like machine learning, real-time analytics, and data science exploration by giving teams flexible access to raw, high-quality data
 
