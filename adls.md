@@ -1,3 +1,5 @@
+
+_____________________________________________________________________________________
 Why are data lakes critical to modern big data analytics, and what types of workloads 
 do they best support?
 
