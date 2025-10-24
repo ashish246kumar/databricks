@@ -1,4 +1,11 @@
 
+
+The Azure Archive tier is used to store long-term, rarely accessed data at the lowest cost — ideal for compliance, audit, and historical data
+Key Benefits
+💰 Lowest storage cost among all tiers 
+♻️ Data durability and security remain the same as other tiers, ensuring long-term data preservation
+Integration with lifecycle management policies, allowing automatic movement of data to the archive tier after a defined retention period (e.g., 365 days).
+
 __________________________________________________________
 How do you design a backup and disaster recovery (DR) strategy for data stored in Azure Data Lake Storage across regions?
 
