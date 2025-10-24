@@ -1,11 +1,38 @@
+What role does data format (Parquet, Delta, CSV, Avro) play in query performance and 
+storage optimization?
 
+Data format directly impacts query speed and storage efficiency. I prefer Parquet and Delta for analytics because they’re compressed, columnar, and optimize read performance
+
+CSV is a simple text format that’s easy to use but inefficient for large-scale analytics — it lacks compression, schema evolution, and optimized reading
+Parquet is a columnar format optimized for analytical workloads. It supports compression and schema evolution, enabling fast queries by reading only the required columns.
+Delta builds on Parquet, adding ACID transactions, time travel, and schema enforcement, making it ideal for lakehouse architectures with concurrent reads and writes, and for incremental updates or merges.
+Schema evolution means the ability of a data format to handle changes in the data structure over time — for example:
+Adding or removing columns
+Changing column order
+Modifying data types
+Parquet stores data by column name, not order.
+_______________________________________________________________________________________________
+How do you design a cost-efficient storage strategy using Hot, Cool, and Archive tiers in ADLS Gen2?
+
+I design a cost-efficient ADLS Gen2 storage strategy by using Hot, Cool, and Archive tiers based on data access frequency. Frequently used data stays in Hot, less-used data moves to Cool, and rarely accessed data shifts to Archive. Lifecycle management rules automate this movement to minimize costs without manual effort
+
+The Hot tier is best for frequently accessed and time-sensitive data, such as recent reports, dashboards, or analytics datasets.
+
+The Cool tier offers lower storage costs but higher access charges, making it suitable for infrequently used data — for example, data accessed a few times a month for trend analysis.
+
+_____________________________________________________________________
+What are the benefits and use cases for using the Azure Archive tier for storing infrequently accessed data in ADLS?
 
 The Azure Archive tier is used to store long-term, rarely accessed data at the lowest cost — ideal for compliance, audit, and historical data
 Key Benefits
 💰 Lowest storage cost among all tiers 
 ♻️ Data durability and security remain the same as other tiers, ensuring long-term data preservation
 Integration with lifecycle management policies, allowing automatic movement of data to the archive tier after a defined retention period (e.g., 365 days).
-
+Considerations
+⚠️ Data is not immediately accessible — it must be rehydrated (restored) to the hot or cool tier, which can take several hours
+Typical Use Cases
+Archiving logs, backups, reports, and raw historical datasets no longer in active use.
+In an Azure Data Lake, I configure lifecycle management rules to automatically move data older than one year to the archive tier
 __________________________________________________________
 How do you design a backup and disaster recovery (DR) strategy for data stored in Azure Data Lake Storage across regions?
 
