@@ -1,3 +1,14 @@
+
+_________________________________________________________________________
+What are the naming conventions and partitioning strategies you follow to optimize 
+querying and manageability in ADLS?
+
+I follow simple and consistent naming conventions — all lowercase, with hyphens and no spaces — for folders and files, like sales-data or customer-transactions-2025-07-23.parquet.
+For partitioning, I usually use a year/month/day folder structure, such as /trusted/sales/transactions/2025/07/23/.
+This helps query engines like Spark and Synapse perform partition pruning and read only relevant data.
+I also consider partitioning by region or category when it fits the access pattern, but I avoid over-partitioning to prevent too many small files.
+These practices make the data lake more efficient, easier to manage, and scalable over time
+_________________________________________________________________________________________________
 What is the hierarchical namespace in Azure Data Lake Storage Gen2, and how does it 
 differ from flat namespace in Blob Storage?
 
