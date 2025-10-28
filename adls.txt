@@ -9,7 +9,9 @@ All configurations are maintained as code in version control, which keeps everyt
 First, I use Azure Active Directory groups to organize users by department, project, or role. This allows me to manage access at the group level instead of assigning permissions to individuals.
 
 Then, I apply Azure RBAC roles like Reader or Contributor at the storage account or container level, and use Access Control Lists (ACLs) for more granular folder-level permissions inside ADLS.
-____________________________________________________________________________
+
+___________________________
+_________________________________________________
 What best practices would you follow to secure data stored in ADLS across 
 environments (Dev/Test/Prod
 
