@@ -1,4 +1,18 @@
+How would you design a folder structure in ADLS for an enterprise-scale data platform?
 
+For enterprise-scale ADLS design, I follow a consistent folder structure like
+/{zone}/{source}/{domain}/{year}/{month}/{day}/.
+
+For example:
+/raw/sap/finance/2025/07/23/ or /trusted/marketing/campaigns/2025/07/23/.
+
+Zones such as raw, curated, and trusted represent the data’s processing stage — from ingestion to cleaned and validated datasets.
+• Source represents where the data comes from, like SAP, Salesforce, or internal APIs.
+• Domain helps group data logically, such as finance, sales, or customer.
+• Finally, partitioning by year/month/day supports time-based querying, efficient storage management, and easier data retention
+Supports lifecycle policies and automated cleanup.
+
+Works efficiently with Spark or Synapse for partition pruning
 _________________________________________________________________________
 What are the naming conventions and partitioning strategies you follow to optimize 
 querying and manageability in ADLS?
