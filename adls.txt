@@ -1,4 +1,13 @@
 
+_________________________________________________________________________________
+In Azure Data Lake Storage, we can control access at a very granular level using Access Control Lists (ACLs) in combination with Azure RBAC.
+
+In Azure Data Lake Storage, we can control access at a very granular level using a combination of Access Control Lists (ACLs) and Azure RBAC.
+My first step is to make sure that all users and groups are properly managed through Azure Active Directory, since ADLS integrates directly with AAD for authentication and identity management.
+Then, I assign a base RBAC role at the storage account level — typically Storage Blob Data Contributor — to allow them to authenticate and reach the data lake.
+For more granular control, I use ACLs at the folder or file level. For example, if the finance team only needs access to /finance, I assign read and write permissions to their AAD group specifically on that folder
+I also set default ACLs, so new data automatically inherits the same permissions.
+This ensures each team only sees the data they need, improving both security and governance
 _____________________________________________________________________________________
 Why are data lakes critical to modern big data analytics, and what types of workloads 
 do they best support?
