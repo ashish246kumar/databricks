@@ -1,4 +1,14 @@
+How do you automate security and permission management in ADLS for a large, dynamic team structure?
 
+For large, dynamic teams, I automate ADLS security using AAD groups, RBAC, and ACLs.
+I assign access at the group level and use Azure CLI or Terraform scripts to automate role assignments during onboarding or resource creation.
+I apply Azure Blueprints or policies to enforce consistent security across environments.
+For governance, I use Entra ID Access Reviews and PIM to manage and review permissions automatically.
+All configurations are maintained as code in version control, which keeps everything auditable and consistent
+
+First, I use Azure Active Directory groups to organize users by department, project, or role. This allows me to manage access at the group level instead of assigning permissions to individuals.
+
+Then, I apply Azure RBAC roles like Reader or Contributor at the storage account or container level, and use Access Control Lists (ACLs) for more granular folder-level permissions inside ADLS.
 ____________________________________________________________________________
 What best practices would you follow to secure data stored in ADLS across 
 environments (Dev/Test/Prod
