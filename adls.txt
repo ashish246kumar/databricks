@@ -1,3 +1,13 @@
+What is the hierarchical namespace in Azure Data Lake Storage Gen2, and how does it 
+differ from flat namespace in Blob Storage?
+
+In ADLS Gen2, the hierarchical namespace provides a true folder structure, where files and directories exist as distinct objects. This allows operations like renaming, moving, and setting permissions at the directory level
+In contrast, Blob Storage uses a flat namespace — folders are just part of the blob name, so folder operations require modifying each blob individually.
+The hierarchical structure in ADLS improves performance, manageability, and organization, which is especially useful in large-scale data processing environments.”
+
+In contrast, Azure Blob Storage uses a flat namespace, which doesn’t have a real folder structure. Folders are just part of the blob’s name. For example, a blob named “sales/2024/data.csv” is treated as a single object with that full path — not an actual folder hierarchy
+Because of this, operations like renaming or deleting a folder in Blob Storage require updating every blob under that path individually, which is less efficient.
+_______________________________________________________________________________________________________
 How do you automate security and permission management in ADLS for a large, dynamic team structure?
 
 For large, dynamic teams, I automate ADLS security using AAD groups, RBAC, and ACLs.
