@@ -1,3 +1,6 @@
+
+
+________________________________________________________
 How do you integrate cloud-based ETL/ELT tools like Azure Data Factory or Synapse 
 Pipelines with ADLS for data ingestion?
 
