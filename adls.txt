@@ -1,3 +1,5 @@
+
+____________________________________________________________________________
 What are the different methods available for ingesting large volumes of data into Azure 
 Data Lake Storage, and how do you choose among them?
 
@@ -7,6 +9,7 @@ For one-time or bulk migrations, I use AzCopy or Azure Data Box. For small or ma
 When we need near real-time ingestion, Event Grid or Event Hub can trigger pipelines as soon as files arrive.
 So overall, I pick the method based on data source, volume, frequency, and whether it’s batch or real-time.
 
+For instance, in one project, we used ADF for daily SQL Server loads, AzCopy for initial file dumps, and Event Grid for near real-time ingestion.
 ____________________________________________________________________________________________________________________________________
 How would you design a folder structure in ADLS for an enterprise-scale data platform?
 
