@@ -1,3 +1,6 @@
+What are the key considerations and steps in building a real-time data ingestion 
+pipeline from Event Hubs or Kafka into ADLS?
+
 
 
 ________________________________________________________
@@ -11,6 +14,11 @@ If transformations are needed, I use Mapping Data Flows or call a Databricks not
 I schedule or trigger pipelines based on business needs, and set up alerts and monitoring to track execution and handle failures.
 Overall, this helps automate, scale, and monitor data ingestion into ADLS efficiently.”
 
+**
+First, I create linked services in ADF or Synapse — one for the source system, such as SQL Server, Oracle, or Blob Storage, and another for the destination, which is ADLS.
+Then, I define datasets representing both the source and target. For ADLS, I usually choose formats like CSV, JSON, or Parquet, depending on the analytics or reporting needs downstream
+After that, I use the Copy Activity to move data from the source to ADLS. Here, I can configure things like the target folder path, file naming conventions, partitioning by date, or compression settings to optimize performance.
+Next, I set up pipeline triggers — these can be scheduled, event-based, or manual, depending on the ingestion frequency
 
 ___________________________________________________________________________________________________
 What are the different methods available for ingesting large volumes of data into Azure
