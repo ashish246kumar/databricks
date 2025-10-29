@@ -1,3 +1,43 @@
+resources:
+  jobs:
+  cdm_a22_workflow:
+    name: cdm_a22_workflow
+    queue:
+        enabled: true
+	parameters:
+	    - name: job_id
+          default: "{{job.id}}"
+        - name: job_run_id
+          default: "{{job.run_id}}"
+        - name: start_dt
+          default: "{{job.trigger.time.iso_date}}"
+        - name: end_dt
+          default: "{{job.trigger.time.iso_date}}"
+        - name: current_job_id
+          default: "{{job.id}}"
+        - name: date_range
+          default: "20"
+        - name: include_tables
+          default: ""
+        - name: skip_tables
+          default: ""
+	
+	tasks:
+        - task_key: streaming_a22
+          notebook_task:
+            notebook_path: ../src/delta_live_table/notebooks/a22/streaming_a22.py
+          existing_cluster_id: ${resources.clusters.cdm_cloud_cluster.id}
+          libraries:
+            - whl: ${var.wheel_file}
+		- task_key: fact_ca_a22
+          run_job_task:
+            job_id: ${resources.jobs.cdm_ca_fact_workflow.id}
+          depends_on:
+            - task_key: landing_a22
+            - task_key: ods_a22
+
+
+______________________________
 Situation	Correct Fix
 You want to run .py like a Databricks notebook	Add # Databricks notebook source and # COMMAND ----------
 ____________________________________________________________________________
