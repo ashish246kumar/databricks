@@ -1,3 +1,15 @@
+How do you integrate cloud-based ETL/ELT tools like Azure Data Factory or Synapse 
+Pipelines with ADLS for data ingestion?
+
+To integrate Azure Data Factory or Synapse Pipelines with Azure Data Lake Storage, I first create linked services to connect both the source and ADLS securely.
+Then, I define datasets for the source and target, choosing formats like CSV, JSON, or Parquet.
+I use the Copy Activity to transfer data, configuring folder paths, file patterns, and partitioning.
+If transformations are needed, I use Mapping Data Flows or call a Databricks notebook.
+I schedule or trigger pipelines based on business needs, and set up alerts and monitoring to track execution and handle failures.
+Overall, this helps automate, scale, and monitor data ingestion into ADLS efficiently.”
+
+
+___________________________________________________________________________________________________
 What are the different methods available for ingesting large volumes of data into Azure
 
 There are multiple ways to ingest large data into Azure Data Lake, and the right method depends on the source, size, and frequency.
