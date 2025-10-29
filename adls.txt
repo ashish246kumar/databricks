@@ -1,3 +1,13 @@
+What are the different methods available for ingesting large volumes of data into Azure 
+Data Lake Storage, and how do you choose among them?
+
+There are multiple ways to ingest data into Azure Data Lake Storage, and the choice depends on the source, volume, and frequency of data.
+For most of my use cases, I prefer Azure Data Factory — it’s great for orchestrating batch and scheduled data loads from databases or APIs. If Synapse is being used, Synapse Pipelines work the same way within that environment.
+For one-time or bulk migrations, I use AzCopy or Azure Data Box. For small or manual uploads, Storage Explorer is quick.
+When we need near real-time ingestion, Event Grid or Event Hub can trigger pipelines as soon as files arrive.
+So overall, I pick the method based on data source, volume, frequency, and whether it’s batch or real-time.
+
+____________________________________________________________________________________________________________________________________
 How would you design a folder structure in ADLS for an enterprise-scale data platform?
 
 For enterprise-scale ADLS design, I follow a consistent folder structure like
