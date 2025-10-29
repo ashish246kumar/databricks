@@ -1,4 +1,5 @@
-
+Situation	Correct Fix
+You want to run .py like a Databricks notebook	Add # Databricks notebook source and # COMMAND ----------
 ____________________________________________________________________________
 What are the different methods available for ingesting large volumes of data into Azure 
 Data Lake Storage, and how do you choose among them?
