@@ -1,3 +1,21 @@
+
+_______________________________________________________________________________________________
+
+How do you handle schema evolution and metadata consistency during ingestion from 
+diverse source systems into ADLS?
+
+“Schema evolution is a big challenge when source systems keep changing.
+I handle it using a central metadata store or schema registry to track schema versions.
+During ingestion, I compare the incoming schema with the expected one — if it differs, I either accept it, quarantine it, or raise an alert.
+I use Parquet or Avro formats because they support schema evolution, and I tag each dataset with a schema version.
+Tools like Databricks help handle missing or extra columns gracefully, and I define dynamic mappings in Data Factory for renamed fields.
+Finally, I ensure clear communication with source teams and have logging and alerting to catch schema drift early.
+
+Schema registry or metadata store:
+I maintain a central schema registry or metadata store — this could be a database table, Azure SQL, or tools like Microsoft Purview — to track the current schema version of each data source.
+
+
+______________________________________________________________________________________________________________________________________________________
 What are the key considerations and steps in building a real-time data ingestion 
 pipeline from Event Hubs or Kafka into ADLS?
 
