@@ -1,4 +1,17 @@
+. How do you maintain data quality and deduplication during ingestion from multiple 
+sources into ADLS? 
 
+Maintaining data quality and avoiding duplicates is a key part of any ingestion pipeline, especially when we’re pulling data from multiple sources into ADLS.
+What I usually do is start with data contracts — working with source teams to define required fields, valid ranges, and schema expectations.
+Then I apply validation rules during ingestion — checking for nulls, invalid dates, or unexpected values.
+I also use schema enforcement in Data Factory or Databricks so that any mismatched records go straight to a quarantine zone for review.
+For deduplication, I rely on unique identifiers or composite keys, and I use Delta Lake merge statements in batch jobs, or watermarking in streaming jobs, to filter duplicate or late events.
+Finally, I include audit fields like ingestion time and source name, and periodically run data profiling to detect anomalies.
+
+
+I detect duplicates using unique keys — such as primary IDs or a combination of fields like user_id + timestamp.
+In batch pipelines, I rely on Delta Lake’s MERGE statements to upsert and remove duplicates efficiently.
+In streaming pipelines, I use watermarking and stateful operations to filter late or repeated events.
 _______________________________________________________________________________________________
 
 How do you handle schema evolution and metadata consistency during ingestion from 
