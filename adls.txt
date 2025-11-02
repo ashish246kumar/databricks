@@ -1,7 +1,22 @@
 What are the key considerations and steps in building a real-time data ingestion 
 pipeline from Event Hubs or Kafka into ADLS?
 
+I start by choosing the right processing tool — usually Azure Stream Analytics for simpler logic or Databricks Structured Streaming for complex transformations.
+Then I define the data schema, configure ADLS as the sink, and use micro-batching or windowing to control write frequency.
+Data is partitioned by time for better query performance, and I enable checkpointing to ensure fault tolerance.
+I continuously monitor performance and error rates using Azure Monitor.
+Finally, I optimize file sizes and output frequency to prevent small-file issues.
 
+
+Sink configuration:
+The processed data is written to ADLS Gen2.
+In Databricks, I use .writeStream() with the ADLS path as the sink. This ensures continuous write operations.
+
+4. Windowing and batching:
+I implement micro-batching or windowing to group data before writing. This reduces the number of small files and improves downstream performance
+
+Partitioning:
+Data in ADLS is partitioned by timestamp — such as year, month, day, or hour — to keep it organized and optimize query performance
 
 ________________________________________________________
 How do you integrate cloud-based ETL/ELT tools like Azure Data Factory or Synapse 
