@@ -1,3 +1,30 @@
+_______________________________________________________________________________________________
+How do you monitor, retry, and handle failures in large-scale batch or streaming 
+ingestion pipelines to ADLS
+
+Monitoring and handling failures is crucial for any reliable ingestion pipeline into ADLS.
+I usually start with monitoring dashboards in Azure Data Factory and Databricks, combined with Azure Monitor and Log Analytics for centralized visibility.
+Then I configure retry logic for transient issues, and alerts via email or Teams so the team knows right away if a job fails.
+For streaming jobs, I use a dead-letter folder in ADLS to capture bad records, and for batch pipelines, I use Delta Lake upserts and idempotent design to make reruns safe.
+Every ingestion event is logged with metadata like file name and timestamp, which makes troubleshooting fast.
+I also implement checkpointing and dependency management to ensure reprocessing only happens for failed data
+
+
+. Retry logic:
+I configure automatic retries in ADF activities and Databricks streaming jobs.
+For instance, ADF allows setting a retry count and interval directly in the activity settings — this helps handle transient errors like network timeouts or temporary unavailability of a data source.
+
+Dead-letter storage:
+In streaming pipelines, I configure a dead-letter folder in ADLS to capture malformed or failed records
+
+Idempotent processing:
+I design pipelines to be idempotent, meaning that rerunning them doesn’t cause duplicate writes or corrupt data.
+I achieve this by using Delta Lake’s upsert (MERGE) operations or by tracking processed files to prevent duplication.
+
+. Reprocessing:
+For streaming data, I use checkpointing to ensure processing resumes from the last successful offset.
+
+___________________________________________________________________________________________________________________________
 . How do you maintain data quality and deduplication during ingestion from multiple 
 sources into ADLS? 
 
