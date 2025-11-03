@@ -10,7 +10,9 @@ Each insert or update operation must also maintain this index structure, which i
 When you insert, update, or delete rows:
 The DB must also update the index structure.
 This is why write-heavy tables can get slower with too many indexes.
-
+The indexed key is passed through a hash function.
+The function returns a hash value that points directly to the data location.
+Lookup time is O(1) on average (very fast for equality searches
 ______________________________________________________________________________________________________________________________
 
 
