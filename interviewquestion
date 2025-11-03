@@ -1,3 +1,7 @@
+
+______________________________________________________________________________
+WINDOW Functions:  Provided use cases for RANK(), DENSE_RANK() for ordering data within partitions
+
 Window functions are used to perform calculations across a set of rows that are related to the current row —
 without collapsing them into a single result like aggregation does
 
