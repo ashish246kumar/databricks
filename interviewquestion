@@ -3,6 +3,12 @@ Think of it like an index in a book — it points you to the page where informat
 Without an index → Database performs a full table scan (checks every row).
 With an index → Database uses the index to quickly locate rows matching the condition.
 
+Internally, traditional databases implement indexes using data structures like B-trees or hash tables.
+A B-tree index maintains sorted keys and pointers to rows, allowing logarithmic time lookups.
+Each insert or update operation must also maintain this index structure, which is why indexes speed up reads but can slow down writes
+
+
+
 | Question                                                | Answer  | Explanation                                                     |
 | ------------------------------------------------------- | ------- | --------------------------------------------------------------- |
 | 1️⃣ Indexes improve the speed of data retrieval.        | ✅ True  | Indexes make searches faster by avoiding full table scans.      |
