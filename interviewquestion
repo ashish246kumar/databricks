@@ -1,0 +1,70 @@
+Window functions are used to perform calculations across a set of rows that are related to the current row —
+without collapsing them into a single result like aggregation does
+
+RANK() gives the same rank to ties, but skips the next number (notice both 400’s get rank 1, and the next rank would be 3).
+DENSE_RANK() does not skip ranks after a tie.
+So if two rows share rank 1, the next is 2 (not 3).
+
+
+
+_______________________________________________________________________________________
+
+SELF JOIN Applications:  Discussed scenarios like finding manager-employee relationships within the same table
+
+A SELF JOIN is when a table is joined to itself —
+you treat the same table as two different tables using aliases.
+This is useful when rows within the same table are related to each other — for example:
+
+SELECT 
+    e.emp_name AS employee,
+    m.emp_name AS manager
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id;
+
+
+________________________________________
+
+HAVING vs WHERE:  Explained how WHERE filters rows before aggregation, whereas HAVING filters groups post-aggregation
+explain this 
+
+WHERE is used to filter individual rows before any grouping or aggregation happens.
+HAVING is used to filter aggregated results after GROUP BY has been applied.
+
+
+_____________________________________________________________________________________________________________________________________
+Both Delta Lake and Parquet are file formats used in data lakes, but they serve different purposes.
+Parquet is a storage format, while Delta is a storage layer built on top of Parquet that adds reliability, transaction support, and versioning
+
+Parquet – Data Storage Format
+Parquet is a columnar storage format.
+It’s highly efficient for read-heavy analytics workloads.
+It supports compression and encoding schemes for better performance.
+However, it is immutable — once written, you can’t easily update or delete records.
+It lacks ACID transactions and data versioning.
+✅ Example use case: Great for storing large, append-only datasets for analytics (like logs or historical data).
+
+
+| Feature            | Parquet              | Delta Lake                           |
+| ------------------ | -------------------- | ------------------------------------ |
+| Storage Type       | Columnar file format | Storage layer built on Parquet       |
+| ACID Transactions  | ❌ No                 | ✅ Yes                                |
+| Schema Enforcement | ❌ No                 | ✅ Yes                                |
+| Updates/Deletes    | ❌ Hard               | ✅ Supported                          |
+| Time Travel        | ❌ No                 | ✅ Yes                                |
+| Streaming Support  | ❌ No                 | ✅ Yes                                |
+| Metadata Handling  | Hive Metastore       | Delta transaction log (`_delta_log`) |
+| Use Case           | Raw data storage     | Reliable data lake / Lakehouse       |
+
+______________________________________________________________________________________________________
+
+Delta Lake is an open-source storage layer that sits on top of Parquet files.
+It adds features that Parquet alone doesn’t provide, such as:
+ACID transactions (ensures reliability during concurrent writes)
+Schema evolution and enforcement
+Time travel (query old versions of data)
+Merge, update, delete support
+Streaming + batch unification
+______________________________________________________________________________________________________
+
+
