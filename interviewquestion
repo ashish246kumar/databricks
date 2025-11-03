@@ -1,5 +1,23 @@
+An index is a database structure (like a lookup table) that helps the database find rows faster without scanning the entire table.
+Think of it like an index in a book — it points you to the page where information is located instead of reading every page.
+Without an index → Database performs a full table scan (checks every row).
+With an index → Database uses the index to quickly locate rows matching the condition.
 
+| Question                                                | Answer  | Explanation                                                     |
+| ------------------------------------------------------- | ------- | --------------------------------------------------------------- |
+| 1️⃣ Indexes improve the speed of data retrieval.        | ✅ True  | Indexes make searches faster by avoiding full table scans.      |
+| 2️⃣ Indexes slow down data insertion and updates.       | ✅ True  | Because the index must be updated whenever data changes.        |
+| 3️⃣ You can create an index on multiple columns.        | ✅ True  | That’s called a **composite index**.                            |
+| 4️⃣ Indexes reduce storage space.                       | ❌ False | They actually **consume extra space** in the database.          |
+| 5️⃣ Indexes are automatically created on every column.  | ❌ False | You must explicitly create them (except for primary keys).      |
+| 6️⃣ A primary key automatically creates a unique index. | ✅ True  | Most databases do this under the hood.                          |
+| 7️⃣ Too many indexes always improve performance.        | ❌ False | Too many indexes can **slow down writes** and use extra memory. |
+
+Internally, traditional databases implement indexes using data structures like B-trees or hash tables.
+A B-tree index maintains sorted keys and pointers to rows, allowing logarithmic time lookups.
+Each insert or update operation must also maintain this index structure, which is why indexes speed up reads but can slow down writes
 ______________________________________________________________________________
+
 WINDOW Functions:  Provided use cases for RANK(), DENSE_RANK() for ordering data within partitions
 
 Window functions are used to perform calculations across a set of rows that are related to the current row —
@@ -8,6 +26,8 @@ without collapsing them into a single result like aggregation does
 RANK() gives the same rank to ties, but skips the next number (notice both 400’s get rank 1, and the next rank would be 3).
 DENSE_RANK() does not skip ranks after a tie.
 So if two rows share rank 1, the next is 2 (not 3).
+
+
 
 
 
