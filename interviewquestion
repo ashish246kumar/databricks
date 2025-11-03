@@ -1,3 +1,4 @@
+______________________________________________________________________________________________________
 An index is a database structure (like a lookup table) that helps the database find rows faster without scanning the entire table.
 Think of it like an index in a book — it points you to the page where information is located instead of reading every page.
 Without an index → Database performs a full table scan (checks every row).
