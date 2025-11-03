@@ -653,6 +653,7 @@ DBSQL ke “Query History” section mein har query ka record hota hai – execu
 *******
 In Apache Spark, yeh cluster has one boss called "master" and kai saare workers called "nodes" that do kaam together
 ********
+IMP*
  Spark ka Core Architecture
 Spark ka architecture Master-Slave model pe based hota hai. Matlab ek Driver Program hota hai jo Executors ko kaam assign karta hai.
 
