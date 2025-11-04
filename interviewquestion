@@ -1,4 +1,24 @@
-“In data warehousing, a hybrid approach combines the benefits of real-time updates and full historical tracking.
+Spark Core is the general execution engine for the Spark platform, responsible for tasks such 
+as scheduling, distributing, and monitoring applications.
+
+__________________
+List Comprehension
+
+A list comprehension is a concise way to create lists in Python —
+it allows you to write a single line of code instead of a multi-line for loop.
+squares = [i * i for i in range(5)]
+__________
+
+A lambda function is a small, anonymous function defined without a name —
+typically used for short, simple operations that you don’t want to formally define using def.
+lambda arguments: expression
+square = lambda x: x * x
+print(square(5))
+
+___________________________________________________________
+Described the hybrid approach of maintaining a current data table and a historical changes table.
+
+In data warehousing, a hybrid approach combines the benefits of real-time updates and full historical tracking.
 We maintain two tables — one for current data and one for historical changes.
 
 When an update happens, the old record is moved to the history table with effective start and end dates, and the current table is updated with the new value.
