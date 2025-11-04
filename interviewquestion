@@ -8,6 +8,18 @@ Files have random customer_id values → Spark scans many files.
 After Z-Order:
 Each file contains a narrow range of customer_id values → Spark skips irrelevant files easily.
 
+⚖️ 6️⃣ Performance Impact
+Z-Ordering reduces the number of files read by Spark.
+
+OPTIMIZE sales_table
+Z-Ordering uses a multi-dimensional clustering technique
+ZORDER BY (customer_id, product_id);
+Under the hood:
+Delta Lake combines files within each partition.
+Then it reorders records based on the Z-order curve of the specified columns.
+The reordered files make data skipping more effective.
+
+
 --------------------------------------------------------------------------------------------------------------
 T — Time Travel (Data Versioning)
 Delta automatically versions your table after every transaction (in _delta_log).
