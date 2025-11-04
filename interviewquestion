@@ -7,7 +7,7 @@ You can query older versions of your data using a timestamp or version number.
 spark.read.format("delta").option("versionAsOf", 5).load("/delta/sales")
 This feature allows rollback to previous versions
 
-What it means:
+Schema Evolution:
 Delta enforces a consistent schema between writes.
 If new data doesn’t match the existing schema, Spark throws an error unless schema evolution is explicitly allowed.
 Example:
