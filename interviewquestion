@@ -1,3 +1,21 @@
+
+
+--------------------------------------------------------------------------------------------------------------
+T — Time Travel (Data Versioning)
+Delta automatically versions your table after every transaction (in _delta_log).
+You can query older versions of your data using a timestamp or version number.
+spark.read.format("delta").option("versionAsOf", 5).load("/delta/sales")
+This feature allows rollback to previous versions
+
+What it means:
+Delta enforces a consistent schema between writes.
+If new data doesn’t match the existing schema, Spark throws an error unless schema evolution is explicitly allowed.
+Example:
+spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
+Delta prevents accidental data corruption by enforcing schema consistency — you can’t write mismatched columns or types.
+But if needed, Delta supports schema evolution for adding new columns
+
+_______________________________________
 Data skew happens when some partitions in a Spark job have significantly more data than others.
 a few tasks take much longer while others finish quickly, leading to poor parallelism and slower job execution
 Let’s say you’re joining on customer_id, and one customer (say ID = 12345) has millions of records, while others have only a few.
