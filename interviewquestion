@@ -1,4 +1,5 @@
 
+____________________________________________________________________________________________________________________________________________________________
 Z-Ordering in Delta Lake is an optimization that reorders data within partitions based on multiple columns, improving data skipping and query performance.
 For example, if my table is partitioned by date but queries often filter by customer_id, I can run OPTIMIZE table ZORDER BY (customer_id) to cluster related records together.
 This way, Spark reads fewer files for those queries
