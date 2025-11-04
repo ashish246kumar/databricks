@@ -1,6 +1,17 @@
 
+___________________________________________________________________________________________
+how Spark executes tasks in DAG (Directed Acyclic Graph) format
 
+When we submit a Spark job, Spark first builds a logical plan of transformations.
+Then, it converts this into a physical plan called a DAG — a Directed Acyclic Graph — that represents stages separated by shuffle boundaries.
+Each stage is further divided into tasks based on partitions.
+The DAG Scheduler submits these stages to the Task Scheduler, which runs the tasks on executors across the cluster.
+Once all stages complete successfully, the job result is returned
 
+DAG Scheduler: Divides the job into stages and creates the DAG.
+Task Scheduler: Schedules tasks to executors.
+Executor: Executes tasks and returns results.
+Cluster Manager (like YARN, Mesos, or Standalone): Allocates resources.
 _____________________________________________
 Spark Core is the general execution engine for the Spark platform, responsible for tasks such 
 as scheduling, distributing, and monitoring applications.
