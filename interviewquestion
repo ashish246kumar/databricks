@@ -12,6 +12,15 @@ DAG Scheduler: Divides the job into stages and creates the DAG.
 Task Scheduler: Schedules tasks to executors.
 Executor: Executes tasks and returns results.
 Cluster Manager (like YARN, Mesos, or Standalone): Allocates resources.
+
+Each node in the DAG represents a RDD/DataFrame.
+Each edge represents a transformation (like map, filter, join, etc.).
+No cycles — because once data is processed, Spark doesn’t go back.
+Spark divides transformations into two types:
+Narrow transformations: (e.g., map, filter) → data from one partition goes to one partition (no shuffle).
+Wide transformations: (e.g., groupBy, join) → data needs to be shuffled across nodes.
+When Spark detects a wide transformation, it creates a new stage in the DAG.
+“Spark breaks the job into stages based on shuffle boundaries and forms a DAG of stages.”
 _____________________________________________
 Spark Core is the general execution engine for the Spark platform, responsible for tasks such 
 as scheduling, distributing, and monitoring applications.
