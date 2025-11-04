@@ -1,3 +1,5 @@
+
+
 ______________________________________________________________________________________________________
 An index is a database structure (like a lookup table) that helps the database find rows faster without scanning the entire table.
 Think of it like an index in a book — it points you to the page where information is located instead of reading every page.
@@ -13,7 +15,7 @@ This is why write-heavy tables can get slower with too many indexes.
 The indexed key is passed through a hash function.
 The function returns a hash value that points directly to the data location.
 Lookup time is O(1) on average (very fast for equality searches
-______________________________________________________________________________________________________________________________
+____________________________________________________________
 
 
 | Question                                                | Answer  | Explanation                                                     |
