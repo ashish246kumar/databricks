@@ -1,3 +1,22 @@
+“In data warehousing, a hybrid approach combines the benefits of real-time updates and full historical tracking.
+We maintain two tables — one for current data and one for historical changes.
+
+When an update happens, the old record is moved to the history table with effective start and end dates, and the current table is updated with the new value.
+In Current Table, we update:
+
+Customer_ID | Name   | Address | IsActive
+-----------------------------------------
+101          | Rajesh | Mumbai  | Y
+
+
+✅ In History Table, we insert the old record:
+
+Customer_ID | Old_Address | Effective_Start | Effective_End | IsActive
+---------------------------------------------------------------------
+101          | Delhi       | 2024-01-01      | 2025-01-15     | N
+
+
+____________________________________________________________________
 scd
 __________
 
