@@ -1,3 +1,19 @@
+scd
+__________
+
+Slowly Changing Dimensions, or SCDs, are techniques used in data warehousing to track and manage 
+changes in dimension table attributes over time — such as a customer’s address or an employee’s department
+
+| **Type**                    | **Description**                                                                                             | **Example**                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Type 0 – Passive**        | No changes are tracked; once stored, values remain fixed.                                                   | Student’s admission major remains the same even if changed later.                                                        |
+| **Type 1 – Overwrite**      | Old data is replaced by new data; no history maintained.                                                    | Customer’s old address replaced by new one.                                                                              |
+| **Type 2 – New Record**     | A new record is created when data changes; full history preserved with effective dates or flags.            | Product’s price change creates a new record with new `start_date` and `end_date`.                                        |
+| **Type 3 – New Column**     | Adds a new column to store the previous value; only one level of history retained.                          | Employee’s previous role stored in “Previous_Role” column.                                                               |
+| **Type 4 – History Table**  | Separate history table maintains old records; main table holds current data.                                | Old store details pushed to “Store_History” table when location changes.                                                 |
+| **Type 6 – Hybrid (1+2+3)** | Combination of Types 1, 2, and 3 — overwriting, adding new records, and tracking previous columns together. | Salesperson changes region → new record (Type 2), previous region column updated (Type 3), contact overwritten (Type 1). |
+
+________________________________________________________________________________
 FACT vs DIM
 
 A fact table is the central table in a data warehouse that stores measurable data — things you can count or sum, such as sales amount, units sold, or revenue.
