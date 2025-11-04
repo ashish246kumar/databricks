@@ -150,9 +150,8 @@ Each Stage has multiple Tasks
 Tasks are executed in parallel on Executors
    ↓
 Each Executor uses its allocated Cores
-```
+___________________________________
 
----
 
 
 __________________
