@@ -1,5 +1,56 @@
+REPARTITION
+repartition() increases or decreases the number of partitions by shuffling all the data across the cluster.
+How it works:
+Performs a full shuffle — data is redistributed across all partitions.
+Each partition gets a roughly equal amount of data.
+Can increase or decrease partitions.
+Creates new partitions from scratch
 
-___________________________________________________________________________________________
+When to use:
+When you increase partitions to improve parallelism.
+When you want even data distribution across partitions (to avoid skew).
+performing a wide transformation (like join or groupBy).
+
+⚙️ 2️⃣ COALESCE
+How it works:
+Narrow transformation — it simply merges adjacent partitions.
+No shuffle, so it’s much faster than repartition.
+Can only decrease the number of partitions
+
+when to use
+., before writing output files
+fewer output files
+
+| Feature                 | `repartition()`                | `coalesce()`             |
+| ----------------------- | ------------------------------ | ------------------------ |
+| **Shuffle**             | Yes (full shuffle)             | No shuffle               |
+| **Performance**         | Slower (due to shuffle)        | Faster (no shuffle)      |
+| **Use case**            | Increase or balance partitions | Decrease partitions      |
+| **Transformation type** | Wide transformation            | Narrow transformation    |
+| **Data distribution**   | More balanced                  | May be uneven            |
+| **Flexibility**         | Can increase or decrease       | Only decrease            |
+| **Fault tolerance**     | Higher                         | Lower (since no shuffle) |
+
+how i coalesce does not do shuffle but repartion do
+
+shuffling means moving data between executors or partitions across the cluster — it’s expensive because it involves:
+writing data to disk,
+sending it over the network
+
+Spark does not move data across executors.
+Instead, it reuses existing partitions and merges adjacent partitions into fewer ones.
+Spark just combines partition 1+2 and partition 3+4 — without redistributing data.
+So:
+No network I/O
+No shuffle
+
+repartition() Works Internally
+Redistribute all records evenly across the 8 partitions.
+Data from every old partition can go to any new partition.
+This ensures balanced data distribution and parallelism
+
+______________________
+_____________________________________________________________________
 how Spark executes tasks in DAG (Directed Acyclic Graph) format
 
 When we submit a Spark job, Spark first builds a logical plan of transformations.
