@@ -1,5 +1,158 @@
+_____________________________________________
 Spark Core is the general execution engine for the Spark platform, responsible for tasks such 
 as scheduling, distributing, and monitoring applications.
+SparkContext is the entry point for any Spark application. It acts as a connection to the 
+Spark cluster, allowing Spark jobs to be executed.
+
+SparkSession is the unified entry point to work with DataFrames, Datasets, and SQL in 
+Apache Spark. It replaces SQLContext and HiveContex
+
+Excellent question, Ashish 👏 — this is **one of the most frequently asked Spark fundamentals** in interviews (especially for data engineering or Spark developer roles).
+
+Let’s break it down clearly — **definitions + examples + how they are related internally + a comparison table** 👇
+
+---
+
+## ⚙️ **1️⃣ Executor**
+
+* **Definition:**
+  Executors are **JVM processes** launched on worker nodes in a Spark cluster that actually **run the tasks** of your Spark job.
+  They are responsible for:
+
+  * Executing your code (tasks)
+  * Storing data in memory/disk (for caching)
+  * Returning results to the driver
+
+* **Key points:**
+
+  * Executors live as long as your Spark application runs.
+  * Each executor can run **multiple tasks in parallel**, depending on the number of **cores** allocated to it.
+
+* **Example:**
+  If your Spark app has 4 executors and each has 4 cores →
+  **Total 16 tasks can run in parallel.**
+
+---
+
+## 🧮 **2️⃣ Cores**
+
+* **Definition:**
+  Cores are the **processing units** (CPU threads) available to executors to run tasks in parallel.
+
+* **Key points:**
+
+  * Each core runs **one task at a time**.
+  * More cores = more parallelism = faster execution (up to a point).
+
+* **Example:**
+
+  * Executor with 4 cores → can process 4 tasks simultaneously.
+  * Cluster with 10 executors × 4 cores = 40 tasks parallel execution.
+
+---
+
+## 🧩 **3️⃣ Stage**
+
+* **Definition:**
+  A **stage** is a **set of parallel tasks** that execute the same computation (like a map or reduce) on different data partitions.
+
+* **Created When:**
+  Spark divides a job into stages **based on shuffle boundaries**.
+  (A shuffle happens when data must be redistributed across the cluster — e.g., during `groupByKey`, `join`, or `reduceByKey`.)
+
+* **Example:**
+
+  ```python
+  rdd.map(lambda x: (x,1)).reduceByKey(lambda a,b: a+b)
+  ```
+
+  * Stage 1 → Map stage
+  * Stage 2 → Reduce stage (after shuffle)
+
+---
+
+## 🧱 **4️⃣ Job**
+
+* **Definition:**
+  A **job** is triggered whenever you perform an **action** (like `count()`, `collect()`, `saveAsTextFile()`, etc.) on an RDD or DataFrame.
+
+* **Key points:**
+
+  * One action → one job
+  * A job is divided into one or more stages
+  * Each stage has multiple parallel tasks
+
+* **Example:**
+
+  ```python
+  df.count()
+  df.show()
+  ```
+
+  → Each of these actions will trigger a **separate Spark job**
+
+---
+
+## 🔄 **5️⃣ Transformation**
+
+* **Definition:**
+  Transformations are operations on RDDs or DataFrames that **define a new dataset** from an existing one.
+  They are **lazy** — Spark does not execute them immediately; it builds a DAG (Directed Acyclic Graph) instead.
+
+* **Types:**
+
+  * **Narrow transformations:** No shuffle (e.g., `map`, `filter`)
+  * **Wide transformations:** Causes shuffle (e.g., `groupByKey`, `reduceByKey`)
+
+* **Example:**
+
+  ```python
+  rdd2 = rdd1.map(lambda x: x*2)
+  rdd3 = rdd2.filter(lambda x: x > 10)
+  ```
+
+  No computation happens yet — Spark just builds the DAG.
+
+---
+
+## ⚡ **6️⃣ Action**
+
+* **Definition:**
+  Actions **trigger execution** of the DAG built by transformations.
+  They tell Spark to **actually perform the computation** and return a result to the driver or write to storage.
+
+* **Example:**
+
+  ```python
+  rdd3.count()          # Returns number of elements
+  rdd3.collect()        # Returns all elements to driver
+  rdd3.saveAsTextFile() # Writes to storage
+  ```
+
+  Once you call an action → Spark starts executing stages → tasks → on executors.
+
+---
+
+## 🔗 **7️⃣ Relationship Between All Components**
+
+```
+Driver Program
+   ↓
+Transformations build DAG
+   ↓
+Action triggers a Job
+   ↓
+Job is split into Stages
+   ↓
+Each Stage has multiple Tasks
+   ↓
+Tasks are executed in parallel on Executors
+   ↓
+Each Executor uses its allocated Cores
+```
+
+---
+
 
 __________________
 List Comprehension
