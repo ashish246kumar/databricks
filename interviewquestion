@@ -7,6 +7,23 @@ Few dominant values in the key column.
 Improper partitioning of data
 
 
+🚀 4️⃣ Strategies to Resolve Data Skew
+from pyspark.sql import functions as F
+# Add random salt to skewed key
+salted_df = df.withColumn("salted_key", 
+                          F.concat(F.col("customer_id"), F.lit("_"), (F.rand()*5).cast("int")))
+# Join using salted key
+result = salted_df.join(other_df, salted_df.salted_key == other_df.salted_key)
+“I used key salting to distribute skewed keys across multiple partitions.
+By adding a random salt, the heavy key gets split into smaller groups, balancing the workload.”
+
+Avoid shuffle altogether by broadcasting the smaller dataset to all executors.
+from pyspark.sql.functions import broadcast
+result = large_df.join(broadcast(small_df), "customer_id")
+“Instead of shuffling both datasets, I broadcast the smaller one to every node — this prevents skew from large shuffle operations
+
+
+
 
 ____________________________________________________________________________
 REPARTITION
