@@ -1,4 +1,32 @@
+FACT vs DIM
 
+A fact table is the central table in a data warehouse that stores measurable data — things you can count or sum, such as sales amount, units sold, or revenue.
+It answers what happened in the business, while dimension tables explain who, what, when, and where.
+For example, in a retail business, the fact table might have columns like Product_ID, Store_ID, Date_ID, and measures such as Units_Sold and Revenue. 
+These foreign keys link to dimensions for deeper analysis.
+
+There are three main types:
+Transactional — records every individual event, like each sale.
+Snapshot — captures the state at regular intervals, like daily inventory.
+Accumulating — tracks progress of a process, like order to delivery.
+Accumulating fact table — tracks processes with defined start and end points, such as an order from booking to delivery
+
+
+A dimension table contains descriptive attributes about business entities — like products, customers, stores, or dates.
+It provides context to the numbers in a fact table, answering the who, what, where, when of a business event.
+It gives context to the numbers in a fact table
+For example, instead of seeing just Product_ID = 101, the dimension table tells you that it’s “iPhone 15”, belongs to the “Smartphones” category, and is made by “Apple”.
+
+
+| **Feature**           | **Fact Table**                                                          | **Dimension Table**                                                          |
+| --------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Purpose**           | Stores measurable, quantitative business data (facts or metrics).       | Stores descriptive, contextual information about business entities.          |
+| **Type of Data**      | Numeric data (e.g., sales amount, quantity, profit).                    | Text or descriptive data (e.g., product name, customer name, location).      |
+| **Foreign Key**       | Contains foreign keys referencing dimension tables.                     | Does **not** contain foreign keys from fact tables (only primary key).       |
+| **Operations**        | Used for aggregations like SUM, AVG, COUNT during analysis.             | Used for filtering, grouping, and labeling facts in reports.                 |
+| **Size**              | Usually very large (millions or billions of records).                   | Smaller in size compared to fact tables.                                     |
+| **Refresh Frequency** | Updated frequently (as new transactions occur).                         | Changes rarely — mostly when entity attributes change.                       |
+| **Example**           | Sales_Fact (Date_ID, Product_ID, Customer_ID, Units_Sold, Revenue).     | Product_Dim (Product_ID, Product_Name, Category, Brand, Price).              |
 
 ______________________________________________________________________________________________________
 An index is a database structure (like a lookup table) that helps the database find rows faster without scanning the entire table.
