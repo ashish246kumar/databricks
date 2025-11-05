@@ -1,3 +1,9 @@
+Batch processing deals with large data sets in bulk — it’s great for analytics and reporting where latency isn’t critical. Real-time processing, 
+on the other hand, processes data continuously as it arrives — useful when immediate insights or actions are required.
+For example, a bank might use real-time processing to detect fraudulent transactions instantly, but use batch processing to generate end-of-day reports.
+The trade-off is between latency and complexity — batch is simpler and cheaper, while real-time gives instant insights but requires more complex infrastructure.
+
+__________________________________________________________________________
 How do you ensure the scalability of a data pipeline handling rapidly growing data volumes.
 
 To ensure scalability of a data pipeline handling rapidly growing data volumes, 
