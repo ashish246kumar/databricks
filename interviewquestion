@@ -1,3 +1,24 @@
+ETL (Extract, Transform, Load):
+Data is first extracted from source systems, transformed into the required format on a separate processing server or ETL tool, and then loaded into the data warehouse.
+
+ELT (Extract, Load, Transform):
+Data is first extracted and loaded directly into the target data warehouse (often cloud-based), and the transformation happens inside the data warehouse using its processing power.
+
+| Feature                     | ETL                                       | ELT                                                    |
+| --------------------------- | ----------------------------------------- | ------------------------------------------------------ |
+| **Transformation Location** | Before loading (external ETL tool/server) | After loading (inside target DB)                       |
+| **Best for**                | On-premises data warehouses               | Cloud-based warehouses (Snowflake, BigQuery, Redshift) |
+| **Performance**             | Limited by ETL server                     | Uses data warehouse’s high scalability                 |
+| **Data Volume**             | Moderate                                  | Large/Big Data                                         |
+| **Latency**                 | Batch processing                          | Near real-time or flexible processing                  |
+
+Use ELT when:
+You need to load large volumes of raw data quickly.
+You want more flexibility for data analysts to run transformations on demand.
+
+Use ETL when:
+You need complex transformations before loading data.
+The target system has limited processing capacity.
 
 ____________________________________________________________________________________________________________________________________________________________
 Z-Ordering in Delta Lake is an optimization that reorders data within partitions based on multiple columns, improving data skipping and query performance.
