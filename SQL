@@ -26,10 +26,46 @@ abs(TIMESTAMPDIFF(second,t1.Trade_Timestamp,t2.Trade_Timestamp)) <=10
 and
 100*(abs(t1.price-t2.price))/t1.price >10 
 order by t1.TRADE_ID
+
+	first_trade	second_trade	first_trade_price	second_price	percent_diff
+	TRADE1	TRADE2	20.00	15.00	25.00
+	TRADE1	TRADE3	20.00	30.00	50.00
+	TRADE1	TRADE4	20.00	32.00	60.00
+	TRADE2	TRADE3	15.00	30.00	100.00
+	TRADE2	TRADE4	15.00	32.00	113.33
 _______________________________________________________________________________________________________
+we have a table which stores data of multiple sections. every section has 3 numbers
+we have to find top 4 numbers from any 2 sections(2 numbers each) whose addition should be maximum
+so in this case we will choose section b where we have 19(10+9) then we need to choose either C or D
+because both has sum of 18 but in D we have 10 which is bigger than 9 so we will give priority to D.
 
 
 
+
+create table section_data
+(
+section varchar(5),
+number integer
+)
+insert into section_data
+values ('A',5),('A',7),('A',10) ,('B',7),('B',9),('B',10) ,('C',9),('C',7),('C',9) ,('D',10),('D',3),('D',8);
+
+
+
+with top2 as(
+select *,ROW_NUMBER() over(partition by section order by number desc) as row_num from section_data
+),
+pick2 as(
+select section,number from top2 where row_num<=2
+),
+cte as(
+select section,sum(number) as sum2,max(number) as max_number from pick2  group by section
+),
+cte2 as(
+select section,sum2,max_number from cte order by sum2 desc,max_number desc limit 2
+)
+
+select s.section,s.number from pick2 s join cte2 t2 on s.section=t2.section order by s.section desc,s.number desc 
 
 __________________________________________________________________________________________
 Imagine you're working for a library and you're tasked with generating a report on the borrowing habits of patrons. You have two tables in your database: Books and Borrowers.
