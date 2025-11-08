@@ -164,4 +164,52 @@ select order_date,sum(case when rn >1 then 1 else 0 end) as old_cust,sum(case wh
 2022-01-01	0	3
 2022-01-02	1	2
 2022-01-03	2	1
+__________________________________________________________________________________
+
+Write a SQL query to find the total_visits, most_visited_floor, and resources_used
+
+create table entries ( 
+name varchar(20),
+address varchar(20),
+email varchar(20),
+floor int,
+resources varchar(10));
+
+insert into entries 
+values ('A','Bangalore','A@gmail.com',1,'CPU'),('A','Bangalore','A1@gmail.com',1,'CPU'),('A','Bangalore','A2@gmail.com',2,'DESKTOP')
+,('B','Bangalore','B@gmail.com',2,'DESKTOP'),('B','Bangalore','B1@gmail.com',2,'DESKTOP'),('B','Bangalore','B2@gmail.com',1,'MONITOR')
+
+
+
+
+
+with cte as(
+select name,count(*) as total_f_c from entries group by name
+),
+floor_visit_count as (
+
+select *,row_number() over(partition by  name order by total_count desc) as rnk   from (
+select name,floor,count(*) as total_count from
+entries group by name , floor
+)  temp2
+),
+resources1 AS (
+select name,GROUP_CONCAT(resources,',') as resources_used from
+(
+select distinct name,resources from entries
+) temp
+group by name
+)
+select c.name,total_f_c,floor,resources_used from cte c join floor_visit_count f on c.name=f.name 
+join resources1 r1 on c.name=r1.name
+ where rnk=1
+
+
+________________________________________________________________________________________________
+
+
+
+
+
+
 
