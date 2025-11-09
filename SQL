@@ -1,3 +1,34 @@
+Write a SQL Query to find the cancellation rate of requests with unbanned users (both client and driver must not be banned).
+Each day between "2013-10-01" and "2013-10-03". Round cancellation rate to two dedimal points.
+The cancellation rate is computed by dividing the number of cancelled (by client or driver) requests with unbanned users by the total
+number of requests with unbanned users on that day.
+
+
+Create table Trips (id int, client_id int, driver_id int, city_id int, status varchar(50), request_at varchar(50));
+
+Create table Users (users_id int, banned varchar(50), role varchar(50));
+
+
+SELECT 
+    request_at,
+    ROUND(
+        SUM(CASE WHEN status <> 'Completed' THEN 1 ELSE 0 END) / COUNT(*),
+        2
+    ) AS cancellation_rate
+FROM Trips t
+JOIN Users u1 ON t.client_id = u1.users_id AND u1.banned = 'No'
+JOIN Users u2 ON t.driver_id = u2.users_id AND u2.banned = 'No'
+WHERE request_at BETWEEN '2013-10-01' AND '2013-10-03'
+GROUP BY request_at;
+
+____________________________________________________________________________
+
+
+
+
+
+
+_________________________________________________________________________________________________________________________________
 Write a sql query to find PersonID, Name, Number of friends, sum of marks of person who have friends with total score greater than 100.
 
 CREATE TABLE person 
