@@ -1,3 +1,24 @@
+A table has start_date and end_date columns — how would you calculate the total number of overlapping days across all rows?
+
+
+SELECT 
+    SUM(
+        DATEDIFF(
+            LEAST(a.end_date, b.end_date),
+            GREATEST(a.start_date, b.start_date)
+        ) + 1
+    ) AS total_overlap_days
+FROM events a
+JOIN events b 
+  ON a.id < b.id  -- avoid self-join duplicates
+ AND a.start_date <= b.end_date
+ AND b.start_date <= a.end_date;
+
+________________________________________________________________________________________________________
+How would you identify duplicate records in a table and delete only the duplicates while retaining one original record?
+
+You can use ROW_NUMBER() to assign a unique rank to each duplicate group.
+____________________________________________________________________________________
 How do you remove duplicates and handle nulls in PySpark?
 
 clean_df = df.dropDuplicates(['emp_id']).na.fill({'age': 0, 'city': 'Unknown'})
