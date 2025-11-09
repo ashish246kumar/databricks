@@ -1,5 +1,31 @@
+Write a sql query to find PersonID, Name, Number of friends, sum of marks of person who have friends with total score greater than 100.
+
+CREATE TABLE person 
+ (
+ PersonID INT,
+ Name STRING,
+ Email STRING,
+ Score INT
+ );
+INSERT INTO person 
+VALUES (1, 'Alice', 'alice2018@hotmail.com', 88),
+(2, 'Bob', 'bob2018@hotmail.com', 11),
+(3, 'Davis', 'davis2018@hotmail.com', 27),
+(4, 'Tara', 'tara2018@hotmail.com', 45),
+(5, 'John', 'john2018@hotmail.com', 63);
+
+CREATE TABLE friend 
+(PersonID INT, FriendID INT);
+
+INSERT INTO friend 
+VALUES (1,2), (1,3), (2,1), (2,3), 
+(3,5), (4,2), (4,3), (4,5);
 
 
+with cte as(
+select f.PersonID,count(*) as tf,sum(score) as total_f_s from person p1 join friend f on p1.PersonID=f.FriendID group by f.PersonID
+)
+select ct.PersonID,name,tf,total_f_s from cte ct join person p on ct.PersonID=p.PersonID where total_f_s>100
 _____________________________________________________________________________________
 Write a SQL query to find all couples of trade for some stock that happened in the range of 10 seconds
 and having price difference by more than 10%.
