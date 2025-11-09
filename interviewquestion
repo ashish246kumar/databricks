@@ -1,3 +1,12 @@
+___________________________________________________________
+How do you implement data governance and lineage in Azure?
+
+Use Azure Purview for data discovery, cataloging, and lineage tracking.
+Store metadata centrally in Data Catalog (Glue Catalog in AWS).
+Assign access via RBAC and Purview roles.
+
+
+_________________________________________________
 walk me through the architecture of last  engineering project
 
 sources: flat files
