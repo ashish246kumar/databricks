@@ -1,3 +1,40 @@
+
+__________________________________________________________________________________________________________
+How do you reduce data storage and compute costs in Azure ?
+
+For storage, we use lifecycle management policies to move old or infrequently used data to cool or archive tiers in Azure Data Lake or Blob Storage.
+We compress data and store it in efficient formats like Parquet or Delta, which reduce both size and read costs.
+For compute, we use auto-scaling and job clusters in Databricks so clusters run only when needed.
+
+Use Delta Lake for storage efficiency and caching for faster reads.
+Schedule jobs during off-peak hours to use lower-cost compute.
+Consolidate small files (“small file problem”) in ADLS to reduce metadata overhead.
+
+Delta Lake improves storage efficiency by storing data in the Parquet format, which is a highly compressed and columnar storage type.
+It supports data versioning (time travel) using transaction logs instead of keeping multiple file copies, saving storage space
+Features like data skipping and Z-ordering make queries faster by reading only the necessary data blocks.
+It supports schema evolution without needing to reload data, which saves both time and resources.
+
+File format: Delta Lake builds on top of Parquet → efficient compression (Snappy, Gzip).
+Transaction log (_delta_log): Stores metadata instead of duplicating data → minimal overhead
+
+
+______________________________________________________________________________
+
+
+How do you process streaming data in Databricks or AWS?
+
+In our project, we process streaming data in Databricks using Spark Structured Streaming.
+The data is consumed from Kafka topics in real time using the Databricks readStream API.
+We define a streaming DataFrame to process incoming data — applying transformations, filters, and aggregations.
+The processed data is then written to different sinks like Delta tables, Azure Data Lake, or another Kafka topic using writeStream.
+We use checkpointing and watermarking to handle fault tolerance and late-arriving data.
+The jobs are scheduled and monitored in Databricks workflows, ensuring reliable and continuous data processing.
+This setup allows us to build real-time pipelines for analytics and dashboarding.
+
+stream df.writeStream.format("delta")
+.option("checkpoint Location", "/mnt/chkpt/")
+.start("/mnt/output/")
 ___________________________________________________________
 How do you implement data governance and lineage in Azure?
 
@@ -5,6 +42,15 @@ Use Azure Purview for data discovery, cataloging, and lineage tracking.
 Store metadata centrally in Data Catalog (Glue Catalog in AWS).
 Assign access via RBAC and Purview roles.
 
+Tool for Governance: Azure Purview (now part of Microsoft Fabric governance).
+For Data Lineage: Purview integrates with Data Factory and Databricks pipelines to trace the complete data flow.
+For Access Control: Azure AD roles + managed identities.
+For Data Security: Sensitivity labels, encryption, and Key Vault
+
+Purview helps us discover, classify, and catalog data across Azure services like Data Lake, SQL, and Databricks.
+It automatically captures data lineage, showing how data moves from source to transformation to reports.
+We define data policies, access control, and sensitivity labels in Purview to ensure data security and compliance.
+We also use Azure AD for role-based access and integrate with Key Vault for managing secrets.
 
 _________________________________________________
 walk me through the architecture of last  engineering project
