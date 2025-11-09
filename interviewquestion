@@ -1,3 +1,8 @@
+What's the difference between Azure Synapse and Databricks when would you use each?
+
+Databricks: Best for ETL, big data, and transformation using PySpark.
+Synapse: Best for serving analytical queries to BI tools (e.g., Power BI).
+In our project → Databricks handled transformation, Synapse served reporting data.
 
 __________________________________________________________________________________________________________
 How do you reduce data storage and compute costs in Azure ?
