@@ -1,4 +1,47 @@
+How do you remove duplicates and handle nulls in PySpark?
 
+clean_df = df.dropDuplicates(['emp_id']).na.fill({'age': 0, 'city': 'Unknown'})
+________________________________________________
+How do you handle Slowly Changing Dimensions (SCD Type 2)?
+
+Compare source and target using business keys.
+Update old record's end_date and is_active=false.
+Insert new record with start_date=current_date().
+Example (Delta Merge):
+MERGE INTO dim customer t
+USING updates s
+ON t.cust id = s.cust_id
+WHEN MATCHED AND t.email <> s.email THEN
+UPDATE SET t.is_active=false, t.end_date=current_date()
+________________________________________________________________________________________
+Design a simple data pipeline on AWS for daily data ingestion.
+
+Ingest: S3 (landing zone) + EventBridge trigger
+Process: AWS Glue job (PySpark ETL)
+Store: S3 curated → Redshift
+Orchestrate: Step Functions / Lambda
+Secure: IAM roles + KMS encryption
+___________________________________________________________
+Tell me about a time your pipeline failed in production.
+What I said:
+"Our ADF job failed due to missing files. I added file existence checks + retry logic → reduced daily failures by 95%."
+___________________________________________
+How do you measure data pipeline performance? .
+
+We measure data pipeline performance using key metrics like throughput, latency, and resource utilization.
+Track throughput (rows/sec). 
+Monitor failure rates via CloudWatch/ADF logs. 
+We set up Grafana dashboards and alerts to visualize performance trends and detect anomalies early.
+
+__________________________________________________________________
+
+How do you ensure data accuracy and quality in ETL pipelines?
+
+Perform schema validation before processing (column count, data types).
+Apply data profiling and threshold checks (null%, duplicates).
+Store invalid data separately in an error zone for audit.
+Log validation results in a control table.
+Automate alerts for any deviation beyond tolerance.
 _________________________________________________________________________________________________________________
 How do you optimize Delta Lake tables for performance and cost?
 
