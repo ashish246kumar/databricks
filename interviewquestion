@@ -7,10 +7,19 @@ storage: adls
 monitoring : log and alert 
 i have implemented error profile reprocessing logic
 written script for data validation
+migrated huge volume of data
+new source integrate 
+clean and tranform the dataframe
 
 ______________
 how do you handle ci/cd for databricks
 
+In our project, we set up CI/CD for Databricks using Azure DevOps pipelines to move code across different environments like Dev, QA, and Prod.
+We use ARM templates to automatically create and configure Databricks workspaces for each environment.
+Our YAML pipeline builds the code and creates a .bundle file that contains notebooks, jobs, and all needed files.
+This bundle is then deployed to the target environment using an automated release pipeline.
+We manage environment-specific details like URLs and secrets using pipeline variables.
+This setup helps us deploy faster, avoid manual errors, and keep all environments consistent.
 
 
 _______________________________________________________________
