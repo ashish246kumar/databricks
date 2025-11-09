@@ -1,3 +1,56 @@
+Write a SQL Query to find the winner in each group.
+The winner in each group is the player who scored the maximum total points within the group. In the case of tie, the lowest player_id wins.
+
+
+select * from 
+
+
+create table players
+(player_id int,
+group_id int)
+
+insert into players values (15,1);
+insert into players values (25,1);
+insert into players values (30,1);
+insert into players values (45,1);
+insert into players values (10,2);
+insert into players values (35,2);
+insert into players values (50,2);
+insert into players values (20,3);
+insert into players values (40,3);
+
+create table matches
+(
+match_id int,
+first_player int,
+second_player int,
+first_score int,
+second_score int)
+
+insert into matches values (1,15,45,3,0);
+insert into matches values (2,30,25,1,2);
+insert into matches values (3,30,15,2,0);
+insert into matches values (4,40,20,5,2);
+insert into matches values (5,35,50,1,1);
+
+
+with cte as(
+
+select first_player as player,first_score as score from matches union all 
+select second_player as player,second_score as score from matches
+)
+cte2 as(
+select sum(score) as total_score,c1.player as player1,c1.group_id  as group_id1 from cte c1 join players p1 on c1.player=p1.player_id group by group_id,c1.player
+)
+select player1 as player,total_score
+from
+(
+select *,dense_rank() over(partion by group_id1 order by total_score desc, player1 asc) as rnk from cte2
+) temp
+where rnk=1
+
+
+_________________________________________________________________________________
 Write a SQL Query to find the cancellation rate of requests with unbanned users (both client and driver must not be banned).
 Each day between "2013-10-01" and "2013-10-03". Round cancellation rate to two dedimal points.
 The cancellation rate is computed by dividing the number of cancelled (by client or driver) requests with unbanned users by the total
