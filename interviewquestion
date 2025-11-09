@@ -4,6 +4,12 @@ Databricks: Best for ETL, big data, and transformation using PySpark.
 Synapse: Best for serving analytical queries to BI tools (e.g., Power BI).
 In our project → Databricks handled transformation, Synapse served reporting data.
 
+Feature	                      Azure Databricks	                                      Azure Synapse Analytics
+Purpose	                    Data engineering, ML, streaming	                       Data warehousing, analytics
+Data type	                Unstructured / semi-structured	                        Structured
+Engine	                 Apache Spark	                                          SQL-based MPP (Massively Parallel Processing)
+Users	                  Data Engineers,                                         Data Scientists	Data Analysts, BI Developers
+Integration	Works well with Kafka, ADLS, MLflow	                                works well with Power BI, SQL tools
 __________________________________________________________________________________________________________
 How do you reduce data storage and compute costs in Azure ?
 
