@@ -1,3 +1,13 @@
+walk me through the architecture of last  engineering project
+sources: flat files
+injestion: autoloader
+processing : pyspark, delta
+storage: adls
+monitoring : log and alert 
+
+
+
+_______________________________________________________________
 Batch processing deals with large data sets in bulk — it’s great for analytics and reporting where latency isn’t critical. Real-time processing, 
 on the other hand, processes data continuously as it arrives — useful when immediate insights or actions are required.
 For example, a bank might use real-time processing to detect fraudulent transactions instantly, but use batch processing to generate end-of-day reports.
