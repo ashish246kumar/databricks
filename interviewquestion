@@ -1,9 +1,15 @@
 walk me through the architecture of last  engineering project
+
 sources: flat files
 injestion: autoloader
 processing : pyspark, delta
 storage: adls
 monitoring : log and alert 
+i have implemented error profile reprocessing logic
+written script for data validation
+
+______________
+how do you handle ci/cd for databricks
 
 
 
