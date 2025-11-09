@@ -1,3 +1,18 @@
+
+_________________________________________________________________________________________________________________
+How do you optimize Delta Lake tables for performance and cost?
+
+We optimize Delta tables using Z-Ordering, OPTIMIZE for file compaction, and VACUUM for cleanup.
+With a good partitioning strategy and Parquet-based compression, we improved query performance by 65% while reducing storage cost
+
+We optimize Delta Lake tables by using multiple techniques to improve performance and reduce cost.
+We use Z-Ordering on high-selectivity columns like region and sale_date to improve query performance by clustering related data together.
+We periodically run OPTIMIZE to compact small files into larger ones, reducing file overhead and improving read efficiency.
+We also schedule VACUUM to remove old or unused files and free up storage space.
+Data is stored in Parquet with Delta format, ensuring efficient compression and faster access.
+We design proper partitioning strategies to balance between parallelism and metadata overhead.
+
+__________________________________________________________________________________________________
 What's the difference between Azure Synapse and Databricks when would you use each?
 
 Databricks: Best for ETL, big data, and transformation using PySpark.
