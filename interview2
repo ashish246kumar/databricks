@@ -1,3 +1,38 @@
+Modify a word count script to output results in descending frequency 
+order.
+
+# Load text file as DataFrame
+df = spark.read.text("input.txt")
+
+# Split lines into words and explode
+words_df = df.select(explode(split(lower(col("value")), "\\s+")).alias("word"))
+
+# Group by word and count occurrences
+count_df = words_df.groupBy("word").count()
+
+# Sort by count descending
+sorted_df = count_df.orderBy(col("count").desc())
+
+or 
+
+from collections import Counter
+
+# Read file and split into words
+with open("input.txt", "r") as f:
+    words = f.read().split()
+
+# Count occurrences
+word_count = Counter(words)
+
+# Sort by frequency (descending)
+sorted_counts = sorted(word_count.items(), key=lambda x: x[1], reverse=True)
+
+# Print sorted results
+for word, count in sorted_counts:
+    print(f"{word}: {count}")
+
+
+_________________________________________________________________________________
 without unity catalog
 usermanagement , metastore and compute need to be managed  for each workspace
 with unitycatalog
