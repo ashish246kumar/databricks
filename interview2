@@ -1,3 +1,12 @@
+
+________________________________________________________________________________
+Explain why lineage in Spark is crucial for fault tolerance. 
+
+Lineage in Spark refers to the record of all transformations that have been applied to an RDD or DataFrame to produce the current dataset
+Instead of recomputing everything from scratch or keeping multiple data copies (like Hadoop), Spark uses the lineage information to rebuild only that lost partition.
+It traces back through the chain of transformations to find which earlier RDD and which transformation produced that specific lost partition.
+It recomputes just that part from the original source data (data.txt) or cached intermediate data.
+_______________________________________________________________________________________________
 Modify a word count script to output results in descending frequency 
 order.
 
