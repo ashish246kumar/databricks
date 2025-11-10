@@ -1,0 +1,35 @@
+Given a nested JSON dictionary from an API, how would you flatten it and convert it into a Pandas DataFrame?
+
+
+data = {
+  "user": {
+    "id": 1,
+    "name": "Ashish",
+    "location": {"city": "Noida", "country": "India"},
+    "skills": [
+      {"name": "Python", "level": "Advanced"},
+      {"name": "SQL", "level": "Intermediate"}
+    ]
+  }
+}
+
+import pandas as pd
+from pandas import json_normalize
+
+# Flatten the nested JSON
+df = json_normalize(
+    data,
+    record_path=['user', 'skills'],         # list to expand into rows
+    meta=[
+        ['user', 'id'], 
+        ['user', 'name'], 
+        ['user', 'location', 'city'], 
+        ['user', 'location', 'country']
+    ]
+)
+
+print(df)
+_____________________________________________________________________________________________________________________
+
+
+
