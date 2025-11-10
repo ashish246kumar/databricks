@@ -1,3 +1,22 @@
+
+_________________________________________________________________________________________________________
+How would you process a large CSV file in chunks, filter only the required rows, and write the filtered data into a new file using Python?
+
+# Step 1: Read CSV in chunks (distributed automatically by Spark)
+df = spark.read.csv("s3://bucket-name/large_file.csv", header=True, inferSchema=True)
+
+# Step 2: Filter only required rows (example condition)
+# Example: select rows where 'country' is 'India' and 'sales' > 1000
+filtered_df = df.filter((col("country") == "India") & (col("sales") > 1000))
+
+# Step 3: Write filtered data into new CSV (or parquet) file
+filtered_df.write.mode("overwrite").csv("s3://bucket-name/filtered_output/")
+
+✅ If You Want Manual Chunk Processing (Less Common in Spark)
+If your CSV is extremely large and you want to control chunking manually:
+df = spark.read.option("maxRecordsPerFile", 1000000).csv("path/to/large.csv", header=True, inferSchema=True)
+
+___________________________________________________________________________________________________________________________
 A table has start_date and end_date columns — how would you calculate the total number of overlapping days across all rows?
 
 
