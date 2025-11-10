@@ -1,3 +1,28 @@
+without unity catalog
+usermanagement , metastore and compute need to be managed  for each workspace
+with unitycatalog
+usermanagement , metastore  and compte for all worspace it is managed
+
+🧩 Without Unity Catalog
+Each workspace manages its own:
+👤 User management (users and groups are created separately in each workspace)
+🧠 Metastore (each workspace has an independent metastore — separate databases, tables, permissions)
+⚙️ Compute resources (clusters, jobs, permissions managed locally per workspace)
+
+➡️ In other words, no central governance — every workspace is siloed and must be managed individually.
+🧠 With Unity Catalog
+Unity Catalog provides centralized governance across all workspaces in the same Databricks account.
+It offers:
+✅ Centralized user and access management — users, groups, and permissions are managed once and shared across workspaces.
+✅ Shared metastore — one unified metastore for all workspaces (so all catalogs, schemas, and tables are visible and governed consistently).
+✅ Consistent compute governance — cluster policies, access controls, and data permissions are consistent across all workspaces.
+➡️ Unity Catalog enables cross-workspace data access, consistent governance, and simplified administration.
+
+
+metastore------>catalog----------->schema------------->table , view,volume,model, function
+
+___________________________________________________________________________________________________________________
+___
 Given a nested JSON dictionary from an API, how would you flatten it and convert it into a Pandas DataFrame?
 
 
