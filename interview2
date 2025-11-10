@@ -20,6 +20,7 @@ It offers:
 
 
 metastore------>catalog----------->schema------------->table , view,volume,model, function
+metastore should be one across region
 
 ___________________________________________________________________________________________________________________
 ___
