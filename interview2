@@ -30,6 +30,39 @@ df = json_normalize(
 
 print(df)
 _____________________________________________________________________________________________________________________
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("FlattenJSON").getOrCreate()
+
+# Read JSON file
+df = spark.read.option("multiline", "true").json("user_data.json")
+df.printSchema()
+______
+from pyspark.sql.functions import col, explode
+
+# Flatten nested struct fields
+df_flat = df.select(
+    col("user.id").alias("user_id"),
+    col("user.name").alias("user_name"),
+    col("user.location.city").alias("city"),
+    col("user.location.country").alias("country"),
+    explode(col("user.skills")).alias("skill")   # Explode array into multiple rows
+)
+
+df_flat.printSchema()
+df_flat.show(truncate=False)
+______
+
+df_final = df_flat.select(
+    "user_id", "user_name", "city", "country",
+    col("skill.name").alias("skill_name"),
+    col("skill.level").alias("skill_level")
+)
+
+df_final.show(truncate=False)
+_____________________________________________________________________________________________________
 
 
+
+    
 
