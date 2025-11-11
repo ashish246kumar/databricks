@@ -1,3 +1,37 @@
+Deletion Vectors are an optimization feature in Delta Lake designed to improve the performance and efficiency of DELETE and UPDATE operations, especially on tables with millions of records [00:49].
+How Deletion Vectors Work
+Without Deletion Vectors (Standard Delta Table Behavior): If you delete a single row in a Parquet data file, the entire Parquet file must be rewritten to remove that row. This is inefficient and costly for small operations on large files [00:55].
+With Deletion Vectors Enabled: Instead of rewriting the data file, a flag (the deletion vector) is added to the Delta Lake metadata, marking the specific row in the Parquet file as deleted [01:18].
+When you query the data, Delta Lake uses the vector to filter out the flagged rows, only reading the non-deleted data [01:34].
+The physical removal of the deleted rows only occurs later when a maintenance operation like OPTIMIZE or predictive optimize is run [01:44]. This allows for many small deletions to be batched and processed in one efficient rewrite.
+
+Practical Demonstration
+The video demonstrates the difference in operation history:
+Deletion Vector Disabled: A DELETE command shows files being removed and new files being added (a file rewrite) to complete the operation [05:57].
+Deletion Vector Enabled: A DELETE command shows 0 files removed and 0 files added. Instead, the operation matrix shows numDeletionVectorsAdded greater than zero, indicating the flags were added without a file rewrite [07:30].
+2. Liquid Clustering
+Liquid Clustering is an alternative to traditional static partitioning and Z-ordering techniques, providing a more flexible and dynamic way to optimize data layout for query performance [08:14].
+Benefits and Scenarios
+Liquid Clustering helps improve query performance, especially in scenarios where:
+The data is queried using different access patterns over time [08:54].
+You have columns with high cardinality on which you need to filter data [08:43].
+The table has significant data skew [08:46].
+The data is growing quickly [08:50].
+
+Key Advantage
+The main benefit is flexibility. Unlike partitioning or Z-ordering, you do not need to rewrite the data whenever
+you decide to change or apply the clustering logic [08:20].
+Automatic Maintenance: Once a cluster column is defined, any incremental data (new data being loaded) will automatically be clustered and organized by that column [08:35].
+Dynamic Repartitioning: Delta Lake automatically takes care of properly repartitioning the file sizes for the selected cluster columns, so you don't have to manually manage partition schemes [08:58].
+Implementation
+Defining Cluster Columns: You define the clustering column(s) using the CLUSTER BY clause [09:31].
+For an existing table, use the ALTER TABLE command: ALTER TABLE table_name CLUSTER BY (column_name) [09:41].
+For a new table, use the CLUSTER BY clause during the CREATE TABLE command [10:48].
+Limitations: Clustering columns must be within the first 32 columns of the Delta table [11:32].
+Query Performance: Queries that use the clustering column in the WHERE predicate (filter) will benefit from the improved data organization [11:46].
+Removing Clustering: You can remove the clustering by running ALTER TABLE table_name CLUSTER BY NONE [10:24].
+
+_________________________________________________________________________________________________________
 Spark Memory Management | Why OOM Errors in Spark
 ___________________________
 
