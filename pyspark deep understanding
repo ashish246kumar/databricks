@@ -1,3 +1,7 @@
+
+________________________________________________________________________________________________________________________________
+Delta Tables - Deletion Vectors and Liquid Clustering
+
 Deletion Vectors are an optimization feature in Delta Lake designed to improve the performance and efficiency of DELETE and UPDATE operations, especially on tables with millions of records [00:49].
 How Deletion Vectors Work
 Without Deletion Vectors (Standard Delta Table Behavior): If you delete a single row in a Parquet data file, the entire Parquet file must be rewritten to remove that row. This is inefficient and costly for small operations on large files [00:55].
@@ -30,6 +34,7 @@ For a new table, use the CLUSTER BY clause during the CREATE TABLE command [10:4
 Limitations: Clustering columns must be within the first 32 columns of the Delta table [11:32].
 Query Performance: Queries that use the clustering column in the WHERE predicate (filter) will benefit from the improved data organization [11:46].
 Removing Clustering: You can remove the clustering by running ALTER TABLE table_name CLUSTER BY NONE [10:24].
+
 
 _________________________________________________________________________________________________________
 Spark Memory Management | Why OOM Errors in Spark
