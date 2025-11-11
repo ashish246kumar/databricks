@@ -1,4 +1,41 @@
+What is data modeling, and why is it important?
 
+Answer: Data modeling is the process of creating a visual representation of the data structure and relationships within a database. It is important because it helps in understanding the data requirements, designing efficient databases, ensuring data integrity, and facilitating communication between stakeholders.
+
+What are the different types of data models?
+
+Answer: There are three main types of data models:
+Conceptual data model: Represents high-level entities and relationships without considering implementation details.
+
+Logical data model: Defines the structure of the data without considering how it will be physically implemented.
+
+Physical data model: Specifies the physical implementation of the database, including tables, columns, indexes, etc.
+
+What is normalization and denormalization?
+
+Answer: Normalization is the process of organizing data in a database to reduce redundancy and dependency by dividing large tables into smaller ones and defining relationships between them. 
+
+Denormalization, on the other hand, involves adding redundant data to improve query performance by reducing the need for joins.
+
+
+What are surrogate keys and natural keys?
+
+Answer: Surrogate keys are artificial keys generated solely for identifying records in a table, while natural keys are attributes that already exist in the real world and can uniquely identify records.
+
+Explain the differences between OLTP and OLAP.
+Answer: OLTP (Online Transaction Processing) is designed for transaction-oriented applications that involve frequent, short transactions, while OLAP (Online Analytical Processing) is optimized for complex queries and analysis of large volumes of data.
+
+What is a star schema and snowflake schema?
+
+Answer: A star schema is a data warehouse schema that consists of one or more fact tables referencing any number of dimension tables. In a snowflake schema, dimension tables are normalized into multiple related tables, resulting in a more normalized structure.
+
+How do you handle slowly changing dimensions (SCDs) in data modeling?
+
+Answer: Slowly changing dimensions are dimensions that change over time. They can be handled using various techniques such as Type 1 (overwrite), Type 2 (add new row), and Type 3 (add new column). The choice depends on the specific requirements of the business.
+
+What is cardinality in data modeling?
+
+Answer: Cardinality refers to the relationship between rows of two tables. It describes the number of instances of one entity that can be associated with a single instance of another entity.
 _________________________________________________________________________________________________________
 How would you process a large CSV file in chunks, filter only the required rows, and write the filtered data into a new file using Python?
 
