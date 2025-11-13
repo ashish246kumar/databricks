@@ -1,3 +1,25 @@
+Write a SQL Query to find students with same marks in physics and chemistry.
+
+create table exams (student_id int, subject varchar(20), marks int);
+
+insert into exams values (1,'Chemistry',91),(1,'Physics',91)
+,(2,'Chemistry',80),(2,'Physics',90)
+,(3,'Chemistry',80)
+,(4,'Chemistry',71),(4,'Physics',54);
+
+
+with cte as(
+
+select * from exams 
+where  subject in ('Physics','Chemistry')
+)
+
+select distinct c1.student_id from cte  c1 join cte as c2 on c1.student_id=c2.student_id
+and c1.marks=c2.marks
+and c1.subject <> c2.subject
+
+# student_id
+'1'
 
 ________________________________________________________________________________________
 Find companies who have atleast 2 users who speaks English and German 
