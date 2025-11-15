@@ -1,4 +1,7 @@
+
+
 ___________________________________________________________________________________
+Write a SQL Query to get the 3 or more consecutive empty seats.
 
 
 create table bms (seat_no int ,is_empty varchar(10));
