@@ -1,3 +1,36 @@
+___________________________________________________________________________________
+
+
+create table bms (seat_no int ,is_empty varchar(10));
+insert into bms values
+(1,'N')
+,(2,'Y')
+,(3,'N')
+,(4,'Y')
+,(5,'Y')
+,(6,'Y')
+,(7,'N')
+,(8,'Y')
+,(9,'Y')
+,(10,'Y')
+,(11,'Y')
+,(12,'N')
+,(13,'Y')
+,(14,'Y');
+
+
+
+ with cte as(
+  SELECT
+    seat_no,
+    seat_no - ROW_NUMBER() OVER (ORDER BY seat_no) AS grp
+  FROM bms
+  WHERE is_empty = 'Y'
+  )
+  select seat_no from (
+  select *,count(*)  over(partition by grp) as cnt from  cte
+) temp  where cnt>=3
+_____________________________
 Write a SQL Query to find students with same marks in physics and chemistry.
 
 create table exams (student_id int, subject varchar(20), marks int);
