@@ -24,6 +24,16 @@ insert into activity values (1,'app-installed','2022-01-01','India')
 ,(6,'app-installed','2022-01-04','Pakistan')
 ,(6,'app-purchase','2022-01-04','Pakistan');
 
+
+SELECT i.event_date, count(p.user_id) as total_active_usr
+FROM activity i
+left JOIN activity p
+    ON i.user_id = p.user_id
+   and i.event_date=p.event_date
+   and i.event_name='app-installed'
+   and p.event_name='app-purchase'
+   group by i.event_date
+   
 ___________________________________________________________________________________
 Write a SQL Query to get the 3 or more consecutive empty seats.
 
