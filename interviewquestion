@@ -1,4 +1,17 @@
-__________________________________________________________
+______________________________________________
+_A Delta Table is simply a table stored in the Delta Lake format.
+
+✔ What it provides:
+ACID transactions (atomicity, consistency, isolation, durability)
+Time travel (versioning)
+Schema enforcement & schema evolution
+
+DLT is a managed ETL/ELT framework built on top of Delta Lake.
+You define pipelines, and Databricks automatically:
+Schedules the pipeline
+Manages the DAG (dependency graph)
+Handles failures and retries
+_________________________________________________________
 𝐇𝐨𝐰 𝐈’𝐝 𝐩𝐫𝐨𝐜𝐞𝐬𝐬 𝐚 𝟐𝟎 𝐓𝐁 𝐟𝐢𝐥𝐞 𝐢𝐧 𝐀𝐩𝐚𝐜𝐡𝐞 𝐒𝐩𝐚𝐫𝐤 𝐃𝐚𝐢𝐥𝐲 - 𝐬𝐭𝐞𝐩 𝐛𝐲 𝐬𝐭𝐞𝐩:
 20 TB daily isn’t a casual batch job.
 We need to finish it in a few hours - not days - and do it every single day.
