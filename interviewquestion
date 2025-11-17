@@ -1,3 +1,166 @@
+__________________________________________________________
+𝐇𝐨𝐰 𝐈’𝐝 𝐩𝐫𝐨𝐜𝐞𝐬𝐬 𝐚 𝟐𝟎 𝐓𝐁 𝐟𝐢𝐥𝐞 𝐢𝐧 𝐀𝐩𝐚𝐜𝐡𝐞 𝐒𝐩𝐚𝐫𝐤 𝐃𝐚𝐢𝐥𝐲 - 𝐬𝐭𝐞𝐩 𝐛𝐲 𝐬𝐭𝐞𝐩:
+20 TB daily isn’t a casual batch job.
+We need to finish it in a few hours - not days - and do it every single day.
+So the first question isn’t “what code,”
+it’s “what cluster can handle this load reliably?”
+I'll go with below setup
+
+Worker nodes = 50   
+Cores per node = 16   
+Memory per node = 128 GB  
+
+💡 That gives:
+ • 50 × 16 = 800 cores
+ • 50 × 128 = 6.4 TB total memory
+But we can’t use all of that - Spark shares each node with the OS and Hadoop daemons.
+
+Each node runs its own OS + NodeManager + Spark overhead.
+So we leave 1 core + 8 GB RAM per node for system processes.
+That leaves:
+ • 15 cores and 120 GB usable memory per node
+ → 50 nodes × 15 cores = 750 cores total
+ → 50 nodes × 120 GB = 6 TB usable memory
+
+Now the real Spark math starts.
+We don’t want one big executor per node - too much GC overhead.
+Nor do we want 16 tiny ones - too much scheduling overhead.
+Thumb Rule: 3–5 cores per executor → sweet spot = 4.
+So per node:
+15 cores ÷ 4 ≈ 3 executors (1 core idle is fine).
+Memory = 120 GB ÷ 3 = 40 GB per executor → after 10 % overhead ≈ 36 GB usable.
+Each executor → 4 cores + 36 GB RAM.
+Executors per node = 3 → 150 executors total.
+🧮 Total cluster usage by Spark =
+ • 150 × 4 = 600 cores
+ • 150 × 36 = 5.4 TB RAM
+The rest (~25 %) stays reserved for system + shuffle overhead — the safe zone.
+
+Spark runs one task per core.
+So 600 parallel tasks = 600 partitions processed at a time.
+For 20 TB Parquet data (~512 MB per partition):
+ • 20 TB / 0.5 GB ≈ 40,000 partitions.
+Waves = 40000 / 600 ≈ 67 waves of tasks.
+Each wave = a batch of 600 parallel tasks → after 67 waves, job done 
+
+Optimization Principles
+1️⃣ Use columnar compression (Parquet + Snappy).
+2️⃣ Partition by date or region for pruning.
+3️⃣ Tune spark.sql.shuffle.partitions = 600 to match cores.
+4️⃣ Broadcast small tables → avoid heavy shuffles.
+5️⃣ Compact tiny files → 512 MB target size.
+6️⃣ Checkpoint long DAGs → no recomputation loops
+______________________________________________________________
+Databricks Jobs Are Slow — Usually for These 6–7 Core Reasons 
+
+1️⃣ Data Skew (Hot Keys)
+Symptom: A few tasks take hours while others finish in seconds.
+Cause: Uneven data distribution — one key has too much data.
+Fix: Add salting to hot keys, use repartition, or broadcast join when possible.
+Check: Spark UI → Stages → task duration variance.
+
+2️⃣ Memory Spill to Disk
+Symptom: Stages show heavy disk I/O during shuffle.
+Cause: Executor memory insufficient for shuffle/join operations.
+Fix:
+1. Increase spark.executor.memory
+2. Reduce cores per executor
+3. Enable Photon (reduces memory pressure)
+4. Monitor spill metrics in Spark UI → Stages.
+
+3️⃣ Wrong Cluster Sizing
+Symptom: Too slow or too costly.
+Cause: Under-provisioned or over-provisioned clusters.
+Fix:
+1. Check CPU utilization in Spark UI → Executors.
+2. Scale up if CPU ~100%, scale down if mostly idle.
+3. Use Autoscaling for variable workloads.
+
+4️⃣ Inefficient Joins & Shuffles
+Symptom: Long shuffle time and large shuffle read/write sizes.
+Cause: Sort-merge joins or unnecessary shuffles.
+Fix:
+1. Use broadcast joins for <1GB lookup tables.
+2. Enable AQE (spark.sql.adaptive.enabled=true) for dynamic join optimization.
+3. Repartition intelligently before joins.
+
+5️⃣ Cold Cache & Slow I/O
+Symptom: First run slow, second run much faster.
+Cause: Data read directly from cloud storage (S3/ADLS).
+Fix:
+1. Use Delta Lake with Liquid Clustering.
+2. Run OPTIMIZE for compacted, co-located data.
+3. Photon improves read speed 3–5x for Parquet/Delta.
+
+6️⃣ Small Files Problem (a.k.a. Too Many Tiny Files)
+Symptom: Jobs spend time opening thousands of small files.
+Cause: Frequent writes/appends create small files.
+Fix:
+1. Use OPTIMIZE in Delta to compact files.
+2. Use mergeSchema and autoOptimize options.
+3. Combine input data at source or before writing to Delta.
+
+7️⃣ Improper Partitioning or Missing Z-Ordering
+Symptom: Full table scans despite filters.
+Cause: Poor partition design or unclustered data.
+Fix:
+1. Partition on high-selectivity columns.
+2. Use Liquid Clustering or Z-ORDER for frequently filtered columns.
+3. Avoid over-partitioning (too many small partitions).
+
+______________________________________________________________
+1️⃣ What happens when you run a Spark job?
+Spark creates a DAG, breaks it into stages, converts them into tasks, and sends those tasks to executors for execution.
+The driver coordinates the whole process.
+
+2️⃣ Driver vs Executors — what’s the difference?
+	•	Driver: creates the DAG, schedules stages, tracks metadata.
+	•	Executors: actually run the tasks and store data in memory/disk.
+
+3️⃣ What is a DAG?
+A Directed Acyclic Graph of transformations.
+It shows how your data flows from one step to the next, without cycles.
+Spark uses it to optimize your job before execution.
+
+
+4️⃣ What are Narrow vs Wide transformations?
+	•	Narrow: each partition depends on a single parent partition (e.g., map, filter). → No shuffle
+	•	Wide: data must move across partitions (e.g., groupBy, join). → Shuffle happens
+
+This one is critical — most performance issues come from wide transformations.
+
+
+5️⃣ What is a Stage?
+A group of tasks that can run without a shuffle.
+A shuffle boundary creates a new stage.
+
+
+6️⃣ What triggers a Shuffle?
+Wide transformations like:
+groupBy, agg, join, distinct, repartition, orderBy.
+If Spark needs to move data across nodes → shuffle.
+
+7️⃣ What is a Task in Spark?
+The smallest unit of work, run on executors.
+Each task processes one partition of data.
+
+
+8️⃣ How does Spark achieve fault tolerance?
+Through lineage.
+Instead of storing intermediate results, Spark knows how data was created and can recompute lost partitions if an executor fails.
+
+9️⃣ What does a Cluster Manager do?
+YARN / Kubernetes / Standalone:
+It allocates resources (CPU, memory) to Spark applications
+but does not schedule tasks — the driver does that.
+
+🔟 What changes when AQE (Adaptive Query Execution) is enabled?
+Spark can:
+	•	Detect skew at runtime
+	•	Change join strategy on the fly
+	•	Merge/split shuffle partitions
+Basically, Spark becomes smarter during execution, not just before it.
+________________________________________
 What is data modeling, and why is it important?
 
 Answer: Data modeling is the process of creating a visual representation of the data structure and relationships within a database. It is important because it helps in understanding the data requirements, designing efficient databases, ensuring data integrity, and facilitating communication between stakeholders.
