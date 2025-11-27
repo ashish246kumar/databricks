@@ -195,6 +195,28 @@ advantage of data waarehouse
 
 __________________________________________________________________________________
 oltp vs olap
+🟦 OLTP — Online Transaction Processing
+Used for day-to-day operations.
+✔️ How to explain:
+“OLTP systems handle real-time transaction processing. These are used for applications like banking, e-commerce, 
+or reservations where data is inserted, updated, or queried very frequently.”
+✔️ Characteristics:
+Supports high volume of small transactions
+Real-time insert/update/delete
+Highly normalized schema
+Fast read/write for operations
+Ensures ACID properties
+Example databases: MySQL, PostgreSQL, SQL Server
+Making a payment, booking a ticket, placing an order on Amazon.
+
+🟩 OLAP — Online Analytical Processing
+Used for analytics and reporting.
+✔️ How to explain:
+“OLAP systems are designed for analytics. They store large volumes of historical data and support 
+complex queries, aggregations, and reporting. 
+They’re used by data analysts and BI teams to make business decisions.”
+Example systems: Snowflake, BigQuery, Redshift, Databricks Delta, Synapse
+
 
 | **Feature**           | **OLTP (Online Transaction Processing)**                                   | **OLAP (Online Analytical Processing)**                                 |
 | --------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
