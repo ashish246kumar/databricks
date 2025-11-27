@@ -84,8 +84,34 @@ KPIs
 BI dashboards
 Summary tables
 ___________________________________________________________
+What can you run using Databricks Workflows?’
+You can say:
+Databricks notebooks (Python, SQL, Scala)
+Delta Live Tables (DLT pipelines)
+Spark JARs
+SQL queries
 
+Python scripts
+“Databricks Workflows is the native orchestration tool inside Databricks.
+It allows us to schedule and run end-to-end data pipelines such as notebooks,
+Delta Live Tables, Python scripts, JARs, SQL queries, and ML workflows.
 
+In my project, we used Databricks Workflows to orchestrate our daily ETL pipeline.
+The workflow had multiple tasks — ingest raw data into Bronze, clean it into Silver, aggregate it into Gold, and finally refresh dashboards.
+Each task was a notebook, and dependencies ensured the sequence ran smoothly. We also added retries and email alerts for failure.”
+
+Key Features
+You can create workflows with:
+Task dependencies
+Built-in Scheduling
+Supports:
+Cron schedules
+Retry, Timeout, Error Handling
+Automatic retries
+
+Monitoring & Logging
+Job run history
+Spark logs
 _________________________________________
 
 __________________________________________________
