@@ -1,3 +1,34 @@
+___________________________________________
+A stored procedure is a reusable set of SQL statements stored in the database. Instead of writing queries again and again,
+we put them in a procedure and call it with parameters. Since it’s precompiled, it improves performance 
+and also helps in implementing business logic at the database level
+
+CREATE PROCEDURE getCustomerOrders(IN customer_id INT)
+BEGIN
+   SELECT * FROM orders WHERE customer_id = customer_id;
+END;
+
+Why companies use stored procedures:
+Faster execution (pre-compiled)
+Centralized business logic
+Reusability
+Better security (limit access to tables)
+__________________________________________________
+A trigger is an automatic action in the database that runs in response to an event such as:
+INSERT
+UPDATE
+DELETE
+Triggers run without being explicitly called. The database fires them automatically.
+We use triggers for auditing, validations, maintaining logs, updating related tables, etc.
+
+CREATE TRIGGER log_employee_changes
+AFTER UPDATE ON employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO employee_audit(emp_id, old_salary, new_salary, changed_at)
+    VALUES (OLD.id, OLD.salary, NEW.salary, NOW());
+END;
+
 ______________________________________________
 _A Delta Table is simply a table stored in the Delta Lake format.
 
