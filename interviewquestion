@@ -58,6 +58,36 @@ Faster execution (pre-compiled)
 Centralized business logic
 Reusability
 Better security (limit access to tables)
+____________________________
+Materialized View 
+A Materialized View (MV) is a pre-computed, stored result of a SQL query.
+Unlike a normal view, which runs the query every time, a materialized view stores the data physically in the database.
+It is used to improve performance for complex queries.
+📌 Why Materialized Views are Used?
+Fast performance for repeated heavy queries
+Reduces load on source tables
+Excellent for BI dashboards, reporting, analytics
+
+CREATE MATERIALIZED VIEW sales_summary AS
+SELECT region, SUM(amount) AS total_sales
+FROM sales
+GROUP BY region;
+
+Materialized Views Are Usually Used in the GOLD Layer
+
+Why?
+Because the Gold layer contains aggregated, business-ready, analytics-ready data
+Materialized views improve performance for:
+Aggregations
+Joins
+KPIs
+BI dashboards
+Summary tables
+___________________________________________________________
+
+
+_________________________________________
+
 __________________________________________________
 A trigger is an automatic action in the database that runs in response to an event such as:
 INSERT
