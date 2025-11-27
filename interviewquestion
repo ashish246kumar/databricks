@@ -1,3 +1,48 @@
+🟫 Bronze Layer (Raw Layer)
+What it is:
+This layer contains raw, unprocessed data exactly as it is coming from the source.
+How to explain in interview:
+“The Bronze layer is the raw data layer. We ingest data from multiple sources—files, 
+APIs, databases, Kafka—into Bronze without any transformation. It acts as the single source of truth.”
+
+Characteristics:
+Contains raw, uncleaned data
+Schema may not be enforced
+Includes duplicates, errors, null values
+Used for reprocessing if needed
+
+The Silver layer contains cleaned, validated, and structured data.
+
+How to explain in interview:
+The Silver layer is the cleaned and standardized layer. We remove duplicates, fix data types, handle nulls, apply quality checks, and create a reliable, analytics-ready dataset.”
+Characteristics:
+Data cleansing
+Deduplication
+Standardization (dates, types, structure)
+Joins across data sources
+Apply business rules/validations
+
+Gold Layer (Business/Analytics Layer)
+What it is:
+The Gold layer contains aggregated, business-level curated data for reporting or ML.
+How to explain in interview:
+The Gold layer is the business-level curated layer. It contains aggregated, transformed data ready 
+for dashboards, reporting, and ML models. This is the layer business users consume
+Characteristics:
+Aggregations, KPIs, business metrics
+Dimension and fact tables (star schema)
+Ready for BI tools (Power BI, Tableau)
+Optimized for performance
+Example:
+Daily sales report
+__________________________________________________________________
+Why do we use this medalian architecture?
+Ensures data quality step-by-step
+Improves performance
+Better governance and auditability
+Easy to reprocess data from Bronze
+____________________________________________________
+
 ___________________________________________
 A stored procedure is a reusable set of SQL statements stored in the database. Instead of writing queries again and again,
 we put them in a procedure and call it with parameters. Since it’s precompiled, it improves performance 
