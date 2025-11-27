@@ -1,3 +1,29 @@
+_____________________________________________________________________________________
+how do we handle exception and logging in  project 
+We handle exceptions using a centralized error-handling strategy.
+For every step of the pipeline or code module, we wrap critical logic in try/except blocks,
+log the error with complete details, send notifications, and ensure the system either retries
+
+We always log:
+Timestamp
+Error message
+Stack trace
+Input parameters
+Job/Task name
+Tools used:
+Databricks Logging
+Log4j
+CloudWatch
+
+If a temporary failure happens (network timeout, cluster issue), auto-retry:
+Using Databricks Workflows retry settings
+
+If an exception occurs, we log the error into a Delta error_log table with metadata like file name, row number, exception type, and stack trace.
+we manitain a table which contain error_date,error_code,source_name,impacted_field
+
+___________________________________________________________________________
+
+____________________________________________________
 🟫 Bronze Layer (Raw Layer)
 What it is:
 This layer contains raw, unprocessed data exactly as it is coming from the source.
@@ -108,6 +134,7 @@ Supports:
 Cron schedules
 Retry, Timeout, Error Handling
 Automatic retries
+Email failure notifications
 
 Monitoring & Logging
 Job run history
