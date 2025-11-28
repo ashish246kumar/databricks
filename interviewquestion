@@ -1,3 +1,5 @@
+how i can secure my etl piepine what are things you follow for the seccurity of your pipe,line
+
 Data Security
 
 a. Encryption
@@ -14,7 +16,12 @@ Azure Key Vault
 
 Service Principals
 Use service accounts for automated jobs
+Enable job-level ACLs (Databricks, Airflow, ADF).
 
+c. Cluster Security
+Use secure clusters:
+No public IPs
+Use IAM-based access
 ______________________________________
 A Star Schema is a type of data modeling used in data warehouses where data is organized into:
 One central Fact table
