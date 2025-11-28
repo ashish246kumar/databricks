@@ -24,6 +24,14 @@ Dimensions are normalized
 More joins, slower
 More complex
 Used for storage optimization
+
+________________
+A Snowflake Schema is a type of data warehouse modeling where dimension tables are normalized 
+into multiple related tables.
+It is basically an expanded version of the Star Schema, where the dimension tables break into sub-dimensions
+it have much lower cost because it des not have data  redundancy so it save storage
+_____________________________________________________
+
 _____________________________________________________________________________________
 how do we handle exception and logging in  project 
 We handle exceptions using a centralized error-handling strategy.
