@@ -31,7 +31,11 @@ into multiple related tables.
 It is basically an expanded version of the Star Schema, where the dimension tables break into sub-dimensions
 it have much lower cost because it des not have data  redundancy so it save storage
 _____________________________________________________
+My name is Ashish Kumar. I’m from Deoghar, Jharkhand, and I completed my graduation from Raj Kumar Goel Institute of Technology, Ghaziabad.
 
+I have around 2.9 years of experience and I’m currently working at Nagarro. I started my career as a Java backend developer, but later moved into Data Engineering.
+
+Recently, I worked on a major migration project where we moved data from on-prem systems to Azure Databricks. My responsibilities included building ETL pipelines, performing data quality checks, migrating data from DB2 to ADLS using AzCopy, and implementing error-handling logic and validations
 _____________________________________________________________________________________
 how do we handle exception and logging in  project 
 We handle exceptions using a centralized error-handling strategy.
