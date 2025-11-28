@@ -1,3 +1,12 @@
+
+____________________________________________________________________________________
+unity catalog
+
+We implemented role-based access using Unity Catalog so engineers had full access to bronze/silver/gold, while analysts only accessed the gold layer.
+We set data quality rules in Delta Live Tables to validate schemas and control bad data.
+Unity Catalog lineage helped track how data moved across layers, which helped in debugging.
+
+___________________________________________________
 what are azure tools we are using in etl pipeline
 
 Ingestion Services
