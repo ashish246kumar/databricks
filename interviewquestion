@@ -27,8 +27,14 @@ and tasks run in parallel on executors
 q)what is better data set or dataframe and why
 q)why we do repartion what problem it solves
 DataFrames are untyped and give the best performance, while Datasets are typed and provide compile-time safety.
+___________________________________
+when to use cte and when to use subquery 
+You need to reuse the same result multiple times
+You want to break down a complex logic step-by-step
 
-
+When to Use a Subquery
+The logic is simple and used only once
+You don’t need to reuse the result
 _________________________________________________________
 PySpark is the Python API for Apache Spark.
 It allows you to write Spark applications using Python instead of Scala or Java.
