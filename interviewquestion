@@ -12,6 +12,16 @@ df \
 _______________
 
 _____________________________________________
+| Query                    | Meaning                        | Output Count     | Notes                  |
+| ------------------------ | ------------------------------ | ---------------- | ---------------------- |
+| **1. COUNT(*)**          | Count all rows                 | = number of rows | Standard & fastest     |
+| **2. COUNT(1)**          | Count all rows                 | = number of rows | Same as COUNT(*)       |
+| **3. COUNT(DISTINCT 2)** | Count distinct constant values | Always 1         | Only if table has rows |
+| **4. SELECT 1 FROM emp** | Return 1 for each row          | = number of rows | Useful for EXISTS      |
+| **5. SELECT 1**          | Return single row              | Always 1 row     | No table used          |
+
+
+_____________________________________________________________________
 difference between series and dataframe in pandas 
 how i can know repartionning is needed when i am doing task in notebook
 through spark ui and df.explain()
