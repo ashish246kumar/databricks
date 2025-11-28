@@ -71,12 +71,16 @@ and track data lineage automatically. It supports Delta tables, ML models, noteb
 all access for auditing and compliance. Essentially, it makes managing, securing, and sharing data across
 teams much easier and more reliable.”
 
+Unity Catalog provides built-in end-to-end data lineage. 
+It automatically tracks how data flows across tables, notebooks, jobs, and dashboards
+
 we had 10 people — 4 data engineers and 6 data analysts.
 Data engineers need full access because they work on ingestion, cleaning, transformations, and building golden datasets.
 So they get SELECT + WRITE permissions on bronze, silver, and gold layers.
 Data analysts only need business-ready data, so we only grant them SELECT access on the gold layer.
 Unity Catalog allows us to manage all this security centrally across all workspaces.
 __________________________________________________________
+
 47. What are persistence levels in Spark and how do you choose between them? 
 
 In Spark, persistence levels define how and where data is stored — whether in memory, on disk, or both — so that we don’t have to recompute it again and again.
