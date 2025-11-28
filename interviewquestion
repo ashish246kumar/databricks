@@ -1,5 +1,5 @@
 
-
+how i can know repartionning is needed when i am doing task in notebook
 when we do spark  job what happen
 
 When we run a Spark job, Spark first creates a logical plan, 
