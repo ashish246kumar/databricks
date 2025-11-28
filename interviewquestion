@@ -29,6 +29,9 @@ ________________________________
 cdc is the process of capturing only changed data since pervious version
 cdf is new feature which supports cdc in databrick delta lake env.
 change data feed interally create view which have the following column(_change_Type, _Commit_Version, _Commit_timestamp)
+(technique used to track and capture only the data that has changed — inserts, updates, and deletes — instead of moving the entire dataset. It helps build efficient, 
+real-time or near-real-time data pipelines by reducing the amount of data that needs to be processed)
+
 __________________________________________
 
 ______________________________________
