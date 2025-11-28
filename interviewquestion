@@ -25,6 +25,11 @@ Use IAM-based access
 _______________________________
 Service Principals are used so that automated systems like ETL pipelines, applications, or CI/CD processes can securely 
 authenticate to cloud resources without using personal user accounts
+________________________________
+cdc is the process of capturing only changed data since pervious version
+cdf is new feature which supports cdc in databrick delta lake env.
+change data feed interally create view which have the following column(_change_Type, _Commit_Version, _Commit_timestamp)
+__________________________________________
 
 ______________________________________
 A Star Schema is a type of data modeling used in data warehouses where data is organized into:
