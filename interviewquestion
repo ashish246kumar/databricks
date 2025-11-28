@@ -1,3 +1,21 @@
+Data Security
+
+a. Encryption
+Data-at-rest: Enable encryption on storage layers
+Masking & Tokenization
+Mask PII/Sensitive data
+
+Identity & Access Management (IAM)
+Role-Based Access Contro
+
+Secret/Key Management
+Store passwords, API keys, tokens in:
+Azure Key Vault
+
+Service Principals
+Use service accounts for automated jobs
+
+______________________________________
 A Star Schema is a type of data modeling used in data warehouses where data is organized into:
 One central Fact table
 Multiple surrounding Dimension tables
