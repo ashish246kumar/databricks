@@ -28,6 +28,11 @@ DataFrames are untyped and give the best performance, while Datasets are typed a
 
 
 _________________________________________________________
+A nested field means a column that contains a STRUCT (record) inside it.
+In other words, a column itself has multiple sub-columns.
+👉 It is like a JSON object stored inside a single column.
+
+______________________________________
 Maximum Number of Partitions
 
 .number of executors
