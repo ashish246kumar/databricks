@@ -1,10 +1,14 @@
+_____________________________________________________________________
 df.rdd.getNumPartitions()
+
+This is the BEST DataFrame-only way to see the number of partitions and how data is distributed across them
 
 df \
     .withColumn("partitionId", spark_partition_id()) \
     .groupBy("partitionId") \
     .count() \
     .show()
+_______________
 
 _____________________________________________
 how i can know repartionning is needed when i am doing task in notebook
