@@ -1,3 +1,24 @@
+what are azure tools we are using in etl pipeline
+
+Ingestion Services
+Azure Databricks (Auto Loader / Spark Streaming)
+Auto Loader detects new files and ingests incrementally.
+
+Azure Event Hub
+Ingests real-time streaming data
+
+Azure Data Lake Storage Gen2 (ADLS)
+Stores raw, cleaned, and curated datasets.
+
+Azure Blob Storage
+Cheaper storage option for unprocessed data/files
+
+Azure Key Vault
+Manages secrets, service principal credentials, connection strings
+
+
+
+_________________________________________________________
 A data lake is raw file storage without ACID guarantees. Delta Lake is a layer built on top of a data lake that adds ACID transactions, schema enforcement, time travel, and reliability.
 
 A data lake is a storage system that stores all kinds of data (structured, semi-structured, unstructured) in its raw format.
