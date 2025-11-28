@@ -1138,6 +1138,13 @@ Parquet – Data Storage Format
 Parquet is a columnar storage format.
 It’s highly efficient for read-heavy analytics workloads.
 It supports compression and encoding schemes for better performance.
+It has compression technique that why size is very low 
+for coulmnar format if we are looking for aggregation we will choose only those particular column rest column we will not choose
+so this is more optimized
+Columnar formats store each column separately, so during aggregations we scan only the required columns instead 
+of full rows. This reduces data read from storage and gives huge performance improvements
+
+
 However, it is immutable — once written, you can’t easily update or delete records.
 It lacks ACID transactions and data versioning.
 ✅ Example use case: Great for storing large, append-only datasets for analytics (like logs or historical data).
