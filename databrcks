@@ -1,10 +1,22 @@
 
 ____________________________________________________________________________________
-unity catalog
+data govenrnace where you have used in the project
+
+Access Control & Security (Role-Based Governance)
+How we used it:
+We classified users into groups like data_engineers, data_analysts, business_users.
+Engineers had access to raw, silver, and gold data.
+Analysts had access only to gold layer (curated data).
+PII data was masked and only visible to authorized users.
 
 We implemented role-based access using Unity Catalog so engineers had full access to bronze/silver/gold, while analysts only accessed the gold layer.
 We set data quality rules in Delta Live Tables to validate schemas and control bad data.
 Unity Catalog lineage helped track how data moved across layers, which helped in debugging.
+
+Data Quality Rules (DQ Governance)
+What we did:
+Applied validation checks at the bronze → silver stage.
+Verified schema, data types, duplicates, null handling, and unexpected values.
 
 ___________________________________________________
 what are azure tools we are using in etl pipeline
