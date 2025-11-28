@@ -11,7 +11,7 @@ df \
     .show()
 
 _____________________________________________________________________
-
+if we do not use inferschema=true what it is used
 what is the pyspark and why it is used
 difference between series and dataframe in pandas 
 how i can know repartionning is needed when i am doing task in notebook
