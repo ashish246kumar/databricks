@@ -11,6 +11,8 @@ df \
     .show()
 
 _____________________________________________________________________
+
+what is the pyspark and why it is used
 difference between series and dataframe in pandas 
 how i can know repartionning is needed when i am doing task in notebook
 through spark ui and df.explain()
