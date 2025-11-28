@@ -1,5 +1,22 @@
 A data lake is raw file storage without ACID guarantees. Delta Lake is a layer built on top of a data lake that adds ACID transactions, schema enforcement, time travel, and reliability.
 
+A data lake is a storage system that stores all kinds of data (structured, semi-structured, unstructured) in its raw format.
+Examples: Azure Data Lake, AWS S3, Google Cloud Storage
+Key Characteristics:
+Stores raw data (CSV, JSON, Parquet, images, logs, etc.)
+Cheap and scalable
+
+Delta Lake is a storage layer built on top of a data lake, adding reliability and database-like features.
+It works on top of S3, ADLS, GCS, etc.
+Key Features:
+ACID Transactions
+Schema enforcement & schema evolution
+Time Travel (restore older versions)
+Audit history
+Deletion + updates using MERGE (upsert)
+
+
+
 _______________________________________________________________________________________________
 “Databricks Unity Catalog is a centralized governance solution for all data and AI assets in Databricks. It provides a single place to manage metadata, enforce fine-grained access controls at table, row, or column level, and track data lineage automatically. It supports Delta tables, ML models, notebooks, and files, while logging all access for auditing and compliance. Essentially, it makes managing, securing, and sharing data across teams much easier and more reliable.”
 
