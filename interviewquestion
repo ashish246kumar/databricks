@@ -1,6 +1,13 @@
-what is better data set or dataframe and why
+when we do spark  job what happen
 
+When we run a Spark job, Spark first creates a logical plan, 
+then optimizes it, then converts it into physical execution plans. The job is divided into stages and tasks,
+and tasks run in parallel on executors
+
+q)what is better data set or dataframe and why
+q)why we do repartion what problem it solves
 DataFrames are untyped and give the best performance, while Datasets are typed and provide compile-time safety.
+
 
 _________________________________________________________
 how i can secure my etl piepine what are things you follow for the seccurity of your pipe,line
