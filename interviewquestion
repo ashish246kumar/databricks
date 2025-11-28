@@ -1,4 +1,12 @@
+df.rdd.getNumPartitions()
 
+df \
+    .withColumn("partitionId", spark_partition_id()) \
+    .groupBy("partitionId") \
+    .count() \
+    .show()
+
+_____________________________________________
 how i can know repartionning is needed when i am doing task in notebook
 through spark ui and df.explain()
 
