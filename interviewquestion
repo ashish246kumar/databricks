@@ -1,3 +1,5 @@
+
+
 when we do spark  job what happen
 
 When we run a Spark job, Spark first creates a logical plan, 
@@ -10,6 +12,13 @@ DataFrames are untyped and give the best performance, while Datasets are typed a
 
 
 _________________________________________________________
+.number of executors
+✔ number of cores
+✔ memory
+✔ cluster size
+✔ shuffle overhead
+
+__________________________________________________
 how i can secure my etl piepine what are things you follow for the seccurity of your pipe,line
 
 Data Security
