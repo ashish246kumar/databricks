@@ -30,7 +30,22 @@ DataFrames are untyped and give the best performance, while Datasets are typed a
 _________________________________________________________
 A nested field means a column that contains a STRUCT (record) inside it.
 In other words, a column itself has multiple sub-columns.
-👉 It is like a JSON object stored inside a single column.
+ It is like a JSON object stored inside a single column.
+{
+  "name": "Ashish",
+  "address": {
+      "city": "Delhi",
+      "pincode": 110001
+  }
+}
+
+A repeated field means the column contains an array (list) of values or an array of STRUCTS.
+{
+  "orders": [
+     {"id": 1, "amount": 100},
+     {"id": 2, "amount": 200}
+  ]
+}
 
 ______________________________________
 Maximum Number of Partitions
