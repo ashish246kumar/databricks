@@ -38,8 +38,13 @@ In other words, a column itself has multiple sub-columns.
       "pincode": 110001
   }
 }
-
+_____________________________
 A repeated field means the column contains an array (list) of values or an array of STRUCTS.
+{
+  "name": "Ashish",
+  "skills": ["Spark", "Python", "SQL"]
+}
+
 {
   "orders": [
      {"id": 1, "amount": 100},
