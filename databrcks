@@ -7,7 +7,8 @@ Stores raw data (CSV, JSON, Parquet, images, logs, etc.)
 Cheap and scalable
 
 Delta Lake is a storage layer built on top of a data lake, adding reliability and database-like features.
-It works on top of S3, ADLS, GCS, etc.
+It works on top of S3, ADLS, GCS, etc. also it add unity catlog
+we can use 
 Key Features:
 ACID Transactions
 Schema enforcement & schema evolution
