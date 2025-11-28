@@ -11,6 +11,7 @@ df \
     .show()
 
 _____________________________________________________________________
+Why did you use Databricks Workflows for orchestration
 if we do not use inferschema=true what it is used
 what is the pyspark and why it is used
 difference between series and dataframe in pandas 
@@ -49,7 +50,12 @@ _____________________________________________
 | **4. SELECT 1 FROM emp** | Return 1 for each row          | = number of rows | Useful for EXISTS      |
 | **5. SELECT 1**          | Return single row              | Always 1 row     | No table used          |
 
+_______________________________________________________________________________________________
+Why did you use Databricks Workflows for orchestration
 
+I used Databricks Workflows because it is natively integrated with the Databricks Lakehouse. It allows me to orchestrate notebooks,
+Delta Live Tables, SQL, and Python jobs in one place, without needing an external tool. It supports scheduling, retries, alerts, dependency management,
+and gives full lineage and monitoring in one UI. This makes the pipeline more reliable and easier to maintain
 __________________________________________________________
 A nested field means a column that contains a STRUCT (record) inside it.
 In other words, a column itself has multiple sub-columns.
