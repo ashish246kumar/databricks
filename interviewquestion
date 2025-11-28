@@ -29,7 +29,12 @@ DataFrames are untyped and give the best performance, while Datasets are typed a
 
 
 _________________________________________________________
+PySpark is the Python API for Apache Spark.
+It allows you to write Spark applications using Python instead of Scala or Java.
+With PySpark, we can process large-scale data in a distributed manner across a cluster
 
+
+__________________________________________________
 1. select count(*) from emp;
 2. select count(1) from emp;
 3. select count(distinct 2) from emp;
