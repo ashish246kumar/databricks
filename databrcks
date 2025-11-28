@@ -17,6 +17,9 @@ Data Quality Rules (DQ Governance)
 What we did:
 Applied validation checks at the bronze → silver stage.
 Verified schema, data types, duplicates, null handling, and unexpected values.
+Tools used:
+Delta Live Tables 
+
 
 ___________________________________________________
 what are azure tools we are using in etl pipeline
