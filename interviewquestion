@@ -1,3 +1,4 @@
+
 _____________________________________________________________________
 df.rdd.getNumPartitions()
 
@@ -11,6 +12,7 @@ df \
 _______________
 
 _____________________________________________
+difference between series and dataframe in pandas 
 how i can know repartionning is needed when i am doing task in notebook
 through spark ui and df.explain()
 
