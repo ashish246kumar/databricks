@@ -9,17 +9,6 @@ df \
     .groupBy("partitionId") \
     .count() \
     .show()
-_______________
-
-_____________________________________________
-| Query                    | Meaning                        | Output Count     | Notes                  |
-| ------------------------ | ------------------------------ | ---------------- | ---------------------- |
-| **1. COUNT(*)**          | Count all rows                 | = number of rows | Standard & fastest     |
-| **2. COUNT(1)**          | Count all rows                 | = number of rows | Same as COUNT(*)       |
-| **3. COUNT(DISTINCT 2)** | Count distinct constant values | Always 1         | Only if table has rows |
-| **4. SELECT 1 FROM emp** | Return 1 for each row          | = number of rows | Useful for EXISTS      |
-| **5. SELECT 1**          | Return single row              | Always 1 row     | No table used          |
-
 
 _____________________________________________________________________
 difference between series and dataframe in pandas 
@@ -38,6 +27,23 @@ DataFrames are untyped and give the best performance, while Datasets are typed a
 
 
 _________________________________________________________
+
+1. select count(*) from emp;
+2. select count(1) from emp;
+3. select count(distinct 2) from emp;
+4. select 1 from emp;
+5. select 1;
+_____________________________________________
+| Query                    | Meaning                        | Output Count     | Notes                  |
+| ------------------------ | ------------------------------ | ---------------- | ---------------------- |
+| **1. COUNT(*)**          | Count all rows                 | = number of rows | Standard & fastest     |
+| **2. COUNT(1)**          | Count all rows                 | = number of rows | Same as COUNT(*)       |
+| **3. COUNT(DISTINCT 2)** | Count distinct constant values | Always 1         | Only if table has rows |
+| **4. SELECT 1 FROM emp** | Return 1 for each row          | = number of rows | Useful for EXISTS      |
+| **5. SELECT 1**          | Return single row              | Always 1 row     | No table used          |
+
+
+__________________________________________________________
 A nested field means a column that contains a STRUCT (record) inside it.
 In other words, a column itself has multiple sub-columns.
  It is like a JSON object stored inside a single column.
