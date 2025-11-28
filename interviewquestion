@@ -1,6 +1,6 @@
 
 how i can know repartionning is needed when i am doing task in notebook
-through spark ui 
+through spark ui and df.explain()
 
 when we do spark  job what happen
 
