@@ -1,3 +1,29 @@
+A Star Schema is a type of data modeling used in data warehouses where data is organized into:
+One central Fact table
+Multiple surrounding Dimension tables
+It looks like a star, where the fact table is in the center and dimension tables are the points around it.
+Fact Table
+Contains:
+Measures / metrics (SalesAmount, Revenue, Quantity)
+Foreign keys to dimension tables
+Usually very large in size
+
+Dimension Tables
+Contain:
+Descriptive attributes
+Textual data
+
+Star Schema
+Dimensions are denormalized
+Fewer joins, faster
+Simpler model
+Used for performance
+
+Snowflake Schema
+Dimensions are normalized
+More joins, slower
+More complex
+Used for storage optimization
 _____________________________________________________________________________________
 how do we handle exception and logging in  project 
 We handle exceptions using a centralized error-handling strategy.
