@@ -270,7 +270,10 @@ Improves performance
 Better governance and auditability
 Easy to reprocess data from Bronze
 ____________________________________________________
-
+view
+A view in a database is a virtual table that is based on the result-set of an SQL query. 
+Views are used to simplify complex queries, 
+enhance security, and present data in a specific format
 ___________________________________________
 A stored procedure is a reusable set of SQL statements stored in the database. Instead of writing queries again and again,
 we put them in a procedure and call it with parameters. Since it’s precompiled, it improves performance 
