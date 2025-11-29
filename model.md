@@ -34,4 +34,33 @@ scd2
 <br>
 <img width="355" height="276" alt="11" src="https://github.com/user-attachments/assets/d1e04ec4-4caa-4729-bb99-d358f2c3cdec" />
 
+<br>
+<br>
+___________________________________________________________________________
+Salting
+<img width="613" height="311" alt="Screenshot 2025-11-29 132028" src="https://github.com/user-attachments/assets/bf495d93-e062-4f9d-b3dd-dbaddc234e37" />
+
+<br>
+<br>
+<img width="742" height="392" alt="Screenshot 2025-11-29 124237" src="https://github.com/user-attachments/assets/0e083e78-4b44-4a8c-8684-556f4e2bbc0e" />
+<br>
+<img width="820" height="373" alt="Screenshot 2025-11-29 124541" src="https://github.com/user-attachments/assets/0fb234c8-8eef-46d0-ad99-70b78b4d9f2f" />
+<br>
+<img width="704" height="325" alt="Screenshot 2025-11-29 125030" src="https://github.com/user-attachments/assets/d109f859-6e9f-4ca9-adf5-b817635ba6e2" />
+<br>
+<img width="538" height="357" alt="Screenshot 2025-11-29 125653" src="https://github.com/user-attachments/assets/e86473f0-7e2c-4f09-b591-bdeb6eb2b302" />
+<br>
+
+<img width="491" height="311" alt="Screenshot 2025-11-29 125837" src="https://github.com/user-attachments/assets/8e0869a4-2c27-4182-9a7f-370fdbb9c63c" />
+<br>
+<img width="498" height="326" alt="Screenshot 2025-11-29 130131" src="https://github.com/user-attachments/assets/8ae1d421-16ec-49a5-8655-1aecdf56b3fd" />
+<br>
+<img width="452" height="302" alt="Screenshot 2025-11-29 130739" src="https://github.com/user-attachments/assets/dbe5636d-ad03-498b-a65d-af633a08300a" />
+<br>
+
+
+
+
+
+
 
