@@ -1,3 +1,4 @@
+_____________________________________________________________________________________________
 
 _____________________________________________________________________
 df.rdd.getNumPartitions()
@@ -11,6 +12,28 @@ df \
     .show()
 
 _____________________________________________________________________
+“Spark follows a master-slave architecture with one Driver and multiple Executors running on a cluster
+managed by a Cluster Manager.
+The driver converts your code into tasks, the cluster manager allocates resources, 
+and the executors run the tasks in parallel on partitions of data.”
+
+Driver Program
+Runs your main Python/Scala code
+Creates SparkSession
+Converts DataFrame operations into Logical Plan → Physical Plan
+Creates DAG (Directed Acyclic Graph)
+Divides work into stages and tasks
+Sends tasks to executors
+Collects results from executor
+
+Cluster Manager
+Allocates resources (CPU, RAM) to your Spark job.
+
+Executors
+These are the workers running on cluster nodes.
+Execute the tasks assigned by the driver
+Keep data in memory
+_______________________________________________________
 Why did you use Databricks Workflows for orchestration
 if we do not use inferschema=true what it is used
 what is the pyspark and why it is used
@@ -39,7 +62,11 @@ _________________________________________________________
 PySpark is the Python API for Apache Spark.
 It allows you to write Spark applications using Python instead of Scala or Java.
 With PySpark, we can process large-scale data in a distributed manner across a cluster
-
+_________
+I used Databricks Workflows because it is natively integrated with the Databricks Lakehouse. 
+It allows me to orchestrate notebooks, Delta Live Tables, SQL, and Python jobs in one place,
+without needing an external tool. It supports scheduling, retries, alerts, dependency management, 
+and gives full lineage and monitoring in one UI.
 
 __________________________________________________
 1. select count(*) from emp;
