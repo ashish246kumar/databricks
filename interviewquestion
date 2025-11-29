@@ -40,7 +40,7 @@ what is the pyspark and why it is used
 difference between series and dataframe in pandas 
 how i can know repartionning is needed when i am doing task in notebook
 through spark ui and df.explain()
-
+how  we do Mask of PII/Sensitive data 
 when we do spark  job what happen
 
 When we run a Spark job, Spark first creates a logical plan, 
