@@ -91,6 +91,28 @@ sales_schema = ['sales_id', 'customer_id','customer_name', 'sales_date', 'food_d
 
 sales_df = spark.createDataFrame(data=sales_data,schema=sales_schema)
 
+<br>
+<img width="509" height="374" alt="Screenshot 2025-11-29 231409" src="https://github.com/user-attachments/assets/58e9c5c4-08ba-451b-a185-9ebe941c0cc3" />
+<br>
+<img width="419" height="318" alt="Screenshot 2025-11-29 231831" src="https://github.com/user-attachments/assets/99b1c7a4-1a8d-4067-a8e6-9285ab4080ce" />
+<br>
+<img width="478" height="270" alt="Screenshot 2025-11-29 232008" src="https://github.com/user-attachments/assets/db57f8e5-d95b-4bf1-abf1-6ac1d5124363" />
+<br>
+<img width="442" height="257" alt="Screenshot 2025-11-29 232053" src="https://github.com/user-attachments/assets/cdc993eb-3f16-4d6f-8ff2-5c491c22208e" />
+<br>
+<img width="502" height="355" alt="Screenshot 2025-11-29 232213" src="https://github.com/user-attachments/assets/ce8ab6d5-c041-4340-a9dd-9464068eaaaa" />
+<br>
+<img width="415" height="254" alt="Screenshot 2025-11-29 232924" src="https://github.com/user-attachments/assets/c8e3f90e-e5ff-41f4-afff-b359a7eefa6f" />
+<br>
+<img width="429" height="224" alt="Screenshot 2025-11-29 233057" src="https://github.com/user-attachments/assets/eb056ab1-2aca-4ebf-87cb-a4563ad2ec74" />
+___________________________________________________________________________________
+
+
+
+
+
+
+
 
 
 
