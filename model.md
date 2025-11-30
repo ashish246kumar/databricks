@@ -58,6 +58,40 @@ Salting
 <br>
 <img width="452" height="302" alt="Screenshot 2025-11-29 130739" src="https://github.com/user-attachments/assets/dbe5636d-ad03-498b-a65d-af633a08300a" />
 <br>
+_________________________________________________________________________________________________________________
+
+<br>
+SCD Data:-
+
+customer_dim_data = [
+
+(1,'manish','arwal','india','N','2022-09-15','2022-09-25'),
+(2,'vikash','patna','india','Y','2023-08-12',None),
+(3,'nikita','delhi','india','Y','2023-09-10',None),
+(4,'rakesh','jaipur','india','Y','2023-06-10',None),
+(5,'ayush','NY','USA','Y','2023-06-10',None),
+(1,'manish','gurgaon','india','Y','2022-09-25',None),
+]
+
+customer_schema= ['id','name','city','country','active','effective_start_date','effective_end_date']
+
+customer_dim_df = spark.createDataFrame(data= customer_dim_data,schema=customer_schema)
+
+sales_data = [
+
+(1,1,'manish','2023-01-16','gurgaon','india',380),
+(77,1,'manish','2023-03-11','bangalore','india',300),
+(12,3,'nikita','2023-09-20','delhi','india',127),
+(54,4,'rakesh','2023-08-10','jaipur','india',321),
+(65,5,'ayush','2023-09-07','mosco','russia',765),
+(89,6,'rajat','2023-08-10','jaipur','india',321)
+]
+
+sales_schema = ['sales_id', 'customer_id','customer_name', 'sales_date', 'food_delivery_address','food_delivery_country', 'food_cost']
+
+sales_df = spark.createDataFrame(data=sales_data,schema=sales_schema)
+
+
 
 
 
