@@ -50,6 +50,8 @@ and tasks run in parallel on executors
 q)what is better data set or dataframe and why
 q)why we do repartion what problem it solves
 DataFrames are untyped and give the best performance, while Datasets are typed and provide compile-time safety.
+q) difference between managed table and external table
+
 ___________________________________
 when to use cte and when to use subquery 
 You need to reuse the same result multiple times
