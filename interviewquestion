@@ -34,6 +34,24 @@ These are the workers running on cluster nodes.
 Execute the tasks assigned by the driver
 Keep data in memory
 _______________________________________________________
+1. Difference between client mode and cluster mode
+where exactly your driver runs edge node / executor
+2. what is partition skew, reasons for it. How to solve partition skew issues?
+3. what is a broadcast join in apache spark.
+4. what is the difference between partition and bucketing.
+5. What are different types of joins in Spark
+6. why count when used with group by is a transformation else its an action.
+7. If your spark job is running slow how would you approach to debug it.
+8. Difference between managed table & external table. When do you go about creating exernal tables.
+9. Why we are not using mapreduce these days. what are similarities between spark and mapReduce.
+10. How do you handle your pyspark code deployment, Explain about the CICD process.
+11. Have you used caching in your project, when & where do you consider using it.
+12. Explain about memory management in Apache spark.
+13. difference between narrow and wide transformation
+14. difference between dataframe and dataset
+I
+15. If some job failed with out of memory error in production, what will be you approach to debug that
+16. what is DAG & how that helps.
 Why did you use Databricks Workflows for orchestration
 if we do not use inferschema=true what it is used
 what is the pyspark and why it is used
