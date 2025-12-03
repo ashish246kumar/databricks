@@ -13,6 +13,7 @@ df.repartition(N) tells Spark:
 More partitions →
 More tasks →
 More executors working simultaneously
+_____________________________________
 
 
 ________________________________________________________________________________
