@@ -4,6 +4,16 @@ Spark improves broadcast join performance by avoiding shuffle.
 Spark sends a small table to all executors so each executor can join locally with its partition of the big table.
 Since no large data is moved across the network, the join becomes significantly faster.”
 __________________________________________________________________________
+Repartition improves performance by increasing parallelism and evenly distributing data across executors
+df.repartition(N) tells Spark:
+➡ Shuffle the entire dataset
+➡ Divide it into N equal-sized partitions
+
+2. Increases parallel tasks
+More partitions →
+More tasks →
+More executors working simultaneously
+
 
 ________________________________________________________________________________
 Explain why lineage in Spark is crucial for fault tolerance. 
