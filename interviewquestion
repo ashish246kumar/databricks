@@ -61,6 +61,15 @@ When to Use a Subquery
 The logic is simple and used only once
 You don’t need to reuse the result
 _________________________________________________________
+Every write creates a new version of the table, and Delta stores old Parquet files instead of deleting them.
+
+SELECT * FROM delta.`/mnt/sales` VERSION AS OF 3;
+df = spark.read.format("delta").option("versionAsOf", 3).load("/mnt/sales")
+
+_______________________________________________
+
+
+___________________________________________
 PySpark is the Python API for Apache Spark.
 It allows you to write Spark applications using Python instead of Scala or Java.
 With PySpark, we can process large-scale data in a distributed manner across a cluster
