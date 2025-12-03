@@ -34,7 +34,8 @@ These are the workers running on cluster nodes.
 Execute the tasks assigned by the driver
 Keep data in memory
 _______________________________________________________
-z ordering vs 
+difference between exist and 
+z ordering vs liquid clustring
 cache vs persist
 1. Difference between client mode and cluster mode
 where exactly your driver runs edge node / executor
