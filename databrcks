@@ -1,3 +1,14 @@
+Delta Live Tables (DLT) is a framework by Databricks for building reliable, automated, and ETL pipelines 
+on Delta Lake using declarative Python or SQL.
+It automatically handles:
+✔ Data quality
+✔ Data lineage
+✔ Orchestration
+✔ Job scheduling
+✔ Dependency handling
+✔ Error handling & recovery
+✔ Auto scaling & cluster management
+
 
 ____________________________________________________________________________________
 data govenrnace where you have used in the project
