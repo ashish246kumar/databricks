@@ -10,7 +10,15 @@ It automatically handles:
 ✔ Auto scaling & cluster management
 In DLT, you define rules, not execution steps.
 
-____________________________________________________________________________________
+_Why DLT over Notebooks?
+Because DLT gives:
+Better reliability
+Built-in data quality
+Automatic orchestration
+Versioning + lineage
+
+Less code + less maintenance
+___________________________________________________________________________________
 data govenrnace where you have used in the project
 
 Access Control & Security (Role-Based Governance)
