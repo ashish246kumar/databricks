@@ -39,6 +39,10 @@ Cheaper storage option for unprocessed data/files
 
 Azure Key Vault
 Manages secrets, service principal credentials, connection strings
+________________________________
+Privileged Identity Management :
+Admin access permanent na dekar, just-in-time (JIT) access dena
+____________________
 
 
 
