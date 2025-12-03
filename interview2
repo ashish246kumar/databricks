@@ -1,3 +1,9 @@
+how broadcast join internally improve the performance
+
+Spark improves broadcast join performance by avoiding shuffle.
+Spark sends a small table to all executors so each executor can join locally with its partition of the big table.
+Since no large data is moved across the network, the join becomes significantly faster.”
+__________________________________________________________________________
 
 ________________________________________________________________________________
 Explain why lineage in Spark is crucial for fault tolerance. 
