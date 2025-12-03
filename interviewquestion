@@ -34,6 +34,8 @@ These are the workers running on cluster nodes.
 Execute the tasks assigned by the driver
 Keep data in memory
 _______________________________________________________
+z ordering vs 
+cache vs persist
 1. Difference between client mode and cluster mode
 where exactly your driver runs edge node / executor
 2. what is partition skew, reasons for it. How to solve partition skew issues?
