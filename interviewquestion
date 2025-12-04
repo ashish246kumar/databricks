@@ -88,7 +88,39 @@ SELECT * FROM delta.`/mnt/sales` VERSION AS OF 3;
 df = spark.read.format("delta").option("versionAsOf", 3).load("/mnt/sales")
 
 _______________________________________________
+Clustered Index
+It stores the data in sorted order physically.
+The table itself is the index.
+Only one clustered index per table (because data can be sorted only one way).
+Think of it like a dictionary arranged alphabetically.
+The words (data) are stored in the same order as the index.
 
+Non-Clustered Index
+It creates a separate structure (like another table).
+Contains the index key + pointer to the actual data.
+You can have multiple non-clustered indexes.
+👉 Think of it like a book’s index page at the back.
+It doesn’t store the actual chapter, only page numbers pointing to it.
+
+⭐ 2. One-Line Difference (Perfect for Interview)
+Clustered Index	Non-Clustered Index
+Rearranges the actual data	Creates a separate index structure
+Only 1 per table	Many per table
+Faster for range queries	Faster for specific point queries
+⭐ 3. When the interviewer asks: "Give an example"
+Example Table: Employee(id, name, city, salary)
+If id is Clustered Index:
+
+Data in table is stored like:
+1, 2, 3, 4, 5 …
+
+Searching ID = 450 is super fast because data is physically sorted.
+
+If city is Non-Clustered Index:
+
+SQL creates a separate structure:
+"Delhi" → points to rows 5, 8, 12
+"Mumbai" → points to rows 1, 9
 
 ___________________________________________
 PySpark is the Python API for Apache Spark.
