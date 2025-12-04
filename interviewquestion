@@ -34,6 +34,45 @@ These are the workers running on cluster nodes.
 Execute the tasks assigned by the driver
 Keep data in memory
 _______________________________________________________
+cdc in dlt
+It looks at INSERT / UPDATE / DELETE events from the source (stream/table) in a change-feed pattern.
+✔ (B) It automatically applies SCD logic
+DLT = CDC ingestion + SCD management automatically
+
+@dlt.table(comment="vehicle ca streaming landing table", spark_conf={"spark.databricks.delta.schema.autoMerge.enabled": "true", "spark.databricks.delta.ignoreDeletes": "true"})
+def lnd_vehicle_ca_streaming():
+    storage_base_path = StorageAccountConnection(spark, dbutils).connect_to_storage_account()
+    # source_path = f"{storage_base_path}/{VEHICLE_CA_SOURCE_FILE_DIRECTORY}/"
+    source_path = f"{storage_base_path}/{VEHICLE_CA_SOURCE_FILE_DIRECTORY}/MBC_VEHICLE_INFO_*.txt"
+    log.info(f"start loading bad email source file to streaming landing db with source path: {source_path}")
+    result_df = SourceToLanding(spark, dbutils).load_to_landing_db(source_path, "vehicle_ca.json", "lnd_vehicle_ca_streaming")
+    result_df = result_df.withColumn("transaction_start_dt", lit(datetime.now()))
+    return result_df
+
+
+dlt.create_streaming_table("lnd_vehicle_ca_unique_vin_streaming")
+
+dlt.apply_changes(target="lnd_vehicle_ca_unique_vin_streaming", source="lnd_vehicle_ca_streaming", keys=["VIN"], sequence_by=col("transaction_start_dt"), stored_as_scd_type=1)
+
+
+
+
+dlt.apply_changes(
+    target="lnd_vehicle_ca_unique_vin_streaming",
+    source="lnd_vehicle_ca_streaming",
+    keys=["VIN"],
+    sequence_by=col("transaction_start_dt"),
+    stored_as_scd_type=1
+)
+
+______________________________________________________________________________
+
+
+
+
+
+
+________________________________________________________________________
 difference between not exist and not in
 z ordering vs liquid clustring
 cache vs persist
