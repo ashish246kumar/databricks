@@ -78,12 +78,16 @@ NOT EXISTS
 Works as a correlated subquery (checks each row).
 Returns true only when NO matching row exists.
 Safe with NULLs.
+Best for large tables
+NOT EXISTS is generally faster because it stops searching after finding the first matching row.
+
 SELECT * FROM A
 WHERE NOT EXISTS (SELECT 1 FROM B WHERE A.id = B.id);
 
 NOT IN
 Compares a value against a static list.
 NOT NULL-safe.
+NOT IN must evaluate the entire list before deciding.
 If the subquery returns even one NULL, the entire NOT IN fails.
 SELECT * FROM A WHERE A.id NOT IN (SELECT id FROM B);
 
