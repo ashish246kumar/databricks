@@ -74,6 +74,41 @@ DataFrames are untyped and give the best performance, while Datasets are typed a
 q) difference between managed table and external table
 
 ___________________________________
+NOT EXISTS
+Works as a correlated subquery (checks each row).
+Returns true only when NO matching row exists.
+Safe with NULLs.
+SELECT * FROM A
+WHERE NOT EXISTS (SELECT 1 FROM B WHERE A.id = B.id);
+
+NOT IN
+Compares a value against a static list.
+NOT NULL-safe.
+If the subquery returns even one NULL, the entire NOT IN fails.
+SELECT * FROM A WHERE A.id NOT IN (SELECT id FROM B);
+
+______________________________________________
+cache only stores in memory, but persist gives more control.
+If my dataset is large and doesn’t fit in memory, persist 
+lets me store it on disk or use a memory-and-disk combination.
+
+df.persist(StorageLevel.MEMORY_AND_DISK)
+df.persist(StorageLevel.MEMORY_ONLY)
+
+cache
+Very fast but will recompute partitions if memory is not enough.
+persist
+Useful when the dataset is very large and doesn't fit in memory.
+
+Use cache() when:
+Data fits comfortably in memory
+You want maximum speed
+You will reuse the DataFrame multiple times
+✔ Use persist() when:
+Dataset is too large for memory
+You want reliability (replication)
+You need serialization to reduce GC overhead
+_____________________________________________________________________________
 when to use cte and when to use subquery 
 You need to reuse the same result multiple times
 You want to break down a complex logic step-by-step
