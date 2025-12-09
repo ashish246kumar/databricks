@@ -7,6 +7,13 @@ The marketing campaign doesn't start until one day after the initial in-app purc
 multiple purchases on the first day do not count, nor do we count users that over time purchase is the same product as 
 purchased on the first day.
 
+CREATE TABLE [marketing_campaign](
+ [user_id] [int] NULL,
+ [created_at] [date] NULL,
+ [product_id] [int] NULL,
+ [quantity] [int] NULL
+
+ 
 insert into marketing_campaign values (51,'2019-02-21',120,2,99),
 (51,'2019-03-13',108,4,120),
 (52,'2019-02-23',117,2,999),
