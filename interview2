@@ -1,3 +1,7 @@
+
+
+
+
 how broadcast join internally improve the performance
 
 Spark improves broadcast join performance by avoiding shuffle.
@@ -116,7 +120,47 @@ df = json_normalize(
 )
 
 print(df)
+________________________________________________________________________________________________________
 _____________________________________________________________________________________________________________________
+| Option                        | Purpose                         | Example                                          |
+| ----------------------------- | ------------------------------- | ------------------------------------------------ |
+| **mode**                      | How to handle bad rows          | `"mode", "FAILFAST"`                             |
+|                               | `PERMISSIVE` → keep bad rows    |                                                  |
+|                               | `DROPMALFORMED` → drop bad rows |                                                  |
+|                               | `FAILFAST` → stop immediately   |                                                  |
+| **badRecordsPath**            | Store corrupted rows            | `"badRecordsPath", "/tmp/bad/"`                  |
+| **columnNameOfCorruptRecord** | Name for corrupt column         | `"columnNameOfCorruptRecord", "_corrupt_record"` |
+
+| Option         | Purpose                  | Example               |
+| -------------- | ------------------------ | --------------------- |
+| **nullValue**  | Treat this value as NULL | `"nullValue", "NULL"` |
+| **nanValue**   | Value representing NaN   | `"nanValue", "NaN"`   |
+| **emptyValue** | Replace empty strings    | `"emptyValue", None`  |
+
+| Option        | Purpose                       | Example                |
+| ------------- | ----------------------------- | ---------------------- |
+| **quote**     | Defines quote char            | `"quote", "\"" `       |
+| **escape**    | Escape quotes inside text     | `"escape", "\\"`       |
+| **multiLine** | Allow multi-line fields       | `"multiLine", True`    |
+| **encoding**  | File encoding (default UTF-8) | `"encoding", "UTF-16"` |
+| Option              | Purpose                         | Example               |                        |
+| ------------------- | ------------------------------- | --------------------- | ---------------------- |
+| **header**          | First row is column names       | `"header", True`      |                        |
+| **inferSchema**     | Detect data types automatically | `"inferSchema", True` |                        |
+| **schema**          | Manually specify schema         | `.schema(my_schema)`  |                        |
+| **sep / delimiter** | Column separator                | `"sep", "             | "`, `"delimiter", ";"` |
+____________________________________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+_______________________________________________________________________
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.appName("FlattenJSON").getOrCreate()
