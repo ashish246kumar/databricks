@@ -49,11 +49,13 @@ WITH first_purchase AS (
         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at) AS rnk
     FROM marketing_campaign
 ),
+<br>
 user_first AS (
     SELECT user_id, first_date, first_product
     FROM first_purchase
     WHERE rnk = 1
 ),
+<br>
 after_first_day AS (
     SELECT m.user_id, m.created_at, m.product_id
     FROM marketing_campaign m
@@ -62,6 +64,7 @@ after_first_day AS (
     WHERE m.created_at > DATEADD(day, 1, f.first_date)     -- must be after 1 day
       AND m.product_id <> f.first_product                  -- must be different product
 )
+<br>
 SELECT COUNT(DISTINCT user_id) AS successful_users
 FROM after_first_day;
 ]*
