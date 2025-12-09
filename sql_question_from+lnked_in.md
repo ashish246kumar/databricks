@@ -39,6 +39,33 @@ insert into marketing_campaign values (31,'2019-01-30',104,3,154),
 (34,'2019-01-31',110,3,299),
 (35,'2019-02-03',117,2,999),
 
+*Right answer
+*[
+WITH first_purchase AS (
+    SELECT
+        user_id,
+        created_at AS first_date,
+        product_id AS first_product,
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at) AS rnk
+    FROM marketing_campaign
+),
+user_first AS (
+    SELECT user_id, first_date, first_product
+    FROM first_purchase
+    WHERE rnk = 1
+),
+after_first_day AS (
+    SELECT m.user_id, m.created_at, m.product_id
+    FROM marketing_campaign m
+    JOIN user_first f
+      ON m.user_id = f.user_id
+    WHERE m.created_at > DATEADD(day, 1, f.first_date)     -- must be after 1 day
+      AND m.product_id <> f.first_product                  -- must be different product
+)
+SELECT COUNT(DISTINCT user_id) AS successful_users
+FROM after_first_day;
+]*
+
 <img width="262" height="493" alt="40" src="https://github.com/user-attachments/assets/92ccdfa0-f893-4f83-a709-3b9be9386d82" />
 
 __________________________________________________________________
