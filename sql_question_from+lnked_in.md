@@ -6,7 +6,18 @@ Find the number of users that made additional in-app purchases due to the succes
 The marketing campaign doesn't start until one day after the initial in-app purchase so users that only made one or
 multiple purchases on the first day do not count, nor do we count users that over time purchase is the same product as 
 purchased on the first day.
-
+*(A user counts only if:
+✔ Condition 1:
+They made a first purchase (everyone does).
+✔ Condition 2:
+They made another purchase after 1 day (campaign active).
+✔ Condition 3:
+The product purchased later is NOT the same as the product they bought on Day 1.
+❌ Do NOT count users who:
+Only purchased on the same day as first purchase.
+Purchased multiple times on the first day.
+Purchased only the same product again later.
+)*
 CREATE TABLE [marketing_campaign](
  [user_id] [int] NULL,
  [created_at] [date] NULL,
