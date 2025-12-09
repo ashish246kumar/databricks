@@ -61,6 +61,7 @@ INSERT INTO icc_world_cup values('SA','Eng','Eng');
 INSERT INTO icc_world_cup values('Eng','NZ','NZ');
 INSERT INTO icc_world_cup values('Aus','India','India');
 
+<img width="356" height="511" alt="52" src="https://github.com/user-attachments/assets/923870df-dea8-4b23-9faf-d9c56b0e4b20" />
 
 _________________________________________________________________________________________________________________________________________________
 
@@ -85,6 +86,8 @@ insert into customer_orders values(1,100,cast('2022-01-01' as date),2000),(2,200
 ,(4,100,cast('2022-01-02' as date),2000),(5,400,cast('2022-01-02' as date),2200),(6,500,cast('2022-01-02' as date),2700)
 ,(7,100,cast('2022-01-03' as date),3000),(8,400,cast('2022-01-03' as date),1000),(9,600,cast('2022-01-03' as date),3000)
 
+<img width="299" height="492" alt="53" src="https://github.com/user-attachments/assets/7d1fa34a-9cd9-4a73-a8b2-0c3fbfa1808a" />
+
 __________________________________________________________________________________________________________________
 54
 
@@ -107,6 +110,7 @@ insert into entries
 values ('A','Bangalore','A@gmail.com',1,'CPU'),('A','Bangalore','A1@gmail.com',1,'CPU'),('A','Bangalore','A2@gmail.com',2,'DESKTOP')
 ,('B','Bangalore','B@gmail.com',2,'DESKTOP'),('B','Bangalore','B1@gmail.com',2,'DESKTOP'),('B','Bangalore','B2@gmail.com',1,'MONITOR');
 
+<img width="272" height="507" alt="54" src="https://github.com/user-attachments/assets/699e0c97-380a-4c16-9727-4266ece663da" />
 
 ________________________________________________________________________________________________________________________
 55
@@ -135,6 +139,8 @@ insert into person(PersonID,Name ,Score) values('3','Devis','27')
 insert into person(PersonID,Name ,Score) values('4','Tara','45')
 insert into person(PersonID,Name ,Score) values('5','John','63')
 
+<img width="375" height="518" alt="55" src="https://github.com/user-attachments/assets/f7fa990d-f994-405f-8147-583d5c2f5c88" />
+
 ______________________________________________________________________________________________________________
 56
 Write a SQL Query to find the cancellation rate of requests with unbanned users (both client and driver must not be banned) each day
@@ -161,6 +167,9 @@ insert into Trips (id, client_id, driver_id, city_id, status, request_at) values
 insert into Trips (id, client_id, driver_id, city_id, status, request_at) values ('8', '2', '12', '12', 'completed', '2013-10-03');
 insert into Trips (id, client_id, driver_id, city_id, status, request_at) values ('9', '3', '10', '12', 'completed', '2013-10-03');
 insert into Trips (id, client_id, driver_id, city_id, status, request_at) values ('10', '4', '13', '12', 'cancelled_by_driver', '2013-10-03');
+
+<img width="383" height="481" alt="56" src="https://github.com/user-attachments/assets/bb074c1a-8050-43b1-8a2b-dfbe62718277" />
+
 _________________________________________________________________________________________________-
 57
 Write a SQL Query to find the winner in each group.
@@ -200,6 +209,8 @@ insert into matches values (3,30,15,2,0);
 insert into matches values (4,40,20,5,2);
 insert into matches values (5,35,50,1,1);
 
+<img width="317" height="518" alt="57" src="https://github.com/user-attachments/assets/60bd3eab-e33e-4c1e-98a5-692ee5c9a522" />
+
 _______________________________________________________________________-
 58
 Market Analysis : Write a SQL Query to find for each seller, whether the brand of the second item (by date) they sold is their favorite brand or not.
@@ -237,6 +248,9 @@ user_id int ,
  insert into items values (1,'Samsung'),(2,'Lenovo'),(3,'LG'),(4,'HP');
  insert into orders values (1,'2019-08-01',4,1,2),(2,'2019-08-02',2,1,3),(3,'2019-08-03',3,2,3),(4,'2019-08-04',1,4,2)
  ,(5,'2019-08-04',1,3,4),(6,'2019-08-05',2,2,4);
+
+ <img width="326" height="521" alt="58" src="https://github.com/user-attachments/assets/35e31345-1c58-4715-9748-3e00e61a8ab8" />
+
 ________________________________________________________________________________________________________________________
 59
 Write a SQL query to find the start and end dates with the state of those tasks where the state is consecutively the same until it changes.
@@ -253,6 +267,8 @@ state varchar(10)
 
 insert into tasks values ('2019-01-01','success'),('2019-01-02','success'),('2019-01-03','success'),('2019-01-04','fail')
 ,('2019-01-05','fail'),('2019-01-06','success');
+
+<img width="367" height="512" alt="59" src="https://github.com/user-attachments/assets/6877eeb3-31fd-4dfa-bd23-f535daab2e5f" />
 
 ______________________________________________________________________________________________________-
 60
@@ -277,6 +293,8 @@ amount int
 
 insert into spending values(1,'2019-07-01','mobile',100),(1,'2019-07-01','desktop',100),(2,'2019-07-01','mobile',100)
 ,(2,'2019-07-02','mobile',100),(3,'2019-07-01','desktop',100),(3,'2019-07-02','desktop',100);
+
+<img width="302" height="519" alt="60" src="https://github.com/user-attachments/assets/bdcc5206-1ab4-4eb9-b70e-f03742a7986f" />
 
 _________________________________________________________________________________
 
