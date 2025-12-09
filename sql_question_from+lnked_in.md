@@ -1,3 +1,333 @@
+40
+You have a table of in-app purchases by user. Users that make their first in-app purchase are placed in a marketing
+campaign where they see call-to-actions for more in-app purchases.
+Find the number of users that made additional in-app purchases due to the success of the marketing campaign.
+
+The marketing campaign doesn't start until one day after the initial in-app purchase so users that only made one or
+multiple purchases on the first day do not count, nor do we count users that over time purchase is the same product as 
+purchased on the first day.
+
+insert into marketing_campaign values (51,'2019-02-21',120,2,99),
+(51,'2019-03-13',108,4,120),
+(52,'2019-02-23',117,2,999),
+(52,'2019-03-18',112,5,200),
+(53,'2019-02-24',120,4,99),
+
+insert into marketing_campaign values (31,'2019-01-30',104,3,154),
+(32,'2019-01-31',117,1,999),
+(33,'2019-01-31',117,2,999),
+(34,'2019-01-31',110,3,299),
+(35,'2019-02-03',117,2,999),
+
+<img width="262" height="493" alt="40" src="https://github.com/user-attachments/assets/92ccdfa0-f893-4f83-a709-3b9be9386d82" />
+
+__________________________________________________________________
+41
+
+Write a SQL Query to find all couples of trade for same stock that happened in the range of 10 seconds
+and having price difference by more than 10%.
+Output result should also list the percentage of price difference between the 2 trade.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+Create Table Trade_tbl(
+TRADE_ID varchar(20),
+Trade_Timestamp time,
+Trade_Stock varchar(20),
+Quantity int,
+Price Float
+);
+Insert into Trade_tbl Values('TRADE1','10:01:05','ITJunction4All',100,20)
+Insert into Trade_tbl Values('TRADE2','10:01:06','ITJunction4All',20,15)
+Insert into Trade_tbl Values('TRADE3','10:01:08','ITJunction4All',150,30)
+Insert into Trade_tbl Values('TRADE4','10:01:09','ITJunction4All',300,32)
+Insert into Trade_tbl Values('TRADE5','10:10:00','ITJunction4All',-100,19)
+Insert into Trade_tbl Values('TRADE6','10:10:01','ITJunction4All',-300,19);
+
+<img width="374" height="511" alt="41" src="https://github.com/user-attachments/assets/060500de-7381-49de-8abd-6424f0c50207" />
+
+_______________________________________________________________________________________
+
+42
+
+Problem statement : we have a table which stores data of multiple sections. every section has 3 numbers
+we have to find top 4 numbers from any 2 sections(2 numbers each) whose addition should be maximum
+so in this case we will choose section b where we have 19(10+9) then we need to choose either C or D
+because both has sum of 18 but in D we have 10 which is big from 9 so we will give priority to D.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+create table section_data
+(
+section varchar(5),
+number integer
+)
+insert into section_data
+values ('A',5),('A',7),('A',10) ,('B',7),('B',9),('B',10) ,('C',9),('C',7),('C',9) ,('D',10),('D',3),('D',8);
+
+<img width="318" height="495" alt="42" src="https://github.com/user-attachments/assets/d98e219b-2da7-4830-ad74-b4f2d4e2ba73" />
+
+___________________________________
+43
+Problem statement: We need to obtain a list of departments with an average salary lower than the overall average salary of the company.
+However, when calculating the company's average salary, you must exclude the salaries of the department you are comparing it with. For instance,
+when comparing the average salary of HR department with the company's average, the HR department's salaries shouldn't be taken into consideration 
+for the calculations of company average salary. Essentially, the company's
+average salary will be dynamic for each department.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+create table emp(
+emp_id int,
+emp_name varchar(20),
+department_id int,
+salary int,
+manager_id int,
+emp_age int);
+
+insert into emp
+values
+(1, 'Ankit', 100,10000, 4, 39);
+insert into emp
+values (2, 'Mohit', 100, 15000, 5, 48);
+insert into emp
+values (3, 'Vikas', 100, 10000,4,37);
+insert into emp
+values (4, 'Rohit', 100, 5000, 2, 16);
+insert into emp
+values (5, 'Mudit', 200, 12000, 6,55);
+insert into emp
+values (6, 'Agam', 200, 12000,2, 14);
+insert into emp
+values (7, 'Sanjay', 200, 9000, 2,13);
+insert into emp
+values (8, 'Ashish', 200,5000,2,12);
+insert into emp
+values (9, 'Mukesh',300,6000,6,51);
+insert into emp
+values (10, 'Rakesh',300,7000,6,50);
+
+<img width="322" height="515" alt="43" src="https://github.com/user-attachments/assets/be8e2be7-04dd-49e9-be95-378cc73a120a" />
+
+_________________________________________
+44
+Write a SQL code to find output table as below:
+employeeid, employee_default_phone_number, total_entry, total_login, total_logout, latest_login, latest_logout.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+CREATE TABLE employee_checkin_details
+(employeeid INT, entry_details VARCHAR(20),
+timestamp_details DATETIME);
+
+CREATE TABLE employee_details
+(employeeid INT, phone_number VARCHAR(20), isdefault VARCHAR(20));
+
+INSERT INTO employee_checkin_details
+VALUES 
+(1000 , 'login' , '2023-06-16 01:00:15.34'),
+ (1000 , 'login' , '2023-06-16 02:00:15.34'),
+ (1000 , 'login' , '2023-06-16 03:00:15.34'),
+ (1000 , 'logout' , '2023-06-16 12:00:15.34'),
+ (1001 , 'login' , '2023-06-16 01:00:15.34'),
+ (1001 , 'login' , '2023-06-16 02:00:15.34'),
+ (1001 , 'login' , '2023-06-16 03:00:15.34'),
+ (1001 , 'logout' , '2023-06-16 12:00:15.34');
+
+INSERT INTO employee_details
+VALUES 
+(1001 ,'9999' , 'false'),
+(1001 ,'1111' , 'false'),
+(1001 ,'2222' , 'true'),
+(1003 ,'3333' , 'false');
+
+<img width="367" height="511" alt="44" src="https://github.com/user-attachments/assets/220a571e-f09d-4002-ad0c-18cbe62b374d" />
+
+____________________________________________________________________________-
+45
+An organization is looking to hire employees/candidates for their junior and senior positions. They have a total quota/limit of $50000 in all,
+they have to first fill up the senior positions and then fill up the junior positions. There are 4 test cases. Write a SQL Query to satisfy all
+the testcases. To check whether your SQL query is correct or wrong, you can try with your own test case too.
+
+Create table candidates(
+id int primary key,
+positions varchar(10) not null,
+salary int not null);
+
+-- Test case 1
+insert into candidates values(1,'junior',5000);
+insert into candidates values(2,'junior',7000);
+insert into candidates values(3,'junior',7000);
+insert into candidates values(4,'senior',10000);
+insert into candidates values(5,'senior',30000);
+insert into candidates values(6,'senior',20000);
+
+-- Test case 2
+insert into candidates values(20,'junior',10000);
+insert into candidates values(30,'senior',15000);
+insert into candidates values(40,'senior',30000);
+
+-- Test case 3
+insert into candidates values(1,'junior',15000);
+insert into candidates values(2,'junior',15000);
+insert into candidates values(3,'junior',20000);
+insert into candidates values(4,'senior',60000);
+
+-- Test case 4
+insert into candidates values(10,'junior',10000);
+insert into candidates values(40,'junior',10000);
+insert into candidates values(20,'senior',15000);
+insert into candidates values(30,'senior',30000);
+insert into candidates values(50,'senior',15000);
+
+<img width="292" height="518" alt="45" src="https://github.com/user-attachments/assets/2345b6a8-d3fd-4fa1-bd27-8b50facd2988" />
+
+______________________________________________________
+46
+Write a SQL query to generate a list of all job positions, including multiple entries for each position based on the number of available posts.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+create table job_positions (id int,
+ title varchar(100),
+ groups varchar(10),
+ levels varchar(10), 
+ payscale int, 
+ totalpost int );
+ insert into job_positions values (1, 'General manager', 'A', 'l-15', 10000, 1); 
+insert into job_positions values (2, 'Manager', 'B', 'l-14', 9000, 5); 
+insert into job_positions values (3, 'Asst. Manager', 'C', 'l-13', 8000, 10); 
+
+ create table job_employees ( id int, 
+ name  varchar(100), 
+ position_id int 
+ ); 
+ insert into job_employees values (1, 'John Smith', 1); 
+insert into job_employees values (2, 'Jane Doe', 2);
+ insert into job_employees values (3, 'Michael Brown', 2);
+ insert into job_employees values (4, 'Emily Johnson', 2); 
+insert into job_employees values (5, 'William Lee', 3); 
+insert into job_employees values (6, 'Jessica Clark', 3); 
+insert into job_employees values (7, 'Christopher Harris', 3);
+ insert into job_employees values (8, 'Olivia Wilson', 3);
+ insert into job_employees values (9, 'Daniel Martinez', 3);
+ insert into job_employees values (10, 'Sophia Miller', 3);
+
+ <img width="290" height="491" alt="46" src="https://github.com/user-attachments/assets/9aecdad2-8bfb-4d19-a2d7-4aed2a13e27b" />
+
+_______________________________________________________________________
+
+Write a SQL Query to find cities where not even a single order was returned.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+create table namaste_orders
+(
+order_id int,
+city varchar(10),
+sales int
+);
+
+create table namaste_returns
+(
+order_id int,
+return_reason varchar(20),
+);
+
+insert into namaste_orders
+values(1, 'Mysore' , 100),(2, 'Mysore' , 200),(3, 'Bangalore' , 250),(4, 'Bangalore' , 150)
+,(5, 'Mumbai' , 300),(6, 'Mumbai' , 500),(7, 'Mumbai' , 800)
+;
+insert into namaste_returns values
+(3,'wrong item'),(6,'bad quality'),(7,'wrong item');
+
+<img width="410" height="465" alt="47" src="https://github.com/user-attachments/assets/54cdd230-871c-410b-9b09-180f43056501" />
+
+____________________________________
+48
+Write a SQL Query to find the start and final destination.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+CREATE TABLE travel_data (
+ customer VARCHAR(10),
+ start_loc VARCHAR(50),
+ end_loc VARCHAR(50)
+);
+
+INSERT INTO travel_data (customer, start_loc, end_loc) VALUES
+ ('c1', 'New York', 'Lima'),
+ ('c1', 'London', 'New York'),
+ ('c1', 'Lima', 'Sao Paulo'),
+ ('c1', 'Sao Paulo', 'New Delhi'),
+ ('c2', 'Mumbai', 'Hyderabad'),
+ ('c2', 'Surat', 'Pune'),
+ ('c2', 'Hyderabad', 'Surat'),
+ ('c3', 'Kochi', 'Kurnool'),
+ ('c3', 'Lucknow', 'Agra'),
+ ('c3', 'Agra', 'Jaipur'),
+ ('c3', 'Jaipur', 'Kochi');
+
+ <img width="437" height="517" alt="48" src="https://github.com/user-attachments/assets/2a936baa-bca7-413c-ad5a-c80faf028dd8" />
+
+
+________________________________________________________________
+49
+Write a SQL Query to find the price at the start of the month and the difference. Make sure you already have the Calendar Table created.
+
+I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
+
+Would you take a different approach? Maybe using hashtag#Pandas or a
+hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
+
+Use this below data to create table:-
+create table sku 
+(
+sku_id int,
+price_date date ,
+price int
+);
+insert into sku values 
+(1,'2023-01-01',10)
+,(1,'2023-02-15',15)
+,(1,'2023-03-03',18)
+,(1,'2023-03-27',15)
+,(1,'2023-04-06',20);
+
+<img width="425" height="496" alt="49 1" src="https://github.com/user-attachments/assets/015b07a5-7027-4426-9db5-d1495b5e2890" />
+<br>
+<img width="545" height="261" alt="49 2" src="https://github.com/user-attachments/assets/0dfdd597-3b95-4b84-8367-e96a98221d2f" />
+
+
+
+______________________________________________________________________________________________________________________________________-
 50)
 Write a SQL Query to find the firstname, middlename, and lastname from the customer name.
 
