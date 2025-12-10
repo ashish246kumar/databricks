@@ -81,7 +81,7 @@ Output result should also list the percentage of price difference between the 2 
 I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
 
 Would you take a different approach? Maybe using hashtag#Pandas or a hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
-<br
+<br>
 *condtion(
 They are trades of the same stock
 They happened within 10 seconds of each other
