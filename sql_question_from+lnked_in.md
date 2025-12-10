@@ -81,7 +81,13 @@ Output result should also list the percentage of price difference between the 2 
 I've shared my solution using hashtag#ApacheSpark and hashtag#SQL. Check out the attached image! I'm curious to see how YOU would solve this challenge.
 
 Would you take a different approach? Maybe using hashtag#Pandas or a hashtag#PySparkUDF? Let's see your innovative solutions in the comments below!
-
+<br
+*condtion(
+They are trades of the same stock
+They happened within 10 seconds of each other
+Their price difference is more than 10%
+)
+<br>
 Use this below data to create table:-
 Create Table Trade_tbl(
 TRADE_ID varchar(20),
@@ -90,6 +96,7 @@ Trade_Stock varchar(20),
 Quantity int,
 Price Float
 );
+
 Insert into Trade_tbl Values('TRADE1','10:01:05','ITJunction4All',100,20)
 Insert into Trade_tbl Values('TRADE2','10:01:06','ITJunction4All',20,15)
 Insert into Trade_tbl Values('TRADE3','10:01:08','ITJunction4All',150,30)
