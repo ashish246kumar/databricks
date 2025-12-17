@@ -20,6 +20,8 @@ Folder path
 File format (CSV, Parquet, JSON)
 Schema (optional
 <img width="599" height="322" alt="2" src="https://github.com/user-attachments/assets/565d9ba2-ed07-44bd-9b58-f577a5adea22" />
+<br>
+copying data from source to sink
 <img width="658" height="311" alt="3" src="https://github.com/user-attachments/assets/14e676a3-57d6-49e3-b097-7dcd2a1ca8d6" />
 <img width="716" height="227" alt="4" src="https://github.com/user-attachments/assets/a97aabb0-f165-4a97-964f-4b955f051b4f" />
 <img width="696" height="280" alt="5" src="https://github.com/user-attachments/assets/0cdf5d64-9c49-44c3-a8a0-6e12379807a6" />
