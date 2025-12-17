@@ -1,5 +1,24 @@
 <img width="726" height="374" alt="Screenshot 2025-12-17 075338" src="https://github.com/user-attachments/assets/915b1142-f461-4e75-8de4-d226cb222ecc" />
+<br>
+A Linked Service is a connection configuration to a data source or compute resource.
+It stores:
+Connection string / URL
+Authentication details
+Credentials (Key Vault / Managed Identity)
+Server, database, storage account, etc.
+📌 It does NOT know about data structure
+📌 It only knows where the data is
+Examples of Linked Services
+Azure SQL Database
+Azure Blob Storage
+ADLS Gen2
 
+A Dataset represents the structure and location of data inside a linked service.
+It defines:
+File / table name
+Folder path
+File format (CSV, Parquet, JSON)
+Schema (optional
 <img width="599" height="322" alt="2" src="https://github.com/user-attachments/assets/565d9ba2-ed07-44bd-9b58-f577a5adea22" />
 <img width="658" height="311" alt="3" src="https://github.com/user-attachments/assets/14e676a3-57d6-49e3-b097-7dcd2a1ca8d6" />
 <img width="716" height="227" alt="4" src="https://github.com/user-attachments/assets/a97aabb0-f165-4a97-964f-4b955f051b4f" />
