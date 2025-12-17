@@ -1,7 +1,75 @@
+Write PySpark code to remove duplicate records based on package_id.
+df_dedup = df.dropDuplicates(["package_id"])
 
+window_spec = Window.partitionBy("package_id") \
+                    .orderBy(col("updated_at").desc())
 
+df_dedup = (
+    df.withColumn("rn", row_number().over(window_spec))
+      .filter(col("rn") == 1)
+      .drop("rn")
+)
 
+_________________________________________________________
+Given a DataFrame with event_time, filter records of last 24 hours.
+from pyspark.sql.functions import col, current_timestamp
 
+df_last_24h = df.filter(
+    col("event_time") >= current_timestamp() - expr("INTERVAL 24 HOURS")
+)
+___________________________________
+Write PySpark code to convert string timestamp to proper timestamp type
+df = df.withColumn(
+    "event_time_ts",
+    to_timestamp("event_time", "yyyy-MM-dd HH:mm:ss")
+)
+__________________________________________-
+How do you read data from Azure Data Lake path into Databricks?
+df = spark.read \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .csv("abfss://raw@mydatalake.dfs.core.windows.net/input/data.csv")
+____________________________
+Write code to handle null values in multiple columns dynamically.
+
+from pyspark.sql.functions import col, when, lit
+
+df_filled = df.select(
+    *[
+        when(col(c).isNull(), lit("NA")).otherwise(col(c)).alias(c)
+        if c in string_cols else col(c)
+        for c in df.columns
+    ]
+)
+______________________
+differense between cache and persist 
+
+df.cache()
+What it does
+Stores the DataFrame/RDD in memory
+Uses default storage level
+
+persist() — Configurable storage
+Stores data using a specified storage level
+You choose memory, disk, serialized, replicated, etc.
+________________________
+Write PySpark code to append data safely into Delta Table.
+
+Append with Schema Enforcement (Recommended)
+Ensures incoming data matches existing schema.
+df.write \
+  .format("delta") \
+  .mode("append") \
+  .option("mergeSchema", "false") \
+  .save("/mnt/silver/customer_delta")
+
+df.write \
+  .format("delta") \
+  .mode("append") \
+  .saveAsTable("silver.customer_delta")
+________________________________
+
+____________________________
 how broadcast join internally improve the performance
 
 Spark improves broadcast join performance by avoiding shuffle.
