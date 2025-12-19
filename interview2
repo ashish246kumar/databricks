@@ -1,3 +1,17 @@
+_
+what problem deletion vector solve
+
+How do you delete or update a few rows in huge immutable Parquet files without rewriting the entire file?
+Why this is a problem
+Delta Lake data is stored in immutable Parquet files
+Traditionally, DELETE / UPDATE / MERGE meant:
+Read the whole file
+Modify rows
+Rewrite a new file
+➡️ Very expensive for small row-level changes on large tables
+What Deletion Vectors solve
+Stores a Deletion Vector that marks which rows are logically deleted
+_________________________________________________
 Write PySpark code to remove duplicate records based on package_id.
 df_dedup = df.dropDuplicates(["package_id"])
 
