@@ -654,6 +654,34 @@ state varchar(10)
 
 insert into tasks values ('2019-01-01','success'),('2019-01-02','success'),('2019-01-03','success'),('2019-01-04','fail')
 ,('2019-01-05','fail'),('2019-01-06','success');
+[
+WITH flagged AS (
+    SELECT
+        date_value,
+        state,
+        CASE
+            WHEN LAG(state) OVER (ORDER BY date_value) = state THEN 0
+            ELSE 1
+        END AS is_new_group
+    FROM tasks
+),
+
+grouped AS (
+    SELECT
+        date_value,
+        state,
+        SUM(is_new_group) OVER (ORDER BY date_value) AS grp_id
+    FROM flagged
+)
+
+SELECT
+    state,
+    MIN(date_value) AS start_date,
+    MAX(date_value) AS end_date
+FROM grouped
+GROUP BY state, grp_id
+ORDER BY start_date;
+]
 
 <img width="367" height="512" alt="59" src="https://github.com/user-attachments/assets/6877eeb3-31fd-4dfa-bd23-f535daab2e5f" />
 
