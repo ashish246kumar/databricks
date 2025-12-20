@@ -1,3 +1,43 @@
+A recursive CTE is a way to repeatedly run a query on its own result until there is nothing new to find.
+Use a recursive CTE when:
+Data has parent → child relationships
+You don’t know the depth of the hierarchy
+Examples:
+Employee → Manager
+Category → Subcategory
+Folder → Subfolder
+
+recursive CTE has two parts:
+1. Anchor Member
+Returns the starting rows (roots).
+2. Recursive Member
+References the CTE itself to fetch child rows.
+WITH RECURSIVE emp_cte AS (
+
+    -- Anchor: start with top-level employee
+    SELECT
+        emp_id,
+        emp_name,
+        manager_id,
+        0 AS level
+    FROM employee
+    WHERE manager_id IS NULL
+
+    UNION ALL
+
+    -- Recursive: get subordinates
+    SELECT
+        e.emp_id,
+        e.emp_name,
+        e.manager_id,
+        c.level + 1
+    FROM employee e
+    JOIN emp_cte c
+        ON e.manager_id = c.emp_id
+)
+
+SELECT * FROM emp_cte;
+
 
 __________________________________________________________________________
 Design a schema for tracking insurance claims lifecycle — how do you handle versioning?
