@@ -2,6 +2,44 @@ Change Data Capture (CDC) using Delta Live Tables (DLT) in Databricks. Instead o
 INTO statements, DLT provides the apply_changes API to handle
 SCD Type 1 (overwriting data) and SCD Type 2 (maintaining history with start/end dates) automatically
 
+
+@dlt.table(name="bronze_load")
+def bronze_load():
+    return (
+        spark.readStream.format("cloudFiles")
+        .option("cloudFiles.format", "csv")
+        .schema(source_schema)
+        .load("/Volumes/path/to/your/data/") # Path to your files
+        .withColumn("file_process_date", date_format(current_timestamp(), "yyyy-MM-dd HH:mm:ss"))
+    )
+# Create the target streaming table
+dlt.create_streaming_table("silver_load_scd1")
+
+# Apply changes for SCD Type 1
+dlt.apply_changes(
+    target = "silver_load_scd1",
+    source = "bronze_load",
+    keys = ["P_key"],
+    sequence_by = col("file_process_date"),
+    stored_as_scd_type = 1
+)
+# Create the target streaming table
+dlt.create_streaming_table("silver_load_scd2")
+
+# Apply changes for SCD Type 2
+dlt.apply_changes(
+    target = "silver_load_scd2",
+    source = "bronze_load",
+    keys = ["P_key"],
+    sequence_by = col("file_process_date"),
+    stored_as_scd_type = 2,
+    track_history_column_list = ["file_process_date"] # Tracks changes in this column to trigger a new version
+)
+(
+Track History Column List: Specifically used for SCD Type 2. It monitors specific columns for changes; 
+if a change occurs, it "expires" the old record (sets an end date) and inserts a new one (sets a start date
+)
+
 _____________________________________________________________________________________________-
 A recursive CTE is a way to repeatedly run a query on its own result until there is nothing new to find.
 Use a recursive CTE when:
