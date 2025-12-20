@@ -1,3 +1,6 @@
+Change Data Capture (CDC) using Delta Live Tables (DLT) in Databricks. Instead of writing complex MERGE 
+INTO statements, DLT provides the apply_changes API to handle
+SCD Type 1 (overwriting data) and SCD Type 2 (maintaining history with start/end dates) automatically
 
 _____________________________________________________________________________________________-
 A recursive CTE is a way to repeatedly run a query on its own result until there is nothing new to find.
