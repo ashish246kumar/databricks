@@ -1,3 +1,5 @@
+
+_____________________________________________________________________________________________-
 A recursive CTE is a way to repeatedly run a query on its own result until there is nothing new to find.
 Use a recursive CTE when:
 Data has parent → child relationships
