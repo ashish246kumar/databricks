@@ -1,3 +1,7 @@
+
+______________________________________________________________________________________
+4)How would you implement CDC (Change Data Capture) in a PySpark pipeline?
+
 Change Data Capture (CDC) using Delta Live Tables (DLT) in Databricks. Instead of writing complex MERGE 
 INTO statements, DLT provides the apply_changes API to handle
 SCD Type 1 (overwriting data) and SCD Type 2 (maintaining history with start/end dates) automatically
