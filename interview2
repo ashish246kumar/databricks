@@ -1,3 +1,122 @@
+
+
+# 1️⃣ Problem Understanding (Start Like This)
+
+> *“An insurance claim goes through multiple states (created, verified, approved, rejected, settled), and the data can change over time. We must track both the **current state** and the **full historical evolution** of the claim.”*
+
+Key requirements:
+
+* Track claim lifecycle
+* Preserve historical changes (audit)
+* Support corrections & reprocessing
+* Enable reporting on both **latest** and **past** states
+
+---
+
+# 2️⃣ Core Design Principle
+
+✔ **Separate current state from history**
+✔ **Never update history — only append**
+✔ **Version every meaningful change**
+
+This leads to a **bi-table pattern**:
+
+1. **Current Claim table**
+2. **Claim Version / History table**
+
+---
+
+# 3️⃣ High-Level Schema Overview
+
+```text
+CLAIM
+CLAIM_VERSION
+CLAIM_STATUS_HISTORY
+```
+
+---
+
+# 4️⃣ Core Claim Table (Current Snapshot)
+
+This table always holds the **latest version**.
+
+```sql
+CLAIM (
+    claim_id            VARCHAR(50) PRIMARY KEY,
+    policy_id           VARCHAR(50),
+    customer_id         VARCHAR(50),
+    claim_type          VARCHAR(30),
+    claim_amount        DECIMAL(15,2),
+    current_status      VARCHAR(20),
+    current_version     INT,
+    created_at          TIMESTAMP,
+    updated_at          TIMESTAMP
+);
+```
+
+### Why this table exists
+
+* Fast reads for applications
+* No need to scan history for latest data
+* Optimized for operational workloads
+
+📌 **Interview keyword:** *“current snapshot”*
+
+---
+
+# 5️⃣ Claim Version Table (Versioning Backbone)
+
+This is where **versioning happens**.
+
+```sql
+CLAIM_VERSION (
+    claim_id            VARCHAR(50),
+    version_no          INT,
+    policy_id           VARCHAR(50),
+    claim_amount        DECIMAL(15,2),
+    claim_details       JSON,
+    changed_by          VARCHAR(50),
+    change_reason       VARCHAR(100),
+    valid_from          TIMESTAMP,
+    valid_to            TIMESTAMP,
+    is_current          BOOLEAN,
+    PRIMARY KEY (claim_id, version_no)
+);
+```
+
+### Key points to highlight in interview
+
+* Every update → **new version**
+* No overwrite, only insert
+* `valid_from` / `valid_to` enable **time-travel queries**
+* `is_current = true` identifies active version
+
+📌 **This is SCD Type-2 applied to transactional systems**
+
+---
+
+# 6️⃣ Claim Status Lifecycle Table
+
+Status changes happen more frequently than data changes.
+
+```sql
+CLAIM_STATUS_HISTORY (
+    claim_id        VARCHAR(50),
+    status          VARCHAR(20),
+    status_reason   VARCHAR(100),
+    changed_by      VARCHAR(50),
+    changed_at      TIMESTAMP
+);
+```
+
+### Why separate status?
+
+* Status transitions are audit-critical
+* Easier SLA and turnaround reporting
+* Avoids bloating main version table
+
+
+
 __
 12)How do you approach historical data archiving in a large-scale DW? 
 Historical data archiving is about optimizing performance and cost while still meeting compliance and audit requirements.
