@@ -1,3 +1,61 @@
+Design a schema for tracking insurance claims lifecycle — how do you handle versioning?
+
+
++------------------+
+|      POLICY      |
++------------------+
+| policy_id (PK)   |
+| policy_type      |
+| start_date       |
+| end_date         |
++------------------+
+        |
+        | 1
+        |
+        | N
++------------------+
+|      CLAIM       |
++------------------+
+| claim_id (PK)    |
+| policy_id (FK)   |
+| customer_id      |
+| current_status   |
+| current_version  |
+| created_at       |
+| updated_at       |
++------------------+
+        |
+        | 1
+        |
+        | N
++-------------------------+
+|     CLAIM_VERSION       |
++-------------------------+
+| claim_id (PK, FK)       |
+| version_no (PK)         |
+| claim_amount            |
+| claim_details           |
+| valid_from              |
+| valid_to                |
+| is_current              |
+| changed_by              |
+| change_reason           |
++-------------------------+
+
+        |
+        | 1
+        |
+        | N
++-----------------------------+
+|   CLAIM_STATUS_HISTORY      |
++-----------------------------+
+| status_id (PK)              |
+| claim_id (FK)               |
+| status                      |
+| status_reason               |
+| changed_by                  |
+| changed_at                  |
++-----------------------------+
 
 
 # 1️⃣ Problem Understanding (Start Like This)
