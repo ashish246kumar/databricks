@@ -1,4 +1,49 @@
-_
+__
+12)How do you approach historical data archiving in a large-scale DW? 
+Historical data archiving is about optimizing performance and cost while still meeting compliance and audit requirements.
+In a large-scale DW:
+Not all data is queried equally
+Old data increases storage cost, query latency, and maintenance overhead
+But deleting it is not allowed due to audits, analytics, and regulations
+So the goal is to:
+✔ Keep frequently used data fast
+✔ Move rarely used data cheaply
+✔ Still make archived data accessible
+
+2️⃣ Step 1: Define Data Retention & Classification
+
+The first step is data classification based on usage and business needs.
+
+🔹 Hot / Warm / Cold Model
+Data Type	Age	Usage	Storage
+Hot data	0–3 / 6 months	Daily dashboards, reports	Core DW
+Warm data	6–24 months	Ad-hoc analysis	DW or Nearline
+Cold data	>2 years	Audit, compliance	Archive storage
+
+Step 3: Choose the Archival Storage Layer
+Archived data is moved from expensive DW storage to low-cost storage.
+Common archival targets:
+Object storage (ADLS / S3 / GCS)
+Cold or Archive tiers
+Data format used:
+Parquet / ORC
+Highly compressed
+Columnar → faster reads for audits
+
+Step 5: Accessing Archived Data (Very Important)
+Archived data should still be queryable.
+How?
+External tables
+Federated queries
+Read-only schemas
+Example:
+SELECT SUM(amount)
+FROM archived_fact_transactions
+WHERE transaction_date BETWEEN '2021-01-01' AND '2021-12-31';
+Emphasize:
+“Archived data is not part of daily reporting, but available for audit or historical analysis.”
+
+______________________________________________
 what problem deletion vector solve
 
 How do you delete or update a few rows in huge immutable Parquet files without rewriting the entire file?
