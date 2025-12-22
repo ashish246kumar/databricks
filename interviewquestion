@@ -861,9 +861,29 @@ We use checkpointing and watermarking to handle fault tolerance and late-arrivin
 The jobs are scheduled and monitored in Databricks workflows, ensuring reliable and continuous data processing.
 This setup allows us to build real-time pipelines for analytics and dashboarding.
 
-stream df.writeStream.format("delta")
-.option("checkpoint Location", "/mnt/chkpt/")
-.start("/mnt/output/")
+df = (
+  spark.readStream
+       .format("kafka")
+       .option("kafka.bootstrap.servers", "host:9092")
+       .option("subscribe", "txn_topic")
+       .option("startingOffsets", "latest")
+       .load()
+)
+from pyspark.sql.functions import col, from_json
+from pyspark.sql.types import StructType, StringType, TimestampType
+
+schema = StructType() \
+    .add("txn_id", StringType()) \
+    .add("user_id", StringType()) \
+    .add("amount", StringType()) \
+    .add("event_time", TimestampType())
+
+parsed_df = (
+    df.selectExpr("CAST(value AS STRING)")
+      .select(from_json(col("value"), schema).alias("data"))
+      .select("data.*")
+)
+
 ___________________________________________________________
 How do you implement data governance and lineage in Azure?
 
