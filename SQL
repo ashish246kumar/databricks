@@ -1,3 +1,6 @@
+🔹Write a SQL query to find the second highest salary in each department. If a department has less than two employees, return NULL for that department.
+
+
 SELECT
     Department,
     MAX(
@@ -17,7 +20,7 @@ FROM (
 ) t
 GROUP BY Department;
 
-
+__________________________________________________________________________________________
 
 
 
