@@ -1,3 +1,29 @@
+SELECT
+    Department,
+    MAX(
+        CASE
+            WHEN rnk = 2 THEN Salary
+        END
+    ) AS SecondHighestSalary
+FROM (
+    SELECT
+        Department,
+        Salary,
+        DENSE_RANK() OVER (
+            PARTITION BY Department
+            ORDER BY Salary DESC
+        ) AS rnk
+    FROM Employee
+) t
+GROUP BY Department;
+
+
+
+
+
+
+
+______________________________________________________________________________________________
 Running total per customer
 SELECT
     customer_id,
