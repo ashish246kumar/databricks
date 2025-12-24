@@ -1,4 +1,10 @@
 _____________________________________________________________________________________________
+Question: How do data engineers deploy their pipelines into production? [00:06]
+
+Answer: Data pipeline deployment involves two key components: infrastructure and ETL (Extract, Transform, Load) packages. 
+To speed up development, agile practices are used, and the deployment is managed through a CI/CD process using Jenkins.
+Infrastructure: Deployed using Terraform code as input. [00:40]
+ETL Packages: Packaged based on source code and stored as an artifact in a separate repository. [00:49]
 
 _____________________________________________________________________
 df.rdd.getNumPartitions()
