@@ -414,7 +414,17 @@ INSERT INTO friend
 VALUES (1,2), (1,3), (2,1), (2,3), 
 (3,5), (4,2), (4,3), (4,5);
 
+SELECT
+    f.PersonID,
+    COUNT(f.FriendID) AS NumberOfFriends,
+    SUM(p.Score) AS TotalFriendScore
+FROM friend f
+JOIN person p
+    ON f.FriendID = p.PersonID
+GROUP BY f.PersonID
+HAVING SUM(p.Score) > 100;
 
+or
 with cte as(
 select f.PersonID,count(*) as tf,sum(score) as total_f_s from person p1 join friend f on p1.PersonID=f.FriendID group by f.PersonID
 )
