@@ -1,3 +1,4 @@
+________________________________________________________________
 copying billion rows from a file to a database and identifies lines that are causing the problem. 
 He suggests that the solution is to enable fault tolerance in the copy activity settings and check the "skip the incompatible rows" option. 
 This will allow the compatible rows to be pushed into the database, while the incompatible rows can be found in the log
