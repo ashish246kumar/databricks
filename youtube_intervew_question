@@ -1,3 +1,4 @@
+https://www.youtube.com/watch?v=C94-000jh6E
 Edge Node (Gateway Node): 
 An isolated machine outside the main cluster used for submitting Spark jobs. It serves security and organizational purposes:
 Prevents direct user access to the cluster to avoid manual data corruption or security risks.
