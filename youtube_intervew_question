@@ -1,3 +1,7 @@
+copying billion rows from a file to a database and identifies lines that are causing the problem. 
+He suggests that the solution is to enable fault tolerance in the copy activity settings and check the "skip the incompatible rows" option. 
+This will allow the compatible rows to be pushed into the database, while the incompatible rows can be found in the log
+____________________________________________________
 https://www.youtube.com/watch?v=C94-000jh6E
 Edge Node (Gateway Node): 
 An isolated machine outside the main cluster used for submitting Spark jobs. It serves security and organizational purposes:
