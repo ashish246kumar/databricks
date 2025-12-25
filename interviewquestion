@@ -1,4 +1,21 @@
-_____________________________________________________________________________________________
+6. Delivery partners with more than 20% delay rate.
+Table: delivery_logs
+Columns: partner_id, expected_delivery_date, actual_delivery_date
+
+SELECT *
+FROM (
+    SELECT
+        partner_id,
+        SUM(CASE WHEN actual_delivery_date > expected_delivery_date THEN 1 ELSE 0 END) * 1.0
+        / COUNT(*) AS delay_rate
+    FROM delivery_logs
+    GROUP BY partner_id
+) t
+WHERE delay_rate > 0.20;
+__________________________________________________________________________________________
+
+
+____________________________________________________________________________________________
 Question: How do data engineers deploy their pipelines into production? [00:06]
 
 Answer: Data pipeline deployment involves two key components: infrastructure and ETL (Extract, Transform, Load) packages. 
