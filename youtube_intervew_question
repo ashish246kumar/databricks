@@ -12,6 +12,24 @@ What it is: A security identity used by applications, services, and automation t
 When to use: Use it when Managed Identity is not supported, or when an external service (like Azure DevOps) needs to access Azure resources. [13:43, 07:39]
 Advantages: It is highly flexible; you can create as many as needed and use them across various internal and external services. [12:49, 12:56]
 Disadvantages: It is less secure and harder to manage because you must manually handle credentials (secret keys) and rotate them before they expire. [11:35, 11:55]
+
+(
+Azure services:
+
+Managed Identity Example (ADF to Databricks):
+
+When you create Azure Data Factory (ADF), Azure automatically creates an identity for it.
+
+To give ADF access to Azure Databricks, you simply go to the Databricks access control and select the "Managed Identity" of that specific Data Factory.
+
+Service Principal Example (Azure DevOps to Databricks):
+
+If you want to use Azure DevOps to run a CI/CD pipeline in Databricks, you cannot use a Managed Identity because Azure DevOps doesn't have one in the same way.
+
+Instead, you must create a "third-party" ID called a Service Principal in Azure Entra ID (Active Directory).
+
+You generate a Client ID and a Secret Key for this Service Principal and then provide those credentials to Azure DevOps so it can "log in" and perform tasks in Databricks
+)
 ________________________________________________________________
 copying billion rows from a file to a database and identifies lines that are causing the problem. 
 He suggests that the solution is to enable fault tolerance in the copy activity settings and check the "skip the incompatible rows" option. 
