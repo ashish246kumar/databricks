@@ -1,0 +1,8 @@
+Question: How does Spark work? Can you quickly guide me through the Spark architecture? [00:01]
+
+Answer: When you write a Spark application, the driver program gets executed. It follows several steps:
+Schema Validation: It checks if the code is syntactically correct and matches the schema catalog. [00:15]
+Unresolved Logical Plan: Once validated, it creates an unresolved logical plan. [00:26]
+Logical Plan: A logical plan is created with the help of the Catalyst Optimizer, considering cost and roles. [00:39]
+Physical Plan: Finally, a physical plan is created and then used for execution. [00:
+______________________________________________________________
