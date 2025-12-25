@@ -1,3 +1,22 @@
+Edge Node (Gateway Node): 
+An isolated machine outside the main cluster used for submitting Spark jobs. It serves security and organizational purposes:
+Prevents direct user access to the cluster to avoid manual data corruption or security risks.
+Handles authentication and authorization (e.g., via Kerberos) before jobs are submitted
+Deployment Modes: The mode is determined by where the driver program runs.
+
+Client Mode:
+The driver runs on the edge node (client machine).
+Logs are displayed directly on the user's screen, making it ideal for development and debugging.
+Disadvantage: Higher network latency due to two-way communication between the edge node and the cluster.
+Disadvantage: If the edge node is shut down or disconnected, the driver dies, and all executors are killed, stopping the process.
+
+Cluster Mode:
+The driver runs on one of the worker nodes inside the cluster.
+Recommended for production workloads.
+Advantage: Lower network latency since the driver and executors are within the same cluster.
+Advantage: The edge node can be disconnected after submission without affecting the job, as the driver is already running in the cluster.
+
+_______________________________________________________________________________
 Question: How does Spark work? Can you quickly guide me through the Spark architecture? [00:01]
 
 Answer: When you write a Spark application, the driver program gets executed. It follows several steps:
