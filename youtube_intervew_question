@@ -6,3 +6,10 @@ Unresolved Logical Plan: Once validated, it creates an unresolved logical plan. 
 Logical Plan: A logical plan is created with the help of the Catalyst Optimizer, considering cost and roles. [00:39]
 Physical Plan: Finally, a physical plan is created and then used for execution. [00:
 ______________________________________________________________
+Question: What exactly is the difference between submitting a job in client mode or in cluster mode in Spark? [00:01]
+
+Answer: - Client Mode: The driver program runs on the client machine [00:09]. This mode allows for interaction with the cluster results 
+and is primarily used for development purposes, as it makes it easy to see the execution results from the cluster. [00:15]
+
+Cluster Mode: The driver program runs on the cluster itself [00:25]. This mode is most commonly used for production environments. [00:31]
+______________
