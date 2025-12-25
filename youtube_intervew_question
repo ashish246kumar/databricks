@@ -1,3 +1,17 @@
+What are the differences between Managed Identity and Service Principal, and when should each be used?
+
+Answer: * Managed Identity: * What it is: An identity automatically created and managed by Azure for specific resources
+(like Azure Data Factory). [03:15, 01:10:35] * When to use: Use it whenever possible (recommended by Microsoft) 
+for authenticating between Azure resources that support it. [13:18] * Advantages: It is highly secure and easy to manage because Azure handles the credentials,
+removing the need for manual key rotation. [11:09, 11:18] * Disadvantages: It is less flexible because users have little control over its configuration, 
+and it is not supported by all services (e.g., Azure DevOps). [12:31, 07:54]
+
+Service Principal:
+
+What it is: A security identity used by applications, services, and automation tools (created via Azure Entra ID/Active Directory) to access specific Azure resources. [03:51, 10:45]
+When to use: Use it when Managed Identity is not supported, or when an external service (like Azure DevOps) needs to access Azure resources. [13:43, 07:39]
+Advantages: It is highly flexible; you can create as many as needed and use them across various internal and external services. [12:49, 12:56]
+Disadvantages: It is less secure and harder to manage because you must manually handle credentials (secret keys) and rotate them before they expire. [11:35, 11:55]
 ________________________________________________________________
 copying billion rows from a file to a database and identifies lines that are causing the problem. 
 He suggests that the solution is to enable fault tolerance in the copy activity settings and check the "skip the incompatible rows" option. 
