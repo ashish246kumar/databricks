@@ -1,3 +1,15 @@
+| Aspect            | Normalization        | Denormalization           |
+| ----------------- | -------------------- | ------------------------- |
+| Goal              | Eliminate redundancy | Improve query performance |
+| Data Redundancy   | Minimal              | Allowed                   |
+| Tables            | More tables          | Fewer tables              |
+| Joins             | Many joins           | Few or no joins           |
+| Write Performance | Slower               | Faster                    |
+| Read Performance  | Slower (joins)       | Faster                    |
+| Data Integrity    | High                 | Lower (needs control)     |
+| Use Case          | OLTP systems         | OLAP / reporting          |
+
+__________________________
 BIG DATA FILE FORMAT
 1. csv - Best for small datasets that need to be shared between different systems or applications (e.g., exporting simple tables like customer
 2. json - Excellent for data interchange, particularly in web applications. It's widely used when you need human-readable data or need to send data over HTTP from a client to a server (e.g., APIs, configuration files).
