@@ -1,3 +1,14 @@
+| Aspect      | Data Lake                                 | Data Warehouse          |
+| ----------- | ----------------------------------------- | ----------------------- |
+| Data Type   | Structured, semi-structured, unstructured | Structured only         |
+| Data State  | Raw (as-is)                               | Cleaned & processed     |
+| Schema      | Schema-on-read                            | Schema-on-write         |
+| Cost        | Low (cheap storage)                       | Higher                  |
+| Performance | Slower for BI queries                     | Very fast for analytics |
+| Users       | Data scientists, ML engineers             | Business analysts       |
+| Use Case    | Big data, ML, exploration                 | Reporting, dashboards   |
+
+_________________________________________________________
 6. Delivery partners with more than 20% delay rate.
 Table: delivery_logs
 Columns: partner_id, expected_delivery_date, actual_delivery_date
