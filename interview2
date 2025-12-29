@@ -1,4 +1,9 @@
-
+BIG DATA FILE FORMAT
+1. csv - Best for small datasets that need to be shared between different systems or applications (e.g., exporting simple tables like customer
+2. json - Excellent for data interchange, particularly in web applications. It's widely used when you need human-readable data or need to send data over HTTP from a client to a server (e.g., APIs, configuration files).
+3. parquet - Ideal for large-scale analytics, especially when you need to process large datasets and perform fast queries on specific columns (e.g., analyzing sales data in a data warehouse).
+4. orc - Perfect for use in the Hadoop ecosystem, especially if you're dealing with large-scale data processing and need both compression and speed (e.g., logging employee activities for analysis in Hive).
+5. avro - Great for real-time data ingestion where schema evolution (changes in data structure) is required, like for IoT data, logs, or event streams (e.g., data from smart home sensors).
 ______________________________________________________________________________________
 4)How would you implement CDC (Change Data Capture) in a PySpark pipeline?
 
