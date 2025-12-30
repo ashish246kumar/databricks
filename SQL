@@ -268,6 +268,33 @@ insert into activity values (1,'app-installed','2022-01-01','India')
 ,(6,'app-purchase','2022-01-04','Pakistan');
 
 
+
+[
+
+WITH installs AS (
+    SELECT
+        user_id,
+        event_date AS install_date
+    FROM activity
+    WHERE event_name = 'app-installed'
+),
+purchases AS (
+    SELECT
+        user_id,
+        event_date AS purchase_date
+    FROM activity
+    WHERE event_name = 'app-purchase'
+)
+SELECT
+    i.install_date,
+    COUNT(DISTINCT i.user_id) AS total_users
+FROM installs i
+JOIN purchases p
+    ON i.user_id = p.user_id
+   AND i.install_date = p.purchase_date
+GROUP BY i.install_date
+ORDER BY i.install_date;
+]
 SELECT i.event_date, count(p.user_id) as total_active_usr
 FROM activity i
 left JOIN activity p
