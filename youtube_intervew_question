@@ -1,4 +1,46 @@
+_______________________________________________________________________
+Database vs datalake vs data warehouse
 
+. Core Concepts Explained
+Database (OLTP):
+
+Purpose: Primarily used for day-to-day transactions (Online Transactional Processing). It focuses on high performance for immediate tasks [01:33].
+Data Type: Deals only with structured data (rows and columns) [02:43].
+Recent Data: It holds only recent data (e.g., last 5-6 months) to maintain speed; it cannot efficiently store years of historical data [03:12].
+Schema: Uses Schema on Write, meaning the structure is validated before data is saved. Any mismatch results in an error during the writing process [04:18].
+
+Cost: The storage cost is high [06:23].
+Data Warehouse (OLAP):
+Purpose: Used for analytical processing (Online Analytical Processing) and finding insights from large amounts of historical data [07:51].
+Source: It aggregates data from multiple databases through an ETL (Extract, Transform, Load) process [14:52].
+Schema: Like a database, it uses Schema on Write and deals with structured data [12:41].
+Cost: Storage is expensive, though generally cheaper than a primary transactional database [13:16].
+
+Data Lake:
+Purpose: Meant to store huge amounts of raw data for later analysis. It offers maximum flexibility for various teams to use the data as they need [18:04].
+Data Type: Handles structured, semi-structured, and unstructured data (like log files or docs) in its original form [17:56].
+Process: Uses ELT (Extract, Load, Transform). Data is loaded first, and transformations happen only when the data is read [19:00].
+Schema: Uses Schema on Read, allowing users to define the structure at the time of analysis [21:01].
+Cost: Highly cost-effective as it uses cheap storage hardware [20:16].
+
+2. Examples Provided
+Database Example:
+
+Scenario: Swiping your card at an ATM or purchasing an item on Amazon. These are instant transactions where your current balance must be updated immediately [01:16].
+
+Systems: Oracle, MySQL [04:06].
+
+Data Warehouse Example:
+
+Scenario: Amazon analysts wanting to see your purchase trends over the last 10 years to find insights. They move data from the transactional database to a warehouse to run complex queries without slowing down the main site [08:15].
+
+Systems: Teradata [13:16].
+
+Data Lake Example:
+
+Scenario: Storing a raw .csv or log file. You load the file into the system as-is and later create a structure (like a Hive table) on top of it to visualize the data [21:10].
+
+Systems: HDFS (Hadoop Distributed File System), Amazon S3 [19
 __________________________________________________________
 difference between Partitioning and Bucketing
 Partitioning:
