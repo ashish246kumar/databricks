@@ -25,21 +25,13 @@ Cost: Highly cost-effective as it uses cheap storage hardware [20:16].
 
 2. Examples Provided
 Database Example:
-
 Scenario: Swiping your card at an ATM or purchasing an item on Amazon. These are instant transactions where your current balance must be updated immediately [01:16].
-
 Systems: Oracle, MySQL [04:06].
-
 Data Warehouse Example:
-
 Scenario: Amazon analysts wanting to see your purchase trends over the last 10 years to find insights. They move data from the transactional database to a warehouse to run complex queries without slowing down the main site [08:15].
-
 Systems: Teradata [13:16].
-
 Data Lake Example:
-
 Scenario: Storing a raw .csv or log file. You load the file into the system as-is and later create a structure (like a Hive table) on top of it to visualize the data [21:10].
-
 Systems: HDFS (Hadoop Distributed File System), Amazon S3 [19
 __________________________________________________________
 difference between Partitioning and Bucketing
