@@ -1,3 +1,44 @@
+
+__________________________________________________________
+Partitioning:
+How it works: It divides data into multiple folders based on a specific column [03:02].
+When to use: Use it when a column has low cardinality (limited distinct values), such as Country or Date [04:10].
+Benefit: When you query for a specific value (e.g., Country = 'India'), the system only scans that specific folder instead of the entire dataset [03:21].
+
+Bucketing:
+How it works: It divides data into a fixed number of files using a hash function [06:21].
+When to use: Use it when a column has high cardinality (many unique values), such as Customer ID or Zip Code [05:44].
+Benefit: It distributes data evenly across a specified number of buckets (files) to manage large volumes of data that partitioning alone cannot handle efficiently [07:31].
+
+2. Examples Provided
+Partitioning Example [01:43]
+Scenario: You have a table with billions of records including a Country column.
+The Query: SELECT * FROM table WHERE Country = 'India'.
+The Process: * Without partitioning, the system scans all 100 billion records.
+With partitioning by Country, the system creates separate folders for India, USA, and UK.
+The query goes directly to the India folder, drastically increasing speed [03:02].
+
+Bucketing Example [06:41]
+Scenario: You want to organize data by Customer ID (which has millions of unique values).
+The Process:
+You decide to create 4 buckets.
+The system uses a hash function: Customer ID % 4.
+If the result is 0, the data goes to Bucket 1; if it's 1, it goes to Bucket 2, and so on [07:07].
+This results in exactly 4 files regardless of how many unique Customer IDs exist [07:17].
+
+
+Partitioning:
+SQL
+CREATE TABLE zip_codes (...)
+PARTITIONED BY (state STRING);
+Bucketing:
+
+SQL
+CREATE TABLE zip_codes (...)
+CLUSTERED BY (zip_code) INTO 10 BUCKETS;
+
+
+_____________________________________________________________________
 What are the differences between Managed Identity and Service Principal, and when should each be used?
 
 Answer: * Managed Identity: * What it is: An identity automatically created and managed by Azure for specific resources
