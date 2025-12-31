@@ -1,5 +1,6 @@
 
 __________________________________________________________
+difference between Partitioning and Bucketing
 Partitioning:
 How it works: It divides data into multiple folders based on a specific column [03:02].
 When to use: Use it when a column has low cardinality (limited distinct values), such as Country or Date [04:10].
