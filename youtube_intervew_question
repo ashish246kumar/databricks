@@ -1,6 +1,38 @@
-_______________________________________________________________________
-Database vs datalake vs data warehouse
+_________________________________________________________
+Spark SQL Engine
+In this lecture (Lec-8), Manish Kumar explains the Spark SQL Engine (also known as the Catalyst Optimizer) and the four phases it uses to convert high-level Spark code (SQL, DataFrames, or DataSets) into low-level Java bytecode for execution on a cluster.
 
+1. The Spark SQL Engine Flow
+The video breaks down the conversion of your code into the following four sequential phases:
+
+Phase 1: Analysis & The Catalog [07:27]
+When you write a query, Spark first creates an Unresolved Logical Plan.
+It then uses the Catalog (a repository of metadata like table names, column types, and file locations) to verify if the tables or columns you referenced actually exist.
+If a column or table is missing, Spark throws an Analysis Exception at this stage [09:13].
+
+Phase 2: Logical Planning / Optimization [10:35]
+Once the plan is resolved, Spark applies logical optimizations.
+Example: If you write SELECT * but only use two columns later, Spark optimizes the plan to fetch only those two specific columns from the source to save network bandwidth. It also combines multiple filter transformations into one [11:42].
+
+Phase 3: Physical Planning [12:37]
+Spark takes the optimized logical plan and generates multiple Physical Plans.
+It uses a Cost-Based Model to evaluate these plans. It calculates which plan will use the least amount of CPU and memory.
+Example: It decides whether to perform a Broadcast Join (sending a small table to all executors) or a standard shuffle join based on table sizes to avoid expensive data shuffling [12:54].
+The best performing plan is selected as the Selected Physical Plan.
+
+Phase 4: Code Generation [06:17]
+The final physical plan consists of RDD transformations. Spark uses Whole-Stage Code Generation to convert these into highly optimized Java bytecode that runs on the cluster's executors [14:50].
+
+2. Key Interview Questions Answered [01:40]
+What is the Catalyst Optimizer? It is the engine that converts your high-level code into an optimized physical execution plan.
+Why do we get an Analysis Exception? This occurs during the first phase if the metadata (table/column names) doesn't match the Catalog [10:06].
+What is the Catalog? It is a storage for metadata (data about data), such as file sizes and schema information [08:17].
+Is Spark SQL Engine a compiler? Yes, because it ultimately translates high-level Spark code into Java bytecode for the machine to execute [16:39].
+
+3. Example: Analysis Error [09:19]
+Manish shows a code snippet where he tries to select a column named name1 from a JSON file, but the actual column name is name. Because the Catalyst Optimizer checks the Catalog during the Analysis phase and finds no match, it throws an error immediately before any data is even processed._______________________________________________________________________
+Database vs datalake vs data warehouse
+_______________________________________________________________________________________________
 . Core Concepts Explained
 Database (OLTP):
 
