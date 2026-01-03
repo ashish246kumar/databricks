@@ -33,6 +33,7 @@ Manish ne Fault Tolerance samjhane ke liye ye example diya:
 
 *   **Spark Example (DAG & Lineage):**
     "Spark kya karta hai ki Spark jo hai na wo DAG banata hai Directed Acyclic Graph". Iske paas RDD hota hai. "Isko pata hai ki process 1 ke baad fail hua hai... to process 1 ko banane ke liye kya laga tha kahan se data laga tha wo iske paas information hoti hai... wo us tarike se us data ka use karke wapas bana lega".
+
 ____________________________________________________________________________________
 https://www.youtube.com/watch?v=N3vk5i_Hh78&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=3
 why apache spark
