@@ -1,4 +1,31 @@
+https://www.youtube.com/watch?v=xW_GNBDW568&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=2
+spark overview 
 
+**What is Apache Spark?**
+Video mein definition di gayi hai: "Apache Spark is a unified computing engine and set of libraries for parallel data processing on a computer cluster". Is definition ko samajhne ke liye YouTuber ne har term ko explain kiya hai:
+
+**1. Unified**
+*   **Explanation:** Unified ka matlab hota hai "sab cheez ko ek jagah la dena."
+*   **Example:** Video mein example diya hai ki Data Engineer (pipeline banane wala), Data Analyst (sales analysis karne wala), aur Data Scientist (future predict karne wala)—agar ye teeno "ek hi software ya ek hi jagah pe kaam kar sakte hain, toh usi ko bolte hain Unified." Spark mein ye sab log ek hi computing engine par kaam kar sakte hain,.
+
+**2. Computing Engine**
+*   **Explanation:** Spark data ko store nahi karta hai. "Basically ye sara cheez RAM mein ho raha hota hai," jo ki permanent storage nahi hai.
+*   **Example:** Jaise hamare laptop mein CPU task perform karta hai. Example diya ki "2+5 = 7... ye humein jo compute karne wali cheez hai wo kaun dega? Wo humein dega Spark." Agar 5 Terabyte ka data hai aur usme +1 karna hai, toh wo Spark compute karega. Storage ke liye S3, HDFS, ya RDBMS use hota hai kyunki Spark ke paas storage nahi hota,.
+
+**3. Set of Libraries**
+*   **Explanation:** Ye "set of code hota hai jo ki humein likh kar de diye jaate hain."
+*   **Example:** Jaise aapne "Pandas" suna hoga, waise hi Spark mein libraries hoti hain jiska use karke hum aage ke kaam perform karte hain.
+
+**4. Parallel Data Processing**
+*   **Explanation:** Ek task ko multiple logon mein divide karke karwana.
+*   **The Father-Son Example:** Yahan ek example explain kiya hai: "Maan lo ki ek baap hai, uske char bete hain. Ab baap ke paas total 10 task hain... toh wo kya karega do-do ya teen-teen task de dega do beton ko." Is tarah 10 task char beton mein divide ho gaye. "Charon bete apne apne independent task karenge aur shaam ko aakar result de denge." Agar baap akele karta toh time lagta, par beton ne mil kar jaldi kar diya. Same cheez Spark mein hoti hai jahan task alag-alag executors par bhej diya jata hai,.
+
+**5. Computer Cluster**
+*   **Explanation:** Spark "Master-Slave architecture" par kaam karta hai. "Ek machine jo ban gaya wo Master ban gaya aur baaki sare jo machines hain wo hamare ban gaye Slave (naukar)."
+*   **Architecture Example:** Video mein assume kiya hai ki har computer (worker) ke paas "16GB ka RAM hai aur 1 Terabyte ka storage hai aur 4 core CPU hai."
+*   **Process:** Agar Master ko 5 Terabyte data process karna hai, toh wo dekhega ki workers ke paas kitni capacity hai (jaise total 64GB ek baar mein). Master ka kaam hai data ko divide karna aur workers se kaam karwana,,.
+
+Finally, video mein kaha gaya hai ki Spark ek "Unified Computing Engine hai... yaad rakhna storage nahi hota iske paas" aur ye parallel data processing karta hai computer clusters par.
 _________________________________________________________
 Spark SQL Engine
 In this lecture (Lec-8), Manish Kumar explains the Spark SQL Engine (also known as the Catalyst Optimizer) and the four phases it uses to convert high-level Spark code (SQL, DataFrames, or DataSets) into low-level Java bytecode for execution on a cluster.
