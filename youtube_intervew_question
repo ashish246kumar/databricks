@@ -1,4 +1,30 @@
 
+_____________________________________________________________________________________
+https://www.youtube.com/watch?v=7x9GXt6-AxU&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=7
+**Spark Ecosystem ka Structure**
+Video mein Spark ke structure ko do hisson mein baant kar samjhaya gaya hai:
+
+*   **Low Level API (Spark Core):** Spark ka jo niche wala section hai, use "Spark Core" bolte hain. Isme RDD (Resilient Distributed Datasets) aata hai. Agar humein bilkul hi low level par jaakar kuch likhna hai, ya koi aisi cheez achieve karni hai jo High Level API se nahi ho pa rahi, toh wahan par hum RDD ka use karte hain.
+*   **High Level API (Libraries):** Jo top mein hai, wo "Set of Libraries" hai jise "High Level API" bhi bolte hain. Isme Data Frame aur Spark SQL aata hai jo Spark Core ke upar run karta hai. Iske alava agar streaming karni hai, machine learning karni hai, ya graph wali cheezein karni hain (GraphX), toh uski libraries bhi available hain.
+*   **Kaise Run hota hai:** Hum jo bhi kuch karne wale hain (High Level API mein), wo internally transform hoga Spark ke Core mein (RDD mein) aur phir Spark ke Computer Engine mein jayega.
+*   **Languages:** Spark ne flexibility di hai ki aap apne code ko multiple languages mein likh sakte ho jaise Python, Java, R, aur Scala.
+
+**Hardware aur Cluster Manager**
+YouTuber ne samjhaya hai ki Spark na hi storage karta hai aur na hi Spark ka khud ka kuch cluster manager hota hai.
+*   Sabse base par "Hardware" ya "Computer Machines" baithe hote hain.
+*   In machines ko manage karne ke liye inke upar "Cluster Manager" baitha hota hai jo hardware se baat karta hai.
+*   Cluster Manager ke kuch popular naam hain: YARN (Yet Another Resource Negotiator), Mesos, aur Standalone Cluster.
+
+**Example (100 GB Calculation)**
+Video mein process ko run karne ka example diya gaya hai ki kaise Spark Engine aur Cluster Manager interact karte hain:
+
+1.  Spark Engine Cluster Manager ke paas jayega aur bolega ki humein "20 GB ki 4 Executor" chahiye aur "ek 20 GB ka Driver" chahiye.
+2.  Total requirement calculation:
+    *   Executors: $20 \times 4 = 80$ GB
+    *   Driver: $20$ GB
+    *   **Total = 100 GB**.
+3.  Cluster Manager check karega ki uske paas 100 GB available hai ki nahi.
+4.  Agar memory hai, toh wo process ko run karne ke liye bhejega. Agar nahi hai, toh wo bolega ki hum queue mein rakh dete hain jo "FIFO order" (First In First Out) mein chalta hai. Matlab jo pehla application run hoga, use memory pehle mil jayega.
 ______________________________________________________________________________
 https://www.youtube.com/watch?v=mpMvOPhNtjA&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=5
 Hadoop vs Spark
