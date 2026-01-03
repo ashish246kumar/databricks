@@ -1,3 +1,4 @@
+
 _________________________________________________________
 Spark SQL Engine
 In this lecture (Lec-8), Manish Kumar explains the Spark SQL Engine (also known as the Catalyst Optimizer) and the four phases it uses to convert high-level Spark code (SQL, DataFrames, or DataSets) into low-level Java bytecode for execution on a cluster.
