@@ -1,4 +1,15 @@
-
+https://www.youtube.com/watch?v=aDCfzM7Cs7c&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=8
+Read Data in Spark
+Video mein bataya gaya hai ki data ko Spark mein kaise read karte hain. Iska ek core structure hota hai DataFrameReader API ke through.
+1. General Format: Data read karne ke liye hum spark.read use karte hain, aur uske baad alag-alag options aate hain:
+    ◦ .format(): Yahan hum file format batate hain, jaise CSV, JSON, ya Parquet. Agar hum .format() nahi dete hain, toh by default Spark parquet format samajhta hai.
+    ◦ .option(): Isme hum key aur value pass karte hain (jaise header, mode). Ye optional field hai, hum de bhi sakte hain aur nahi bhi.
+    ◦ .schema(): Agar humein manually batana hai ki column integer hoga ya string, toh hum schema define kar sakte hain.
+    ◦ .load(): Yahan humein batana hota hai ki data kahan reside kar raha hai (data ka path/location).
+2. Read Modes in Spark: Video mein explain kiya gaya hai ki data read karte waqt 3 tarike ke modes hote hain, aur interview mein isse question aate hi aate hain:
+    ◦ Fail Fast: Jaise hi koi corrupted record (malformed record) mile, execution ko fail kar do.
+    ◦ Drop Malformed: Ye corrupted record ko seedha drop kar dega.
+    ◦ Permissive: Ye default mode hota hai. Agar koi corrupt record milega, toh ye us value ko null set kar dega.
 _____________________________________________________________________________________
 https://www.youtube.com/watch?v=7x9GXt6-AxU&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=7
 **Spark Ecosystem ka Structure**
