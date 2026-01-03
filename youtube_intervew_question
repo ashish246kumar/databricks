@@ -1,3 +1,86 @@
+https://www.youtube.com/watch?v=mpMvOPhNtjA&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=5
+Hadoop vs Spark
+
+**1. Market mein Misconceptions (Galatfehmiyan)**
+Video ke starting mein 3 main misconceptions batayi gayi hain:
+*   **Hadoop Database nahi hai:** "Hadoop aisa koi database nahi hai yeh framework hai... Log Hive use karte hain to unhein lagta hai ki yeh relational database hai... lekin actual mein wo ek file system hota hai".
+*   **Spark Speed:** "Spark jo hai wo 100 times faster hota hai lekin ye actual aisa nahi hota hai... yeh 100 times tak ja sakta hai, 'up to' hota hai".
+*   **RAM Usage:** "Teesri misconception hai wo hai ki Spark jo hai wo RAM mein data ko process karta hai lekin Hadoop aisa nahi karta hai... Hadoop ko bhi RAM ki hi zarurat hoti hai".
+
+**2. Performance Difference (Kaise kaam karte hain)**
+*   **Hadoop Process:** "Hadoop is slower than Spark... Hadoop ko bhi RAM ki hi zarurat hoti hai... lekin usko baad mein usko write kar deta hai disk par... to jo RAM se disk write karne mein time jata hai wahan se slow ho jata hai". Example ke liye, Mapper load kiya, reduce kiya aur fir wapas disk pe write kiya. Fir agla process disk se read karega. Ye baar-baar Read/Write cycle chalta hai.
+*   **Spark Process:** "Spark ke case mein kya ho raha hai ki... alag-alag executor isko read kar liya... write karega kisi apne executor ke... memory hoga jo ki basically RAM hai... to basically yeh kya kar raha hai ki yeh kabhi disk par gaya hi nahi... iski wajah se iska process fast ho gaya".
+*   **Exception Case:** Agar data cluster mein wahin par fit ho ja raha hai (jaise 10GB ka data hai aur sirf count karna hai), toh "uss case mein... time ke case mein... 100 times faster ya 100 times slower hai aisa case to nahi aayega", hardley 1-2 times ka difference hoga,.
+
+**3. Batch vs Streaming**
+*   **Hadoop:** "Hadoop build kiya hai batch data processing ke liye... us samay... data bahut zyada volume mein generate hona shuru ho gaya hai... to wo batch mein process karne ke liye banaya gaya tha".
+*   **Spark:** "Spark ke paas advantage hai... ye batch ko to handle kar hi sakta hai uske alawa ye streaming ko bhi handle kar sakta hai... kyunki humein jaldi-jaldi data ko process karna hai",.
+
+**4. Ease of Use (Code likhna)**
+*   **Hadoop:** "Hadoop mein kya hai ki code likhna bahut hi mushkil tha starting se hi... thoda tough hai likhna".
+*   **Spark:** "Spark mein aur bhi easy bana diya gaya hai... Spark ne High Level API de rakha hai ki yahan se aap apne alag-alag language ke through likh sakte ho... Java, SQL, Python, R ye saare language ke through".
+
+**5. Security**
+*   **Hadoop:** "Security mein Hadoop ko zyada security hai". Ye "Kerberos authentication ka use karta hai" check karne ke liye ki user authorized hai ya nahi,. Folders access karne ke liye ye "ACLs (Access Control Lists)" use karta hai.
+*   **Spark:** "Spark directly aisa koi humein security ke liye nahi deta hai... Spark jo hai hamara wo kya karta hai ki wo HDFS ka storage use kar leta hai... aur jaise hi YARN use karega apna resource negotiate karne ke liye to isko Kerberos mil jata hai".
+
+**6. Fault Tolerance (Video wala Example)**
+Manish ne Fault Tolerance samjhane ke liye ye example diya:
+
+*   **Hadoop Example (Replication):**
+    Man lo ek data hai "260 MB ka... 128 MB ka ek block size banta hai... to iske kitne banenge teen banenge... A, B aur C". Hadoop replication factor use karta hai (jaise ki 3). "A jo hai wo teen jagah pe store hoga alag-alag node pe... Machine 1, Machine 2 aur ye Machine 3".
+    **Agar fail hua to:** "Maan lo ki hum data read kar rahe the Node 1 se... ab ye fail ho gaya... to A ko dekhega ki achha A ka data yahan pe bhi pada hua hai (dusre node par)... koi ek data ko read kar lega... iss tarah se hamara Hadoop fault tolerate hota hai",.
+
+*   **Spark Example (DAG & Lineage):**
+    "Spark kya karta hai ki Spark jo hai na wo DAG banata hai Directed Acyclic Graph". Iske paas RDD hota hai. "Isko pata hai ki process 1 ke baad fail hua hai... to process 1 ko banane ke liye kya laga tha kahan se data laga tha wo iske paas information hoti hai... wo us tarike se us data ka use karke wapas bana lega".
+____________________________________________________________________________________
+https://www.youtube.com/watch?v=N3vk5i_Hh78&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=3
+why apache spark
+
+**1. Apache Spark ke aane se pehle kya tha? (Databases)**
+Video mein bataya gaya hai ki Spark ke aane se pehle hamare paas **Databases** hote the (jaise Oracle, Teradata, MySQL). Ye systems sirf **Structured Format** wale data ko store karte the.
+*   **Example:** Structured data ka matlab hai **Tabular format** mein data, jisme fixed rows aur columns hote hain. Isko aap apne **Excel sheet** jaisa samajh sakte ho.
+
+**2. Problem kahan shuru hui? (Data Formats and Internet)**
+Internet ke invention ke baad data alag-alag formats mein generate hone laga:
+*   **Files:** Text files, CSV files.
+*   **Multimedia:** Images, Videos.
+*   **Semi-Structured Data:** JSON ya YAML format (jahan fixed structure nahi hota, key-value pairs hote hain),.
+Purane databases sirf tabular data handle kar pa rahe the, baaki formats (Unstructured aur Semi-structured) ko handle karne ke liye koi system nahi tha.
+
+**3. Big Data aur "Three Vs"**
+Yahan "Big Data" ke concept ko samjhaya gaya hai **Three Vs** ke through:
+*   **Volume:** Sirf size (jaise 100GB ya 1TB) hone se wo Big Data nahi ban jata.
+*   **Velocity:** Data kis speed se aa raha hai.
+    *   **Example:** Agar 10TB data **per second** ya **per hour** aa raha hai, tab hum bol sakte hain ki Big Data ki problem hai.
+*   **Variety:** Data ke alag-alag forms (Structured, Semi-structured, Unstructured). Aaj kal market mein **Unstructured data** sabse zyada produce hota hai.
+
+**4. ETL vs. ELT (Data Handling ka change)**
+Pehle hum **ETL** (Extract, Transform, Load) karte the (Data Warehouse concept). Lekin ab data ka volume aur velocity itna badh gaya hai ki hum **ELT** (Extract, Load, Transform) karte hain.
+*   Iska matlab pehle hum source se data utha ke ek dump jagah (Data Lake) pe **Load** kar lete hain, aur baad mein jab time milta hai tab usko **Transform** karte hain,.
+
+**5. Main Issues: Storage and Processing**
+Itna zyada data aane se do badi problems aayi:
+1.  **Storage:** Itna data store kahan karein?
+2.  **Processing:** Data ko process karne ke liye RAM aur CPU chahiye,.
+
+**6. Solution Approaches: Monolithic vs. Distributed**
+In problems ko solve karne ke liye do options the:
+
+*   **Monolithic Approach (Vertical Scaling):**
+    *   Isme hum ek hi system ko bada banate hain (jaise hard disk ya CPU add karte jana).
+    *   **Problem:** Iski ek limit hoti hai (Heat dissipation issue, performance drop). Ye **Expensive** hota hai aur isme **Single Point of Failure** hota hai (agar system fail hua to sab band),.
+
+*   **Distributed Approach (Horizontal Scaling):**
+    *   Isme hum multiple saste computers (commodity hardware) ko add karte hain.
+    *   **Benefits:**
+        *   Ye **Economical** (sasta) padta hai.
+        *   **Unlimited Scaling:** Hum jitne chahein computers add kar sakte hain.
+        *   **High Availability:** Agar ek machine fail ho gayi, to doosri machine kaam sambhal leti hai,.
+
+**Conclusion:**
+Isi distributed approach ki wajah se pehle **Hadoop** aaya aur uske baad **Spark** aaya taaki hum Big Data ki storage aur processing problems (Velocity, Variety, Volume) ko solve kar sakein.
+____________________________________________________________________________________________________
 https://www.youtube.com/watch?v=xW_GNBDW568&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=2
 spark overview 
 
