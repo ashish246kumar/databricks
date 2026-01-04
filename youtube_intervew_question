@@ -1,3 +1,29 @@
+
+
+_____________________________________________________________
+data lake vs delta lake vs data warehouse
+https://www.youtube.com/watch?v=t6i6fQilAm8&t=81s
+**What is Delta Lake?**
+The speaker defines Delta Lake as an "open format storage layer that delivers reliability, security and performance on your data lake". It acts as a "single home for structured semi-structured and unstructured data".
+
+To explain this, the video compares three components:
+
+*   **Data Warehouse:** This is a traditional concept for storing huge amounts of data. However, it has limitations. It accepts "only structured data". Also, the computing resources (RAM, processor, storage) are "tightly coupled," meaning you cannot increase one component without exponentially increasing the others.
+*   **Data Lake:** This solution "came to picture" to solve data warehouse problems. You can dump "huge amount of data" and it accepts any format (structured, semi-structured, or unstructured). It is "limitlessly scalable" with minimal effort. However, it has "poor support to asset [ACID] transactions" and is not suitable for DML operations.
+*   **Delta Lake:** This is the "combination of best features" from the data warehouse and data lake. It is a storage layer "sitting on top of the data lake". It supports ACID transactions, scales easily, and ensures that if a process fails, it "will not leave the system corrupted".
+
+**The Example Explained in the Video**
+The speaker uses an example regarding **Schema on Write** to show how a Data Warehouse handles data validation compared to Data/Delta Lake.
+
+*   **The Scenario:** "Let's say we are having one table it's containing employee id employee name and salary but the incoming record is having one extra field maybe date of joining".
+*   **Data Warehouse Result:** Because the record is not compatible with the schema, "on right it would be discarded it would be removed".
+*   **Delta Lake Result:** There is a concept of "schema evaluation," which means "even though there is a mismatch with the schema still it would be accepted".
+
+**Key Features Highlighted**
+*   **ACID Transactions:** The video explains that Data Warehouse supports these (Atomic, Consistency, Isolated, Durable), Data Lake has poor support, but Delta Lake "supports acid transactions very easily".
+*   **Handling Corruption:** In a Data Lake, if a process fails while doing transformations, it leaves the system in a "corrupted state". Delta Lake, similar to a Data Warehouse, "would not leave the system in corrupt status".
+*   **Metadata:** Delta Lake manages metadata. While the Data Lake contains raw data (like CSV or Parquet files), Delta Lake captures metadata "like what is the name of the column what is the data type" and statistics (min/max values) to perform better.
+_________________________________
 database vs data lake vs data warehouse
 https://www.youtube.com/watch?v=Nn7CFCQLKOs&t=938s
 ### **Database**
