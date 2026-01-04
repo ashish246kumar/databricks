@@ -1,4 +1,26 @@
 
+____________________________________________________________-
+unity catalog
+
+**On Governance and Unity Catalog**
+*   "when we talk about governance it means we need to make our data secure available and accurate".
+*   "Unity catalog is first of all an open source unified governance".
+*   "this unified means you have to Define it once and you can secure it everywhere".
+*   "it provides security it provides auditing it provides lineage capability it provides data Discovery".
+*   "without Unity catalog you have to manage each databas workspace individually".
+*   "with unity catalog you can maintain everything from a single place".
+
+**On the Object Model**
+*   **Metastore:** "in the object model topmost is the metastore and it is used to maintain your metadata". "metadata is your data about data it means it captures your schema it captures your Access Control List It captures your permissions and all sort of things". "one region should have one meta store".
+*   **Catalog:** "catalog is the data securable object". "catalogs are basically used to maintain our data assets".
+*   **Schemas:** "you can Define schemas in order to maintain those into different schemas".
+*   **Tables and Views:** "in order to maintain structured data you can use tables and Views".
+*   **Volumes:** "volumes are basically some file systems that can be used to maintain either structured data or unstructured data or semi-structured data".
+*   **Non-data securable objects:** "storage credentials external location share recipient provider connection and clean rooms... are used to maintain nonata securable objects".
+
+**On Three Name Space and the Example**
+*   **The explanation:** "three name space means you have to Define catalog schema and the table name in order to access it".
+*   **The specific example:** "so if you have a catalog called Dev and if you have a schema called Bron and if you have a table called sales then your table name would be something like dev. br. sales".
 _________________________________________________________________________________________________
 https://www.youtube.com/watch?v=VDZ7erjooU0&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=15
 Spark SQL Engine (Catalyst Optimizer)**
