@@ -1,4 +1,21 @@
+https://www.youtube.com/watch?v=M0Kx205dxmM&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=14
+How to read json file in pyspark
 
+1. JSON Kya Hota Hai (What is JSON) JSON ka full form hota hai JavaScript Object Notation. Ye ek key-value pair ka data hai.
+• Example: Agar hum tabular format ki baat karein jahan ID aur Name hai, toh JSON mein hum curly bracket { se start karte hain. Pehle key likhte hain (column name) double quote mein, phir colon :, aur phir value.
+    ◦ Jaise: {"id": 1, "name": "manish"}.
+• Semi-structured Data: Iska advantage ye hai ki ye semi-structured hai. Maan lo ki ek ka salary hai aur ek ka nahi hai, ya kisi ka ek extra column "Nominee" add karna hai. Tabular format mein humein pura column add karna padta aur baaki jagah null value hoti, jisse space zyada lagta. Lekin JSON mein hum sirf specific record mein wo key-value add kar sakte hain.
+2. Line-Delimited vs. Multi-Line JSON Spark mein JSON do type ke aate hain:
+• Line-Delimited: Har ek line mein ek record hota hai. Spark by default line-delimited JSON hi accept karta hai. Isme performance fast hoti hai kyunki wo line-by-line read karta hai.
+• Multi-Line: Agar teen-chaar line mila ke ek JSON record banta hai, toh use multi-line JSON kehte hain. Iske liye humein option("multiline", "true") set karna padta hai.
+    ◦ Performance: Multi-line mein performance thodi degrade milegi kyunki usko pure object ko ek baar mein read aur write karna padta hai.
+3. Interview Questions aur Examples
+• Question: Agar 3 keys hain aur ek record mein 4 keys aa gaye toh kya hoga?
+    ◦ Example: Humare paas Name, Age, Salary teen keys hain, lekin ek record mein humne ek extra key Gender de diya.
+    ◦ Explanation: Jab hum isko read karenge, toh Spark ek Gender column generate karega. Jahan-jahan usko value nahi mila wahan null set kar dega, aur jahan value mila (jaise "Male"), wahan value set kar dega.
+• Question: Corrupted JSON (Invalid File) ke case mein kya hoga?
+    ◦ Example: Ek record mein open bracket { hai lekin closing bracket } humne jaanbujh ke hata diya.
+    ◦ Explanation: Spark error throw nahi karega balki uss specific row ko corrupted record batayega. Wo ek column bana dega jahan aapko wo data show karega ki ye data corrupt hai.
 
 _____________________________________________________________
 data lake vs delta lake vs data warehouse
