@@ -1,3 +1,66 @@
+
+
+___________________________________________________________
+https://www.youtube.com/watch?v=U3sgM-ohLVE&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=10
+Schema in Spark
+
+**Introduction & Interview Questions**
+Starting mein hi humne interview questions discuss kar liye taaki humein idea lag jaye ki agar hum ye padhte hain toh interview mein kis tarah ke questions aa sakte hain. Possible questions ye hain:
+1.  **How to create schema in PySpark?** (Manual schema kaise create karte hain).
+2.  **What are other ways?** (Kya iske alawa koi aur tarika hai schema create karne ka?).
+3.  **StructType aur StructField** ka concept kya hota hai?.
+4.  Agar header pehle se pada hua hai aur hum header ko false kar dein, yaani **rows skip karna hai**, toh wo kaise karenge?.
+
+**Key Concepts Explained**
+
+*   **Schema create karne ke do tarike hain:**
+    1.  **StructType aur StructField** ke through.
+    2.  **DDL String** ke through.
+
+*   **StructType & StructField:**
+    *   **StructType:** Ye Dataframe ke structure ko define karta hai. Ye basically collection of StructFields hai.
+    *   **StructField:** Ye column ki information rakhta hai. Jaise ki column ka naam, uska datatype (kya wo integer hai ya string hai), aur kya wo value null ho sakti hai (nullable true/false).
+
+**Example 1: Basic Data Frame (Laptop Screen Explanation)**
+Youtuber ne concept samjhane ke liye ek chhota sa Data Frame banaya jisme teen columns the: **ID, Name, aur Age**.
+
+1.  **Method 1 (StructType & StructField):**
+    Unhone `pyspark.sql.types` se `StructType` aur `StructField` import kiya.
+    Code kuch aisa likha:
+    ```python
+    schema = StructType([
+        StructField("id", IntegerType(), True),
+        StructField("name", StringType(), True),
+        StructField("age", IntegerType(), True)
+    ])
+    ```
+    Isme list pass kiya kyunki multiple columns the.
+
+2.  **Method 2 (DDL String):**
+    Ye method bahut aasan hai. Isme bas string pass karna hai column name aur type ke saath.
+    Example:
+    ```python
+    ddl_schema = "id integer, name string, age integer"
+    ```
+    Youtuber ne kaha ki ye "bacchon wala kaam" hai agar pehla method samajh aa gaya toh.
+
+**Example 2: Flight Data (Databricks Notebook Implementation)**
+Phir unhone same cheez ko Databricks notebook par replicate kiya using **Flight Data CSV**.
+
+*   **Scenario:** Unhone `header` ko `false` kar diya kyunki unhe apna manual schema banana tha.
+*   **Schema Definition:** Unhone `my_schema` define kiya jisme columns the:
+    *   `DEST_COUNTRY_NAME` (StringType)
+    *   `ORIGIN_COUNTRY_NAME` (StringType)
+    *   `count` (IntegerType).
+
+*   **Issue (Null Values):**
+    Jab data read kiya, toh `count` column mein `null` aa raha tha. Kyunki data mein pehla row header tha ("count" likha hua), aur schema mein wo Integer tha. String "count" integer nahi ho sakta, isliye Spark ne usko null kar diya.
+
+*   **Solution (Skip Rows):**
+    Agar humein header khud se hatana hai (kyunki humne `header=false` kiya hai lekin file mein header hai), toh hum `.option("skipRows", 1)` use kar sakte hain.
+    Jaise hi `skipRows` 1 kiya, pehla row skip ho gaya aur sahi data (integers) aane laga.
+
+Youtuber ne end mein ye bhi bataya ki ye sab options (jaise `skipRows`, `mode`) samajhne ke liye Spark documentation padhna chahiye.
 ___________________________________________________________________________
 https://www.youtube.com/watch?v=xJVonk4yxJY&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=9
 
