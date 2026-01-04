@@ -1,3 +1,4 @@
+
 _________________________________________________
 https://www.youtube.com/watch?v=rYbk-Y8Mx1g
 Legacy Hive Metastore "Before Unity catalog we used to have one default catalog
@@ -10,6 +11,11 @@ Managed Tables "What exactly is a manage table it means both your metadata which
 External Tables "This time I've defined a location where your data would be stored". 
 "This is external table okay and we have defined a location here 
 and this is the location where the table data would be stored".
+
+create schema brunch
+create table br.EMP ...
+select star from brunch.EMP
+create table emp_EXT location '...dbfs/temporary/directory/EMP_EXT...'
 
 ____________________________________________________________-
 https://www.youtube.com/watch?v=rYbk-Y8Mx1g
