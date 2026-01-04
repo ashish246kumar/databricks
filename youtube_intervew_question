@@ -1,3 +1,26 @@
+database vs data lake vs data warehouse
+https://www.youtube.com/watch?v=Nn7CFCQLKOs&t=938s
+### **Database**
+*   **Explanation:** A database is "a system which holds data". It deals with "majorly transactional data," which is data "used on day-to-day basis". It is "best meant for oltp purpose" (Online Transactional Processing). It deals with "structured data" that "has certain format it's in the form of rows and columns". It deals with "recent data," perhaps "last five months data six months data," but "cannot hold years of data" because the "cost to store the data in database is high". It follows "schema on write," meaning "while writing itself it will give you an error if there is any mismatch".
+*   **Examples:**
+    *   "If you go to a bank and swipe your card and you withdraw some 5000 rupees then it's a transaction which is happening".
+    *   "You go to a grocery store you purchase something that's a transaction".
+    *   "You are purchasing something from amazon that's a transaction".
+    *   "One good database" examples are "oracle" and "mysql".
+
+### **Data Warehouse**
+*   **Explanation:** A data warehouse "holds more data than a database and is mainly used for analytical purpose". It is for "olap online analytical processing". It is a place which will "keep lot of your historical data" to "find the insights". We migrate data here because if we run "complex queries" for analysis on a database, "day-to-day transactions will become slow". It deals with "structured data" and follows "schema on right" (similar to a database). It follows an "ETL process" (extract, transform, load), which "restricts our flexibility" because "before loading it to our data warehouse itself we need to get the data to a form which is desired". The storage cost is "high but lesser than your database".
+*   **Examples:**
+    *   "Amazon people want to find some insights around your purchase trends and they want to analyze your last 10 years data".
+    *   "One good example of a data warehouse" is "teradata".
+
+### **Data Lake**
+*   **Explanation:** A data lake is meant to "get insights from huge amounts of data," but the "data is present in raw format". It can be "structured or... unstructured". It follows a "elt process" (extract, load, and then transform). We can "keep the data in its raw form" and "think of transformation only when required later". It is "cost effective" because it uses "cheap hardware or cheap storage," so you can keep "tens of years of data here freely". It follows "schema on read," meaning "first you put a file... next what i do is i create a structure on top of it". It gives "enough flexibility... to keep all your raw data" and "later whenever you want to use it... feel free to use".
+*   **Examples:**
+    *   "Hdfs" and "amazon s3" are "good examples of data lakes".
+    *   "If i have a log file doc file... we can directly have this file in raw form".
+    *   Putting a file like "employee.csv" and creating a "hive table on top of it".
+________________________________________
 https://www.youtube.com/watch?v=M0Kx205dxmM&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=14
 
 ___________________________________________________________________
