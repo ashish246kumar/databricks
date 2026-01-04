@@ -33,6 +33,24 @@ Agar bahut saare records corrupted hain, to unhe store karne ke liye `badRecords
 *   Is command ko chalate waqt 'mode' specify karna allowed nahi hota.
 *   Baad mein us JSON file ko read karke dekh sakte hain ki kis file aur kis reason ki wajah se record corrupt hua.
 
+df = spark.read.format("csv") \
+    .schema(employee_schema) \
+    .option("header", "true") \
+    .option("badRecordsPath", bad_records_path) \
+    .load("dbfs:/FileStore/tables/employees.csv")
+employee_schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    # ... (other columns like address, nominee etc.)
+    StructField("_corrupt_record", StringType(), True) # This column captures the bad data
+])
+
+# Read using the schema
+df = spark.read.format("csv") \
+    .schema(employee_schema) \
+    .option("header", "true") \
+    .load("dbfs:/FileStore/tables/employees.csv")
+
 ___________________________________________________________
 https://www.youtube.com/watch?v=U3sgM-ohLVE&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=10
 Schema in Spark
