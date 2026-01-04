@@ -1,3 +1,46 @@
+
+___________________________________________________________________
+https://www.youtube.com/watch?v=JHm7BkRp3T8&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=13
+Dag and lazy evaluaton
+
+**1. DAG (Directed Acyclic Graph) Kya Hai**
+*   DAG ka full form hota hai **Directed Acyclic Graph**. Iska matlab hai ki ye **cycle mein nahi jayega, ye loop mein kabhi nahi jayega**, ye directed hoga aur graph hoga.
+*   Jitne bhi humne transformations likhe hain, ye usi ka ek graph banata hai ki pehle ye kaam karenge uske baad ye kaam karenge.
+*   **Har ek action pe ek job banega aur har ek job ka apna DAG hoga**,.
+*   Visualisation mein jo boxes hote hain wo vertices hote hain aur jo arrow hote hain wo edges hote hain.
+
+**2. Lazy Evaluation**
+*   Lazy Evaluation ka matlab hai ki **jab tak hum action ko hit nahi karenge tab tak ye jitni bhi transformations hain wo nahi hogi**.
+*   Code line by line run karne ki koshish nahi karta. Ye shanti se baitha hua hai aur wait kar raha hai ki jab tum action hit karoge tabhi hum kaam karna shuru karenge.
+*   Ye aisa isliye karta hai taaki ye code ko **optimize** karega.
+
+**3. Example: Flight Data Analysis**
+Video mein **Flight CSV data** ka example use kiya gaya hai. Isme teen main columns dikhaye gaye: Destination Country Name, Origin Country Name, aur Count.
+
+Youtuber ne is example ke through Lazy Evaluation aur Optimization explain kiya:
+
+*   **Step 1 (Transformations):** Unhone code ko chote-chote chunk mein chalaya. Pehle `repartition` kiya, fir `filter` lagaya (Narrow dependency), fir `groupBy` lagaya (Wide dependency),.
+*   **Observation:** Jab tak sirf transformations run kiye (jaise filter lagana), tab tak **Spark job ka count nahi badha** (wo 2 ka 2 hi raha). Isse pata chala ki ye Lazy Evaluation kar raha hai,.
+*   **Step 2 (Action):** Jaise hi last line (Action) ko hit kiya, job create hua aur count 2 se 4 ho gaya.
+*   **Internal Optimization:** Example mein do filters lagaye gaye the:
+    1.  Destination Country Name = **United States**.
+    2.  Origin Country Name = **India** ya **Singapore**.
+*   Ideally, pehle United States wala filter hona chahiye tha fir dusra code run hona chahiye tha. Lekin Spark ne **in dono step ko combine kar diya** aur ek baar mein hi calculate kar liya.
+*   Isse ye fayda hua ki usko do baar processing karne ki zarurat nahi padi.
+
+**4. Spark UI**
+*   Jo hum application ke status ko dekhte hain (Jobs, Stages, DAG), usi ko bolte hain **Spark UI**,.
+*   Yahan par hum dekh sakte hain ki kaise code optimize hua hai aur SQL query kaise bani hai,.
+
+(
+Lazy evaluation facilitates internal code optimisation in Spark by allowing the system to wait until
+an 'action' is triggered before executing any transformations, rather than processing code line-by-line immediately.
+Instead of running each step as it encounters it, Spark sits quietly 
+and builds a plan—specifically a Directed Acyclic Graph (DAG)—which represents the sequence of jobs required.
+This delay allows Spark to view the entire chain of transformations holistically, 
+enabling it to combine steps and remove redundancies before touching the data.
+)
+_____________________________________________________________________
 https://www.youtube.com/watch?v=ce-F5lyFeyk&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=12
 transformation and action
 
