@@ -1,4 +1,37 @@
 
+__________________________________________
+https://www.youtube.com/watch?v=wXGhaNGA7KA&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=11
+Handling courupted record
+
+**1. Potential Interview Questions**
+Video ki shuruat mein bataya gaya hai ki is topic se related ye questions pooche ja sakte hain:
+*   Kya aapne kabhi corrupted record ko handle kiya hai?
+*   Humein kaise pata chalega ki record corrupted hai?
+*   Agar hum alag-alag "Read Mode" mein read kar rahe hain to corrupted record ke saath kya hoga?
+*   Bad records ko hum kaise print karwa sakte hain?
+*   Corrupted records ko kahan store karte hain? (Kyunki agar hazaar records corrupt hain to hum print nahi karwaenge, store karenge).
+
+**2. Corrupted Record ka Example**
+Unhone CSV aur JSON ke examples diye hain:
+*   **JSON:** Agar koi record hai aur uska last mein closing (bracket) nahi hai, to wo 'bad record' ho jayega kyunki wo properly close nahi hua.
+*   **CSV (Main Example):** Ek table dikhaya gaya hai jisme 6 columns hain. Isme third record ke "Address" column mein "Bangalore, India" likha hai. Kyunki CSV ka matlab "Comma Separated Value" hota hai, to ye Bangalore aur India ko alag-alag consider kar lega. Is wajah se 'India' agle column 'Nominee' mein chala jayega aur data shift ho jayega. To ye ek bad record ban jayega.
+
+**3. Different Read Modes ke Results**
+Video mein practical karke dikhaya gaya ki same CSV file ko alag-alag mode mein read karne par kya aata hai:
+*   **Permissive Mode:** Isme paanchon ke paanchon records aa jayenge. Jo record galat hoga, Spark usko "Null" set kar dega lekin error throw nahi karega.
+*   **Drop Malformed:** Ye corrupted record ko drop kar dega. Example mein 2 record galat the (ek Bangalore wala aur ek Kolkata wala), to total 3 records hi aayenge.
+*   **Fail Fast:** Isme 0 record aayega kyunki jaise hi bad record milega, wo process ko fail kar dega.
+
+**4. Bad Records ko Print karna**
+Bad records ko print karne ke liye "Manual Schema" define karna padta hai:
+*   Schema mein ek extra column `_corrupt_record` (underscore corrupt underscore record) banana padta hai jiska type String hota hai.
+*   Jab isko run karte hain, to corrupted data us column mein aa jata hai. Pura data dekhne ke liye `truncate=False` ka use karte hain.
+
+**5. Corrupted Records ko Store karna**
+Agar bahut saare records corrupted hain, to unhe store karne ke liye `badRecordsPath` option ka use karte hain:
+*   Value mein wo path dete hain jahan aap store karna chahte hain. Ye ek directory bana deta hai aur wahan JSON format mein file store hoti hai.
+*   Is command ko chalate waqt 'mode' specify karna allowed nahi hota.
+*   Baad mein us JSON file ko read karke dekh sakte hain ki kis file aur kis reason ki wajah se record corrupt hua.
 
 ___________________________________________________________
 https://www.youtube.com/watch?v=U3sgM-ohLVE&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=10
