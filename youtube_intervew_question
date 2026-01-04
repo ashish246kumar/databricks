@@ -20,7 +20,28 @@ unity catalog
 
 **On Three Name Space and the Example**
 *   **The explanation:** "three name space means you have to Define catalog schema and the table name in order to access it".
-*   **The specific example:** "so if you have a catalog called Dev and if you have a schema called Bron and if you have a table called sales then your table name would be something like dev. br. sales".
+*   **The specific example:** "so if you have a catalog called Dev and if you have a schema 
+called Bron and if you have a table called sales then your table name would be something like dev. br. sales".
+
+       METASTORE
+            (Topmost Object) [1]
+                     |
+       ______________|______________
+      |                             |
+      |                             |
+NON-DATA SECURABLE            DATA SECURABLE
+    OBJECTS                      OBJECTS
+ ("Left Hand Side")             (Main Focus)
+      |                             |
+      |-- Storage Credentials [2]   |-- CATALOG [2]
+      |-- External Location [2]     |   |
+      |-- Share [2]                 |   |-- SCHEMA [3]
+      |-- Recipient [2]             |       |
+      |-- Provider [2]              |       |-- Tables [3]
+      |-- Connection [2]            |       |-- Views [3]
+      |-- Clean Rooms [2]           |       |-- Volumes [3]
+                                    |       |-- ML Models [3]
+                                    |       |-- Functions [3]
 _________________________________________________________________________________________________
 https://www.youtube.com/watch?v=VDZ7erjooU0&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=15
 Spark SQL Engine (Catalyst Optimizer)**
