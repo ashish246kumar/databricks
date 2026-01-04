@@ -1,5 +1,18 @@
+_________________________________________________
+https://www.youtube.com/watch?v=rYbk-Y8Mx1g
+Legacy Hive Metastore "Before Unity catalog we used to have one default catalog
+which is called Hy metast store and we used to save all our structured data assets under this Hy meta store". 
+"In order to use this we need a compute". 
+"If you don't specify any schema while creating a table table would go directly under this default schema".
+Managed Tables "What exactly is a manage table it means both your metadata which is your schema and your data would be managed by The Meta store"-.
+"Once you drop your manage table both your meta data which which is your schema and your data would be gone". 
+"This is the manage location where datab stores the data for a manage table until you define the location explicitly for an external table". "Whenever you create a manage table in data brakes the default table that is created is off form Delta".
+External Tables "This time I've defined a location where your data would be stored". 
+"This is external table okay and we have defined a location here 
+and this is the location where the table data would be stored".
 
 ____________________________________________________________-
+https://www.youtube.com/watch?v=rYbk-Y8Mx1g
 unity catalog
 
 **On Governance and Unity Catalog**
