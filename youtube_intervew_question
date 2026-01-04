@@ -1,4 +1,47 @@
+___________________________________________________________________________
+https://www.youtube.com/watch?v=xJVonk4yxJY&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=9
 
+spark architecture
+**1. Cluster Setup (Example Scenario)**
+Sabse pehle unhone Cluster ka example diya hai. 
+*   "Cluster matlab kya? Bahut sare computers ko ek saath connect kar do network ke through."
+*   **Example Setup:** Unhone 10 machines ka example liya hai.
+    *   "20 core per machine."
+    *   "Har ek machine me 100 GB RAM laga hua hai."
+    *   Total calculate karein toh: "200 core" aur "1000 GB (1 TB)" RAM ka cluster hai.
+
+**2. Master-Slave Architecture**
+Cluster kaise kaam karta hai, isko unhone "Malik aur Naukar" ke example se samjhaya hai:
+*   Cluster mein ek "Master" hota hai (Malik) aur baaki "Slaves" hote hain (Naukar).
+*   Master node par "Resource Manager" install hota hai.
+*   Slave nodes ko "Worker Node" ya "Node Manager" bolte hain.
+
+**3. Application Submission Flow (Step-by-Step)**
+Developer jab code submit karta hai, toh process kaise chalta hai:
+*   **Request:** Developer ek application run karne ko bolta hai aur demand karta hai: "Hamein Driver de do 20 GB ka, aur Executors 25 GB ka aur number of Executors 5 aur CPU core de do 5".
+*   **Driver Allocation:** Ye request "Resource Manager" ke paas jati hai. Wo dekhta hai ki Driver chahiye, toh wo kisi ek Worker Node (jaise example mein `w5` liya) ko bolta hai: "Please create container with 20 GB of RAM".
+*   **Application Master:** Worker node (`w5`) apne 100GB mein se 20GB ka ek Container banata hai. Is container ke andar "Spark Application" run hota hai. Spark mein is container ko "Application Master" bolte hain.
+
+**4. PySpark Internal Working**
+Container ke andar kya hota hai, ye bahut important part hai:
+*   Agar hum Python (PySpark) use kar rahe hain, toh bhi internally ek "JVM ka main method" create hota hai kyunki Spark core Scala (Java based) mein likha hai.
+*   Python code pehle convert hota hai aur Java wrapper ke through chalta hai. Is JVM main method ko "Application Driver" bolte hain.
+*   Agar humne Java/Scala mein code likha hai toh seedha Application Driver banta hai, lekin Python mein "PySpark Driver" aur "Application Driver" dono hote hain.
+
+**5. Executor Allocation**
+Jab Driver set ho jata hai, tab wo baaki resources mangta hai:
+*   Application Driver wapas "Resource Manager" ke paas jata hai aur bolta hai ki "5 Executors, 25-25 GB ke aur 5 Core ke saath" chahiye.
+*   Resource Manager dekhta hai kaunse Workers free hain. Example mein usne `w2, w3, w4, w7, w8` ko choose kiya aur wahan 5 containers create kar diye.
+*   Ab Driver in containers (Executors) ko data aur tasks bhejta hai.
+
+**6. Python UDF (User Defined Function) ka Masla**
+YouTuber ne Python UDF use karne se mana kiya hai aur uska reason bataya hai:
+*   Agar humne application mein "User Defined Function (UDF)" likha hai, toh Executer ke andar sirf JVM se kaam nahi chalega.
+*   Wahan "Python Worker" ki zarurat padegi runtime environment mein.
+*   Isliye bola jata hai ki UDF mat use karo, kyunki "Python Worker" aane se performance slow ho jati hai. In-built functions use karoge toh performance zyada milega.
+
+**Summary:**
+Process simple hai: Developer Resource Manager se Driver mangta hai -> Driver create hota hai -> Driver Resource Manager se Executors mangta hai -> Executors milte hain -> Kaam shuru hota hai. Jab kaam complete ho jata hai, Driver aur Executors band ho jate hain.
 _____________________________________________________________________________
 https://www.youtube.com/watch?v=aDCfzM7Cs7c&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=8
 Read Data in Spark
