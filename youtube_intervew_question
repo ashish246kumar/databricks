@@ -1,4 +1,32 @@
+https://www.youtube.com/watch?v=ce-F5lyFeyk&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=12
+transformation and action
 
+**1. Transformation aur Action kya hote hain**
+*   **Transformation:** Iska matlab hum koi bhi data pe kuch bhi **processing** karenge. Jaise agar hum filter kar rahe hain ya select kar rahe hain columns ko, toh usko transformation bolte hain,.
+*   **Action:** Action matlab jab hum bolte hain ki kuch kaam humko chahiye, jaise ki `.show` ya `.count`. Jab tak action hit nahi karoge, Spark data ko scan nahi karega kyunki **Spark lazy evaluation** hai. Woh wait karega aur dekhega ki action hit hua toh hi woh kaam karega,.
+
+**2. Types of Transformations**
+Transformations do type ke hote hain:
+
+*   **Narrow Dependency Transformation:** Aise transformations jisme data movement ki requirement nahi hoti between partitions. Isme ek executor akele apna kaam kar lega, usko dusre executor ya partition pe depend nahi rehna padta,,.
+*   **Wide Dependency Transformation:** Jahan pe ek executor ko dusre executor se baat karke cheezein sort out karni padegi. Isme data ki movement hoti hai ek jagah se dusri jagah, aur jab ye movement hoti hai toh ye **expensive operation** ho jata hai. Hamesha Wide Dependency se bachna chahiye. Examples hain: `Group By`, `Join`, `Distinct`.
+
+**3. Examples jo Video mein explain kiye gaye (Employee Data)**
+YouTuber ne ek CSV file ka example liya jisme Employee ka data hai (ID, Name, Income, Age) aur do questions solve kiye concept samjhane ke liye,.
+
+*   **Example 1: Narrow Dependency (Filter)**
+    *   **Question:** "Show me the employee who is less than 18." (Aise employee dikhao jinki age 18 se kam hai).
+    *   **Explanation:** Maan lo data ke do partition hain aur do executor hain. Executor 1 apne data mein check karega aur Executor 2 apne data mein. Dono apna-apna result return kar denge. Kahin pe bhi **data ko move karne ki zarurat nahi padi**. Isliye ye **Narrow Dependency** hai,.
+
+*   **Example 2: Wide Dependency (Group By)**
+    *   **Question:** "Find out the total income of each employee." (Kyunki ek employee ke multiple source of income ho sakte hain),.
+    *   **Explanation:** Agar hum `Group By ID` karte hain, aur maan lo ID '2' Executor 1 ke partition mein bhi hai aur Executor 2 ke partition mein bhi hai. Agar data shift nahi karenge toh answer galat aayega.
+    *   Sahi answer ke liye **Data ki Shuffling** hogi. Matlab same ID wale data ko same partition mein move karna padega taaki total sum calculate ho sake. Jab data idhar se udhar network mein move hoga, toh ye **expensive transformation** (Wide Dependency) kehlayega,.
+
+**4. Driver Out of Memory aur Jobs**
+*   Jab bhi action hit hota hai (jaise `.collect`), toh executor sara data process karke **Driver** ko bhejta hai.
+*   Agar tumne zyada data maang liya (maan lo Driver 10GB ka hai aur 15GB data maang liya), toh **Driver Out of Memory Exception** aayega aur job fail ho jayega.
+*   Jab bhi action hit hoga, tab tab naya **Job** create hoga.
 __________________________________________
 https://www.youtube.com/watch?v=wXGhaNGA7KA&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=11
 Handling courupted record
