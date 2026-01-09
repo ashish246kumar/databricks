@@ -1,0 +1,42 @@
+Based on the transcript, here is the explanation of the Kafka concepts, maintaining the same language, tone, and spoken format as the speaker in the video.
+
+### **What is Apache Kafka and what are its core components?**
+
+Uh Apache Kafka is an open source distributed uh streaming platform that is designed for handling the realtime streaming data. And uh this is basically uh for high throughput, low latency, and fault tolerance uh purpose that it has built.
+
+Coming to the core components of the Kafka, it has a core components like Brokers, topics, partitions, and producers and consumers.
+
+*   **Brokers:** So Brokers are like uh various servers that Kafka cluster has. So each broker is a responsible for uh you know receiving the messages from the producers and storing them uh inside the topics and the partitions.
+*   **Topics:** Topics like uh the data in the Kafka was uh stored or categorized in the form of different topics. Like each topic is something like a table in a database and so the relevant data will be get stored inside the topic.
+*   **Partitions:** The data inside the topic will be categorized or divided as a kind of a partitions... like how the table in database has uh created the partitions this is also similar way. And this will allow us to uh connect the consumers in the parallel.
+*   **Producers:** So producers are like Services which can produce the data and can send the data to the Kafka.
+*   **Consumers:** Consumers like who are actually reading the data from the Kafka topics or from the partitions... we'll subscribe to a topic and we'll start reading the data.
+*   **ZooKeeper:** So this is the uh managing Services of the Kafka Brokers and maintaining all about the metadata about the topics, partitions, and uh the roles. Even in case of any node get failure so the ZooKeeper will assign another role as like leader node.
+*   **Schema Registry:** Like each topic has its own schema so we can Define the schema over there and if you wanted to change the schema right so to support the schema Evolutions we can use this uh schema registry.
+
+### **Explain the difference between a topic, partition, and segment.**
+
+Okay, so in Apache Kafka the concepts like uh topics, partitions, and segments are like fundamental uh Concepts.
+
+*   **Topic:** Topic is like a uh table name in a database... like all the relevant data will be stored into the single table right. So similarly in the Kafka also we have a topic is like a logical channel uh which records are published and it can act as like a category or a feed name.
+*   **Partition:** Partition is a subdivision from the topic like each topic can have one or more partitions which are ordered and immutable uh sequence of record. And partitions are basically for uh for scalability and improve the parallelism. Within a partition the order is uh sequential order... but across the partitions so there is no guarantee in the across order.
+*   **Segment:** Like segment is a kind of a file in the disk that actually the data gets stored in a file in the form of log uh suffix format. It has some specified size that we need to configure... once it reaches that configuration uh it will close that file and it will open a new file. So usually the last segment file is kind of a active segment where the new messages are getting added to it.
+
+### **How does Kafka ensure message ordering?**
+
+So ordering in the uh Kafka like uh it will be uh maintained in a multiple ways.
+
+*   **Single Partition Guarantee:** Kafka follows like single partition guarantee... like within a single partition Kafka can store the messages sequentially. Like whatever the messages that are sent by the producer it will get stored in the same order. So the Kafka can guarantee only on the partition level not on topic level.
+*   **Key-Based Partitioning:** When messages are produced uh they can be uh attached with some specific key. Kafka uses this key to determine like which partition that message has to go... so typically it uses a kind of a hash function. Since all messages are related to send to the single partition so this also it maintains the kind of ordering.
+*   **Consumer Behavior:** Like when the consumer uh reads the data from the Kafka partitions... so from each consumer from the consumer group can able to connect to only one partition at any given time. Like if you allow the multiple consumers to read from the same partition so it might mess up with the ordering.
+*   **Producer Configuration:** Also on the producer side we have some uh configurations like "Max inflight request" for connection. So by setting this value to the one so producer can send only one message at a time to the uh Kafka without waiting for acknowledgement... and it will get stored inside the uh partitions.
+
+### **What is a consumer group in Kafka?**
+
+So in Apache Kafka a consumer group is a kind of a fundamental concept that allows the multiple consumers uh work together to consume your messages from one or more topics. So uh the consumer group is a like a collection of one or more consumer can uh formed as a group.
+
+It has the many uh features:
+*   **Partition Assignment:** Like each partition in a topic can only be consumed by one consumer within the consumer group at any point of time. If there are more consumers are available than the partitions... the remaining consumers are in ideal state. If there are uh less consumers are available than the partition then one consumer can connect it to the multiple partitions.
+*   **Load Balancing (Rebalancing):** Like whenever a new uh consumer uh or gets added to the uh added to the consumer group or leaves the existing one Kafka automatically assigns the partitions to among existing active consumers. So this process is known as rebalancing.
+*   **Fault Tolerance:** Like if the if any any at any point of time if any consumer fails while uh reading out the data it actually allows the other consumers to start reading from it from the consumer group.
+*   **Offset Management:** Like Kafka tracks off the offset uh the position of the Kafka message in the partition for each consumer groups. So this allows the consumer consumers to resume from where uh they will left off in case of any failures.
