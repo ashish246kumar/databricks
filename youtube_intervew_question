@@ -1,4 +1,63 @@
 
+____________________________________________________________________________________
+https://www.youtube.com/watch?v=lI8SryM3Dqk
+CDC
+### 1. What is Change Data Capture (CDC)?
+The YouTuber introduces CDC not as a tool-specific feature, but as a fundamental concept in data engineering and ETL pipelines. Put simply, CDC is the process of understanding how data changes over time. If you ingest data from a source system on "Day 1" and then again on "Day 2", specific records may have changed—names might be updated, or addresses altered. Capturing these variations is essential for building data lakes or data stores.
+
+### 2. The Three Types of Data Changes
+There are three primary ways data changes in a source system:
+*   **Insertion:** A completely new record is added.
+*   **Update:** An existing field within a record is modified (e.g., an address changes from "Pune" to "Bangalore").
+*   **Deletion:** A record is removed from the source system.
+
+**Example:**
+On Day 1, you have records with IDs 1, 2, and 3. On Day 2:
+*   ID 1’s address changes (Update).
+*   ID 2 disappears (Delete).
+*   ID 4 appears (Insert).
+
+### 3. Handling Load Scenarios
+The video explains three specific scenarios for handling these changes, depending on how the source sends data:
+
+#### **Scenario A: Full Load**
+This is the simplest scenario. Every day, the source system sends the **entire dataset** again, regardless of what changed.
+*   **How to handle it:** You simply overwrite the data from the previous day with the new dataset. Because you receive a fresh copy of everything, updates, inserts, and deletes are automatically reflected by the new file.
+
+#### **Scenario B: Incremental Load (With Flags)**
+The source sends only the data that changed and provides a flag indicating the type of change (e.g., 'I' for Insert, 'U' for Update, 'D' for Delete).
+*   **Inserts (Flag 'I'):** Simply append these new records to your table.
+*   **Updates (Flag 'U'):** You must locate the existing records (often by partitioning) and update them.
+*   **Deletes (Flag 'D'):** You locate and remove or flag these records.
+
+#### **Scenario C: Incremental Load (Without Flags)**
+This is more complex. The source sends changed data but does **not** tell you if it is an insert or an update.
+*   **How to handle it:** You must perform a **Left Outer Join** between the incoming dataset and your existing table.
+*   **Logic:** Match records using the Primary Key.
+    *   If there is **no match**, it is a new record (Insert).
+    *   If there is a **match**, compare the columns of interest. If the data differs, it is an Update.
+*   **Important Note:** To avoid performance issues with very wide tables, discuss with the business side which specific columns need to be tracked for changes, rather than checking every single column.
+*   **Limitation:** You cannot identify deleted records in this scenario because the source does not explicitly tell you what is missing.
+
+### 4. Storage Strategies: SCD Types
+Once changes are identified, the YouTuber explains how to store them using Slowly Changing Dimensions (SCD).
+
+#### **SCD Type 1 (Latest Version Only)**
+*   **Concept:** You only keep the most current version of the data. History is not preserved.
+*   **Example:** If a customer moves from Pune to Bangalore, the system overwrites "Pune" with "Bangalore." You will have no record that they ever lived in Pune.
+
+#### **SCD Type 2 (Full History)**
+*   **Concept:** You keep the entire history of changes. If a record is updated, the old version is kept, and a new version is inserted as a new row.
+*   **Implementation:** You add columns such as **Start Date**, **End Date**, and a **Flag** (e.g., `is_latest` or `is_active`).
+*   **Example:**
+    *   **Row 1:** ID 1, Address: Pune, Start: 1st July, End: 2nd July, Active: N.
+    *   **Row 2:** ID 1, Address: Bangalore, Start: 2nd July, End: NULL, Active: Y.
+*   **Benefit:** To see the current state of the world, you simply filter the table where the "Active" flag is set to 'Y' or the End Date is NULL.
+
+### 5. Handling Deletes
+Finally, the video explains two ways to handle deleted records when they are identified:
+*   **Soft Delete:** You do not physically remove the record. Instead, you update a flag column (e.g., `Delete_Flag`) to 'Y'. This keeps the data for historical reference.
+*   **Hard Delete:** You physically remove the record from your storage. This is less common in data warehousing unless specifically required.
 _________________________________________________
 https://www.youtube.com/watch?v=rYbk-Y8Mx1g
 Legacy Hive Metastore "Before Unity catalog we used to have one default catalog
