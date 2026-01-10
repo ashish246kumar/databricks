@@ -1,4 +1,68 @@
 
+___________________________________________________________________
+Data Skipping and Z-Ordering in Delta Lake Tables
+https://www.youtube.com/watch?v=kUMAmZQIMfA&t=604s
+### Introduction to Data Skipping and Z-Ordering
+In our last discussion, we saw the importance of avoiding unnecessary data scans using partitioning. Today, we will understand **data skipping** and the importance of **Z-Ordering**. Data skipping and avoiding unnecessary scanning are almost the same thing.
+
+### The Problem: High Cardinality Columns
+Consider an example where we have orders data with order numbers like `o001`. If we search based on "Country," we can partition the data by country. However, what if we have to search only by `order_id`? We know `order_id` is a **high cardinality column**. We cannot partition by `order_id` because it would create too many partitions, causing the query to lag.
+
+Since we cannot implement partitioning on the order ID column, normally we would have to scan all the files to find a specific order. To prevent this, Delta Lake implements Z-Ordering.
+
+### How Z-Ordering Works
+To optimize this, you run a query specifying to **Z-Order by `order_id`**. Here is what happens in the background:
+1.  All the data for that column is sorted.
+2.  It is distributed sequentially into different files (e.g., File 1 has orders 101–104, File 2 has 105–108).
+3.  Delta Lake stores this information in its metadata.
+
+When you search for a specific order (e.g., 106), Delta Lake checks the metadata. It knows the second file contains the range 105 to 108, so it will **skip** the first and third files and only scan the second file.
+
+Z-Ordering is also **multi-dimensional**, meaning you can implement it on more than one column (e.g., Country and Order ID). In this case, the Country data is sorted first, and then the Order ID is sorted within that.
+
+### The Live Example (Retail Data)
+Let's see this in action using Databricks Community Edition with retail sales data containing columns like `InvoiceNo`, `StockCode`, and `Country`.
+
+1.  **The Setup:** We have written this data as a Delta table with 16 files. The data is unevenly distributed, and the invoice numbers overlap across different files.
+2.  **The Issue:** When we run a query to select a specific `InvoiceNo`, the Spark UI shows that the **number of files read is 16**. This is because Delta Lake doesn't know where the invoice lies, so it scans everything.
+3.  **Configuration:** Before optimizing, we change the `spark.databricks.delta.optimize.maxFileSize` configuration. The default is 1 GB. Since our data is small, we set it to **64 MB** to ensure we create enough files to demonstrate Z-Ordering effectively.
+
+### Implementing the Optimization
+We run the following command:
+`OPTIMIZE SalesDelta ZORDER BY invoice_number`.
+
+**What happens:**
+*   Delta arranges all invoice numbers in sequence and distributes them into different Parquet files.
+*   When we check the minimum and maximum invoice numbers per file, they are no longer overlapping. They are perfectly sequential.
+
+**The Result:**
+When we run the search query for the invoice number again:
+*   It finishes in **0.5 seconds** (compared to 3 seconds previously).
+*   The **number of files read is 1** (compared to 16 previously).
+*   The metrics show that 16 files were removed and 16 new, sorted files were added.
+
+### Multi-Dimensional Z-Ordering Warning
+We then try optimizing by **Country** and **Invoice Number** together.
+*   If we search *without* the country filter, the number of files read increases (e.g., to 2) because the data is distributed differently.
+*   If we add `Country = 'Australia'` to the filter, it goes back to reading just 1 file.
+
+It is very important that you select your Z-Orders properly. You cannot blindly put any column as a Z-Order; it might create problems.
+
+### The Best Approach: Combining Partitioning and Z-Ordering
+Is there a better way? Yes. We can **partition** the table based on Country and then **Z-Order** the data based on Invoice Number.
+
+1.  We take a table partitioned by Country (e.g., a folder for Australia containing 16 files).
+2.  We perform a **selective optimization**:
+    `OPTIMIZE SalesDelta WHERE Country = 'Australia' ZORDER BY invoice_number`.
+
+**The Outcome:**
+When we search for an invoice in Australia:
+*   **Number of partitions read:** 1.
+*   **Number of files read:** 1.
+This is **data skipping at its best**.
+
+### Auto Compaction
+Finally, note that Delta tables provide **Auto Compaction**. This means small files can be automatically compacted into larger ones. However, the data will **not** be Z-Ordered automatically. Z-Ordering is an instruction you must specifically provide.
 ____________________________________________________________________________________
 https://www.youtube.com/watch?v=lI8SryM3Dqk
 CDC
