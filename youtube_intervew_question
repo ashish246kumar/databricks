@@ -58,7 +58,126 @@ Once changes are identified, the YouTuber explains how to store them using Slowl
 Finally, the video explains two ways to handle deleted records when they are identified:
 *   **Soft Delete:** You do not physically remove the record. Instead, you update a flag column (e.g., `Delete_Flag`) to 'Y'. This keeps the data for historical reference.
 *   **Hard Delete:** You physically remove the record from your storage. This is less common in data warehousing unless specifically required.
-_________________________________________________
+-- ============================================================================
+-- CDC SCENARIO C: INCREMENTAL LOAD WITHOUT FLAGS (SQL IMPLEMENTATION)
+-- ============================================================================
+
+-- Step 1: Create sample tables
+-- ============================================================================
+
+-- Existing table (your current data lake/warehouse table)
+CREATE TABLE existing_table (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    address VARCHAR(100),
+    salary DECIMAL(10, 2)
+);
+
+-- Insert sample existing data
+INSERT INTO existing_table (id, name, address, salary) VALUES
+(1, 'Alice', 'Pune', 50000),
+(2, 'Bob', 'Mumbai', 60000),
+(3, 'Charlie', 'Delhi', 55000);
+
+-- Staging table (incoming data from source)
+CREATE TABLE staging_table (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    address VARCHAR(100),
+    salary DECIMAL(10, 2)
+);
+
+-- Insert incoming data (Day 2)
+INSERT INTO staging_table (id, name, address, salary) VALUES
+(1, 'Alice', 'Bangalore', 50000),  -- Address changed (UPDATE)
+(3, 'Charlie', 'Delhi', 65000),    -- Salary changed (UPDATE)
+(4, 'Diana', 'Kolkata', 58000);    -- New record (INSERT)
+
+
+-- Step 2: Identify INSERTS (records in staging but not in existing)
+-- ============================================================================
+
+SELECT 
+    s.*,
+    'INSERT' AS change_type
+FROM staging_table s
+LEFT JOIN existing_table e ON s.id = e.id
+WHERE e.id IS NULL;
+
+-- Result: ID 4 (Diana) is a new insert
+
+
+-- Step 3: Identify UPDATES (records that exist in both but have different values)
+-- ============================================================================
+
+SELECT 
+    s.id,
+    s.name,
+    s.address,
+    s.salary,
+    'UPDATE' AS change_type,
+    -- Show what changed
+    CASE WHEN s.name != e.name THEN 'name' ELSE '' END AS name_changed,
+    CASE WHEN s.address != e.address THEN 'address' ELSE '' END AS address_changed,
+    CASE WHEN s.salary != e.salary THEN 'salary' ELSE '' END AS salary_changed
+FROM staging_table s
+INNER JOIN existing_table e ON s.id = e.id
+WHERE 
+    s.name != e.name OR
+    s.address != e.address OR
+    s.salary != e.salary;
+
+-- Result: ID 1 (address changed), ID 3 (salary changed)
+
+
+-- Step 4: APPLY CHANGES - Method 1 (Using MERGE - SQL Server, Oracle, PostgreSQL 15+)
+-- ============================================================================
+
+MERGE INTO existing_table AS target
+USING staging_table AS source
+ON target.id = source.id
+WHEN MATCHED AND (
+    target.name != source.name OR
+    target.address != source.address OR
+    target.salary != source.salary
+) THEN
+    UPDATE SET
+        target.name = source.name,
+        target.address = source.address,
+        target.salary = source.salary
+WHEN NOT MATCHED THEN
+    INSERT (id, name, address, salary)
+    VALUES (source.id, source.name, source.address, source.salary);
+
+
+-- Step 5: APPLY CHANGES - Method 2 (Using separate INSERT and UPDATE)
+-- ============================================================================
+
+-- Insert new records
+INSERT INTO existing_table (id, name, address, salary)
+SELECT s.id, s.name, s.address, s.salary
+FROM staging_table s
+LEFT JOIN existing_table e ON s.id = e.id
+WHERE e.id IS NULL;
+
+-- Update existing records
+UPDATE existing_table e
+SET 
+    e.name = s.name,
+    e.address = s.address,
+    e.salary = s.salary
+FROM staging_table s
+WHERE e.id = s.id
+AND (
+    e.name != s.name OR
+    e.address != s.address OR
+    e.salary != s.salary
+);
+
+
+-- Step 6: COMPLETE CDC PROCESS with audit columns
+
+________________________________________________
 https://www.youtube.com/watch?v=rYbk-Y8Mx1g
 Legacy Hive Metastore "Before Unity catalog we used to have one default catalog
 which is called Hy metast store and we used to save all our structured data assets under this Hy meta store". 
