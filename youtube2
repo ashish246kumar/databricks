@@ -1,0 +1,53 @@
+
+____________________________________________________________________________________________________
+https://www.youtube.com/watch?v=NHQcq-ubOig&list=PL2IsFZBGM_IGiAvVZWAEKX8gg1ItnxEEb&index=10&t=347s
+Enable Unity Catalog and Setup Metastore | How to setup Unity Catalog for Databricks Workspace
+### 1. Understanding the Hierarchy
+ The YouTuber explains that to set up Unity Catalog, you first need to create a **Metastore**. The Metastore is described as the "top-level container" in the Unity Catalog architecture.
+*   Without a Metastore, the workspace only contains the default `hive_metastore` catalog, and there is no option to create new catalogs because catalogs are the "second level in the hierarchy".
+
+### 2. Setting up Azure Storage (Prerequisites)
+Before creating the Metastore in the Databricks console, you must create a storage account in the Azure Portal to store the managed tables.
+
+*   **Create Storage Account:**
+    *   **Resource Group:** Changed to `EAS with data ADB r`.
+    *   **Name:** `ad e with data 0 one`.
+    *   **Region:** Central India (recommended to match the Metastore region).
+    *   **Redundancy:** Changed to "Local redundancy storage".
+    *   **Hierarchical Namespace:** This must be enabled to complement the blob storage with "Data Lake Storage Gen 2 endpoint".
+    *   **Soft Delete:** Unchecked all soft delete and retention period options.
+    *   **Tags:** Added a tag with name "Owner" and value "EAS with data".
+
+*   **Configure Container and Directory:**
+    *   Inside the new storage account, the YouTuber creates a container named `root`.
+    *   Inside the `root` container, a directory named `metastore` is created. This serves as the root location where all Metastore data is saved.
+
+### 3. Creating the Access Connector
+To allow Databricks to access the storage account, an **Access Connector for Azure Databricks** is created. This acts as the identity for the connection.
+*   **Name:** `ADB UC connector`.
+*   **Region:** Central India.
+*   **Resource Group:** `EAS with data ADB r`.
+
+### 4. Assigning Permissions (IAM)
+The Access Connector must be given permission to access the storage account.
+*   The YouTuber goes to the Storage Account’s **IAM** settings and clicks "Add role assignment".
+*   **Role:** `Storage Blob Data Contributor`.
+*   **Members:** The Managed Identity selected is the `ADB UC connector` created in the previous step.
+
+### 5. Creating the Metastore and Enabling Unity Catalog
+Once the Azure resources are ready, the YouTuber returns to the Databricks Account Console to finish the setup.
+
+*   **Metastore Details:**
+    *   **Name:** Azure Central India.
+    *   **Region:** Central India (It is recommended to create only one Metastore per region).
+    *   **ADLS Gen 2 Path:** The path is entered as `root@<storage_account_name>.dfs.core.windows.net/metastore`.
+    *   **Access Connector ID:** The "Resource ID" is copied from the Access Connector page in Azure and pasted into the console.
+
+*   **Assignment:**
+    *   After the Metastore is created, a prompt asks to assign a workspace. The YouTuber selects the existing workspace and clicks "Assign".
+    *   When asked "Do you want to enable Unity Catalog?", the response is "Yes".
+
+### 6. Verification and Results
+*   **Workspace Changes:** Upon refreshing the workspace, the "Catalog" tab now shows sample catalogs and a "+" button (Add a catalog), which was not there before.
+*   **Admin Privileges:** The user configured (EAS data) is now the "Metastore Admin" and has the privileges to work with catalogs.
+*   **Account Console:** Back in the console, the "Permissions" tab is now enabled for the workspace, allowing the addition of users, groups, or service principals.
