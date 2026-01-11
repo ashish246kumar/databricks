@@ -1,4 +1,50 @@
+__________________________________________________________________________
+Delta Tables Liquid Clustering and Deletion Vectors
+https://www.youtube.com/watch?v=EveYBUZP__4&t=115s
+Before we start, it is very important that you understand partitioning and Z-ordering techniques, as Liquid Clustering helps improve performance where you have data with high cardinality. So without any delay, let’s begin.
 
+### Deletion Vectors
+
+What exactly are Deletion Vectors? In a normal data scenario, whenever we modify data in a particular Parquet file—even if you just try to delete one record out of millions—the whole Parquet file will get rewritten. That is an optimization issue.
+
+The solution is to add Deletion Vectors. If the table is enabled with this feature, when you delete a single row, a vector or a "flag" is added to that row. The data will not be rewritten; rather, the row in the Parquet file is flagged as deleted. Next time when you read the data, only the rows not marked or flagged will be read. Later, when you run your maintenance—which is the `OPTIMIZE` command—the Parquet file gets rewritten and all the rows marked for deletion are removed.
+
+**Let's go ahead and see this in action:**
+
+1.  **Setup:** We use the `read_files` utility to read a CSV file and create a table (`dev.bronze.sales`).
+2.  **Checking Properties:** If we run `DESCRIBE EXTENDED` on the table, we can see the property `enable deletion vectors` is set to true by default.
+3.  **The Test (Disabled):**
+    *   First, we turn off the vector by running `ALTER TABLE ... SET TBLPROPERTIES ... false`.
+    *   We delete a specific invoice number. When we check `DESCRIBE HISTORY`, we see that Delta has removed files and added new files. This means the data was rewritten.
+4.  **The Test (Enabled):**
+    *   *Note:* To use this, you need Delta Lake 2.3.0+ or Databricks Runtime 12.2 LTS+.
+    *   We set the property back to `true`.
+    *   We delete another invoice number. Now, if we look at `DESCRIBE HISTORY`, we see "deletion vectors added" and the number of files added is zero. The data is not rewritten; it just added flags.
+    *   You can then run the `OPTIMIZE` command to automatically remove those flagged records while rewriting the file.
+
+### Liquid Clustering
+
+Now, let's check what is **Liquid Clustering**. In previous videos, we saw Z-ordering or partitioning, but in those cases, we have to rewrite the data whenever we try to optimize the table.
+
+But there is one "neat way" Delta table has introduced called Liquid Clustering. Whenever you enable clustering, you don't need to rewrite the data; the incremental data will automatically get adjusted as per the cluster column you mentioned.
+
+**When should you use this?**
+You can use it if you have a high cardinality column to filter on, significant skew in your data, data growing too quickly, or different access patterns. To use this, you need Delta Lake 3.1.0+ or Databricks Runtime 13.3 LTS+.
+
+**How do we do it?**
+We just need to use `CLUSTER BY`.
+
+*   **On an existing table:** You run `ALTER TABLE table_name CLUSTER BY column_name` (e.g., invoice number). If you want to go back to a simple table without clustering, you just use `CLUSTER BY NONE`.
+*   **On a new table:** While creating the table, you mention `CLUSTER BY` and the column name.
+
+**Important Limitation:**
+You can have more than one clustering column, but you need to have the column within the first **32 columns** in the Delta table.
+
+Once you do this, running a `SELECT *` with a filter on that column runs so fast, and the new incremental data will automatically get clustered properly so you don't have to worry about maintenance.
+
+I hope you have learned a lot about Delta tables. In our next video, we are going to talk about **Volumes**, and we will see Delta Sharing towards the end of our series.
+
+Till then, keep learning, keep growing, and keep sharing.
 ___________________________________________________________________
 Data Skipping and Z-Ordering in Delta Lake Tables
 https://www.youtube.com/watch?v=kUMAmZQIMfA&t=604s
