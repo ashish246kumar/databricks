@@ -1,3 +1,25 @@
+Show patient_id, first_name, last_name from patients whose does not have any records in the admissions table. (Their patient_id does not exist in any admissions.patient_id rows.)
+Table
+patient and admssion
+
+SELECT patient_id, first_name, last_name
+FROM patients I
+WHERE patient_id NOT IN (SELECT patient_id FROM admissions)
+_________________________________________________
+Display patient's full name, height in the units feet rounded to 1 decimal, weight in the unit pounds rounded to O decimals,
+birth_date,
+gender non abbreviated.
+Convert CM to feet by dividing by 30.48.
+Convert KG to pounds by multiplying by 2.205.
+
+SELECT first_name || || last_name AS full_name
+و ROUND(height/30.48,1) AS height_feet
+* ROUND (weight 2.205,0) AS weight_pound
+birth_date
+CASE WHEN gender = 'M' THEN 'MALE' ELSE 'FEMALE
+END AS gender_type
+FROM patients p
+I
 
 ______________________________________
 Show the total amount of male patients and the total amount of female patients in the patients table. Display the two results in the same row.
