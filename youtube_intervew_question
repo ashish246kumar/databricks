@@ -1,3 +1,182 @@
+
+
+____________________________________________________________________
+https://www.youtube.com/watch?v=_PA86Npk1ck&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=46
+dynamic resource allocation in spark 
+
+### 1. Introduction & Interview Questions
+Sabse pehle unhone bataya ki interview mein is topic se kya questions aate hain:
+*   Dynamic Resource Allocation kya hota hai?
+*   Resource Manager resources kaise allocate karta hai?
+*   Kaun-kaun si techniques hain (Static vs Dynamic)?
+*   Challenges kya hain aur process fail kyun ho sakta hai?
+*   Dynamic Allocation kab avoid karna chahiye?
+*   Configurations kaun si lagti hain?
+
+### 2. The Scenario (Problem Statement with Example)
+Unhone ek real-world example se samjhaya ki Dynamic Allocation ki zarurat kyun padi:
+
+*   **User 1 (Heavy Job):** Ek developer ne `spark-submit` command chalayi. Usne configuration rakhi:
+    *   **Executors:** 49 (Max executors).
+    *   **Executor Memory:** 20 GB.
+    *   **Cores:** 4 per executor.
+    *   **Driver Memory:** 20 GB.
+    *   **Calculation:** $49 \times 20$ GB = 980 GB + 20 GB Driver = **Total 1000 GB** use kar liya.
+*   **Cluster Condition:** Maan lijiye poore cluster ki capacity hi 1000 GB RAM aur 196 Cores thi. Iska matlab User 1 ne poora cluster full kar diya.
+*   **User 2 (Small Job):** Ab ek dusra developer aata hai jise sirf **25 GB** chahiye (20 GB executor + 5 GB driver).
+*   **Problem:** Resource Manager (RM) **FIFO (First In First Out)** pe kaam karta hai. Kyunki cluster full hai, RM bolega "Wait karo". User 2 ka job ho sakta hai 5 minute ka ho, lekin use User 1 ke 5 ghante ke job ke khatam hone ka wait karna padega.
+
+Development environment mein ye aksar hota hai ki log resource lekar baith jate hain par kaam nahi kar rahe hote, jisse baaki log block ho jate hain.
+
+### 3. Static vs. Dynamic Resource Allocation
+Yahan do techniques aati hain:
+*   **Static Resource Allocation:** Ek baar jo memory mil gayi (e.g., 100 GB), wo poore time (pure application duration tak) reserve rehti hai, chahe aap use karein ya na karein.
+*   **Dynamic Resource Allocation:** Agar aapka process resource use nahi kar raha, to use release (khali) kar diya jata hai taaki dusre use kar sakein.
+
+### 4. How Dynamic Allocation Works (Release & Acquire)
+Is process ko enable karne ke liye `spark.dynamicAllocation.enabled = true` set karna padta hai (by default ye false hota hai).
+
+*   **Releasing Resources:**
+    *   Maan lo shuru mein load karte waqt 1000 GB chahiye tha.
+    *   Phir filter lagaya, data kam ho gaya, ab sirf 500 GB ki zarurat hai.
+    *   Dynamic allocation mein bacha hua **500 GB release** kar diya jayega.
+    *   Phir aur data kam hua, to aur 250 GB release ho jayega.
+
+*   **Acquiring Resources (On Demand):**
+    *   Agar aage chalkar koi Join operation aata hai aur wapas memory ki zarurat padti hai, to Spark Resource Manager se demand karega.
+    *   **Risk/Challenge:** Resource Manager kisi se jabardasti resource khali nahi karwa sakta. Agar wo release kiya hua 500 GB kisi aur process ne le liya hai, to aapke process ko wapas resource nahi milega aur **process fail ho sakta hai**.
+
+### 5. Solutions & Configurations (Detailed)
+Process fail hone se bachane ke liye kuch configurations set ki jati hain:
+
+*   **Min & Max Executors:**
+    *   `spark.dynamicAllocation.minExecutors`: Default 1 hota hai, par hume isse badhana chahiye (jaise ki example mein **5 ya 20** set kar sakte hain). Iska matlab hai ki chahe kaam ho ya na ho, itne executors hamesha aapke paas rahenge taaki process starve na ho.
+    *   `spark.dynamicAllocation.maxExecutors`: Maximum kitne executors hum le sakte hain (example mein **49** tha).
+
+*   **External Shuffle Service / Shuffle Tracking:**
+    *   **Challenge:** Jab executor khali (kill) kiya jata hai, to uske disk pe rakha hua **Shuffle Data (Map output/exchange data)** bhi chala jata hai. Agar ye data chala gaya, to Join ke time recalculate karna padega.
+    *   **Solution:** `spark.shuffle.service.enabled` (ya shuffle tracking) ko true karte hain. Ye service `Worker Node` pe alag se chalti hai aur data ko hold karti hai, bhale hi executor kill ho jaye. Isse recalculation nahi karni padti.
+
+### 6. Timing & Request Strategy (Bahut Important Detail)
+Video mein ye bhi explain kiya gaya hai ki resource kab chhoda jata hai aur kab maanga jata hai:
+
+*   **Kab Release karega (Idle Timeout):** Agar koi executor **60 seconds** (default) tak idle hai (koi kaam nahi kar raha), to usko release kar diya jayega. Aap is config ko change bhi kar sakte hain (jaise video mein 45 sec kiya tha).
+*   **Kab Request karega (Backlog Timeout):** Agar pending tasks ko resource nahi mil raha aur wo **1 second** se zyada wait kar rahe hain, to new executors ki demand shuru hogi.
+*   **Kaise Maangega (Two-Fold Strategy):**
+    *   Aisa nahi hai ki seedha 500 GB maang lega.
+    *   Ye **exponentially (Two-Fold)** maangta hai: Pehle **1** executor maangega, agar kaam nahi bana to **2** maangega, phir **4**, phir **8**, phir **16**... is tarah se badhta jayega.
+
+### 7. When to Avoid Dynamic Allocation?
+Interview mein ye pucha jata hai.
+*   **Production Critical Jobs:** Agar aap production mein koi critical job chala rahe hain jahan aap SLA (Time) miss nahi kar sakte, wahan Dynamic Allocation **avoid** karna chahiye.
+*   Wahan **Static Allocation** use karein taaki resources guaranteed rahein aur resource na milne ki wajah se job fail ya delay na ho.
+
+### 8. Summary of Configurations Mentioned
+Video mein dikhaye gaye `spark-submit` mein ye settings thin:
+*   `spark.dynamicAllocation.enabled`: true
+*   `spark.shuffle.service.enabled`: true (ya shuffle tracking)
+*   `spark.dynamicAllocation.minExecutors`: (e.g., 5)
+*   `spark.dynamicAllocation.maxExecutors`: (e.g., 49)
+*   `spark.dynamicAllocation.executorIdleTimeout`: (e.g., 60s)
+
+spark-submit \
+--name YourAppName \
+--master yarn \
+--deploy-mode cluster \
+--conf spark.dynamicAllocation.enabled=true
+--conf spark.dynamicAllocation.minExecutors=5
++
+20
+--conf spark.dynamicAllocation.maxExecutors=49
+++
+--conf spark.shuffleTracking.enabled=true
+--conf spark.dynamicAllocation.executorialeTimecut=45s \
+--conf spark.scheduler.backlogTimeout=2s \
+--conf spark.executor.memory=20g
+\2
+--conf spark.executor.cores=4
+\
+--conf spark.driver.memory=20g \
+--py-files python_dependencies.zip \
+main.py
+________________________________
+cache vs persist
+https://www.youtube.com/watch?v=Pw1vn82wEBE&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=45
+Chaliye, main aapko bilkul usi flow aur tone mein samjhata hoon jaise video mein explain kiya gaya hai using HinEnglish.
+
+### 1. Basic Concept aur Memory Management Recap
+Sabse pehle, Caching kya hai? Ye ek optimization technique hai jo hamare **intermediate results** ko store karke rakhta hai.
+
+Isko samajhne ke liye humne Spark Memory Management (Executor wala part) ko recap kiya tha. Executor ke container ke andar teen cheezein hoti hain: User Memory, Spark Memory, aur Reserved Memory. Spark Memory ke andar do pools hote hain:
+1.  **Storage Memory Pool**
+2.  **Executor Memory Pool**
+
+Jab bhi hum data ko cache karte hain, toh wo data sirf aur sirf **Storage Memory Pool** mein jaake store hota hai. Agar Execution pool (jahan calculation hoti hai) ko memory ki zaroorat padti hai, toh wo Storage pool se data ko "evict" (udha) kar sakta hai LRU (Least Recently Used) fashion mein.
+
+### 2. Example: Caching ki zaroorat kyun hai? (The "Why")
+Ab main aapko code example se samjhata hoon ki humein iski actual need kyun padti hai.
+
+Imagine kijiye humne ek code likha:
+*   Pehle `df` banaya ek file load karke.
+*   Phir `df2` banaya jisme `df` ko join kiya `df1` ke saath.
+*   Phir `df4` banaya jisme usi `df` ko join kiya `df3` ke saath.
+
+Spark mein DataFrames immutable hote hain aur operations **Lazily Evaluated** hote hain. `df` jo hai wo Executor ki "short-lived memory" mein banta hai.
+*   Jab `df2` ke liye action call hoga, `df` calculate hoga aur use ho jayega.
+*   Lekin jab `df4` banega, toh kyunki `df` memory se chala gaya tha (short-lived tha), Spark wapas jayega aur DAG (Directed Acyclic Graph) ke through `df` ko **re-calculate** karega.
+
+Isse hamara time waste hoga. Isiliye hum `df.cache()` use karte hain. Jaise hi hum `.cache()` likhte hain, data short-lived memory se uth kar **Storage Memory Pool** mein aa jata hai jo long-term ke liye rehta hai (jab tak application chal rahi hai). Isse baar-baar re-calculation nahi karni padti.
+
+### 3. Partition aur Storage Logic
+Yahan ek bahut important interview question banta hai. Maan lijiye aapke paas 2GB ka storage pool hai lekin data 2.5GB ka hai.
+*   Spark kabhi bhi **half partition** store nahi karega. Agar wo 12 partitions store kar pa raha hai aur 13th partition aadha fit ho raha hai, toh wo us aadhe ko store nahi karega.
+*   Jo partitions fit nahi honge, unhein ya toh disk pe bheja jayega (agar level waisa hai) ya phir unhein **re-calculate** kiya jayega.
+*   Agar koi partition galti se **lost** ho jata hai, toh DAG usse wapas re-calculate kar leta hai.
+
+### 4. Cache vs Persist
+Bahut baar pucha jata hai: **Difference between Cache and Persist?**
+Seedha sa answer hai: `Persist` hi main function hai. `Cache` bas `Persist` ke upar likha gaya ek wrapper hai.
+*   **Cache:** Jab hum `.cache()` call karte hain, toh wo internal `.persist()` ko call karta hai ek fixed default storage level ke saath (Video mein bataya gaya hai ki default `MEMORY_AND_DISK` set hota hai).
+*   **Persist:** `.persist()` humein flexibility deta hai ki hum arguments pass kar sakein, yaani hum apna **Storage Level** khud choose kar sakte hain.
+
+### 5. Storage Levels (In-Depth)
+Humne alag-alag storage levels discuss kiye jo aap `.persist()` mein use kar sakte hain:
+
+*   **MEMORY_ONLY:**
+    *   Ye data ko sirf RAM mein rakhta hai **Deserialized** form mein.
+    *   **Advantage:** Process fast hota hai.
+    *   **Disadvantage:** Memory utilization bahut high hoti hai.
+*   **MEMORY_AND_DISK:**
+    *   Pehle RAM mein try karega. Agar RAM full ho gayi, toh bacha hua data **Disk** pe bhej dega.
+    *   Disk pe data hamesha **Serialized** form mein rehta hai.
+    *   Disk se read/write karne mein time lagta hai aur CPU usage high ho sakta hai kyunki data ko wapas deserialize karna padega.
+*   **DISK_ONLY:**
+    *   Sara data disk pe rahega. Ye slow hota hai.
+*   **_SER (Serialized) levels (e.g., MEMORY_ONLY_SER):**
+    *   Data ko byte stream (Serialized) mein rakhta hai.
+    *   **Benefit:** Space bachta hai (e.g., 5GB data compress hoke kam jagah lega).
+    *   **Drawback:** Jab use karna hoga toh CPU usage high hoga kyunki De-serialization karna padega.
+    *   *Note:* Video ke end mein bataya tha ki ye Serialization wala feature mainly **Java aur Scala** mein kaam karta hai, Python mein directly aise nahi dikhta.
+*   **_2 (Replication) levels (e.g., MEMORY_ONLY_2):**
+    *   Ye data ki 2 copies rakhta hai alag-alag nodes pe.
+    *   Agar ek worker node down ho gaya, toh doosre node se data le lega taaki re-calculation na karna pade.
+
+### 6. Practical Demo aur "Show" vs "Count" ka catch
+Humne code run karke bhi dekha Spark UI pe.
+*   Jab humne `df.cache()` ke baad sirf `df.show()` kiya: Spark UI ke Storage tab mein sirf **1 Partition** cache hua dikha. Kyunki Spark intelligent hai, usne dekha ki `show()` ke liye sirf top rows chahiye, toh poora data kyu cache karein?.
+*   Jab humne `df.count()` kiya: Tab saare partitions (4 partitions) cache huye kyunki count ke liye poora data chahiye tha.
+*   UI mein humne dekha ki **Serialized (Disk)** data ka size (1.2 MB) kam tha as compared to **Deserialized (Memory)** data (3.3 MB).
+
+### 7. Unpersist aur Conclusion
+Last mein, agar data ko memory se hatana hai toh kya karein?
+Simple, `df.unpersist()` method call kar dijiye, data cache se hatt jayega.
+
+Toh ye thi saari kahani Cache aur Persist ki. Maine koshish ki hai ki koi bhi detail miss na ho. Agar aap ye saare points (Intermediate results, Lazy evaluation example, Partition logic, Storage levels difference) interview mein bol denge, toh I don't think koi aapko phasa payega.
+
+**Link:** Description mein documentation ka link mil jayega, wahan se aur detail padh lena.
+
+Chaliye, milte hain agle video mein. Tab tak ke liye, Bye Bye!
+
 __________________________________________________________________________
 Delta Tables Liquid Clustering and Deletion Vectors
 https://www.youtube.com/watch?v=EveYBUZP__4&t=115s
