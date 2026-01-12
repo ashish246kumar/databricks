@@ -1,3 +1,27 @@
+
+__________________________________________________________
+Show all of the patients grouped into weight groups.
+Show the total amount of patients in each weight group.
+Order the list by the weight group decending.
+For example, if they weight 100 to 109 they are placed in the 100 weight group, 110-119 = 110 weight group, etc.
+
+SELECT COUNT(*) no_of_patients, FLOOR (weight/10)*10 AS weight_group
+FROM patients
+GROUP BY FLOOR (weight/10)*10
+ORDER BY weight_group DESC
+________________
+Display a single row with max_visits, min_visits, average_visits where the maximum, minimum and average number of admissions per day is calculated. Average is rounded to 2 decimal places.
+WITH cte AS (
+SELECT admission_date, COUNT(*) AS no_of_visits
+FROM admissions
+GROUP BY admission_date
+)
+SELECT MAX(no_of_visits) AS max_vigits, MIN(no_of_visits) AS min_visits
+ROUND (AVG(no_of_visits), 2) AS avg_visits
+FROM cte
+innon join admissions on nationt idea patient id
+
+_________
 Show patient_id, first_name, last_name from patients whose does not have any records in the admissions table. (Their patient_id does not exist in any admissions.patient_id rows.)
 Table
 patient and admssion
@@ -5,6 +29,24 @@ patient and admssion
 SELECT patient_id, first_name, last_name
 FROM patients I
 WHERE patient_id NOT IN (SELECT patient_id FROM admissions)
+
+or 
+SELECT 
+    p.patient_id,
+    p.first_name,
+    p.last_name
+FROM patients p
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM admissions a
+    WHERE a.patient_id = p.patient_id
+);
+
+or
+SELECT p.patient_id, first_name, last_name, a.patient_id
+FROM patients p
+LEFT JOIN admissions a ON p.patient_id=a.patient_id
+WHERE a.patient_id IS null
 _________________________________________________
 Display patient's full name, height in the units feet rounded to 1 decimal, weight in the unit pounds rounded to O decimals,
 birth_date,
