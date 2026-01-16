@@ -1,5 +1,11 @@
+https://www.youtube.com/watch?v=EEq9JxGGEZE&list=PLTsNSGeIpGnGkpfKMf7ilFmzfx6AjMKyT&index=20&t=856s
+spark submit
+Spark Submit is a command-line tool used to run Spark applications. It works by taking all necessary files and JARs, packaging them, and triggering the application on the cluster. 
+The cluster can be located in several places: Standalone, Local mode, Kubernetes, or YARN (which is the most common
 
-
+Dynamic Allocation: Setting spark.dynamicAllocation.enabled=true allows Spark to release resources that are idle so other processes can use them.
+• Executor Limits: You can set minExecutors (e.g., 1) and maxExecutors (e.g., 10) to prevent a single job from consuming all cluster memory.
+• Broadcast Settings: You can adjust autoBroadcastJoinThreshold and broadcastTimeout. While he mentions a 3600-second (1-hour) timeout for extreme cases, he typically recommends starting
 ____________________________________________________________________
 https://www.youtube.com/watch?v=_PA86Npk1ck&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=46
 dynamic resource allocation in spark 
