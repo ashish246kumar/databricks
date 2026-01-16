@@ -1,3 +1,19 @@
+________________________
+Json explode 
+https://www.youtube.com/watch?v=sTk1hflzPYc&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=41
+from pyspark.sql.functions import explode, explode_outer
+
+resturant_json_data \
+    .select("*", explode("restaurants").alias("new_restaurants")) \
+    .drop("restaurants") \
+    .select(
+        "new_restaurants.restaurant.R.res_id",
+        explode_outer(
+            "new_restaurants.restaurant.establishment_types"
+        ).alias("establishment_types_new"),
+        "new_restaurants.restaurant.name"
+    ) \
+    .show(truncate=False)
 
 __________________________________________
 Sort the province names in ascending order in such a way that the province 'Ontario' is always on top.
