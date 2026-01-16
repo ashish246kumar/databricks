@@ -1,3 +1,55 @@
+
+____________________________________
+https://www.youtube.com/watch?v=b2hO1oJf9nA&list=PLTsNSGeIpGnGkpfKMf7ilFmzfx6AjMKyT&index=19
+executor out of memory spark | spark memory management 
+
+### **Potential Interview Questions**
+The YouTuber highlights several "famous" questions addressed in the video:
+*   **Why do we get OOM** even when data can be spilled to disk?
+*   How does Spark manage **internal storage**?
+*   How are **tasks split** inside an executor?
+*   What is the use of **Overhead Memory** (usually 10%)?
+*   What are the different **Memory Managers** in Spark?
+
+### **Executor Architecture & Container Size**
+When you request a 10GB executor, Spark doesn't just give you 10GB; it creates a container that includes **Overhead Memory**.
+
+*   **Configuration:** `spark.executor.memory` (e.g., 10GB) + `spark.executor.memoryOverhead` (10% of executor memory, min 384MB).
+*   **Total Container Size:** In the example of a 10GB executor, the total size becomes **11GB** (10GB + 1GB overhead).
+*   **Physical Limit:** You cannot exceed this 11GB limit. If the process crosses this physical memory limit, you will get an **OOM exception**.
+
+### **Memory Division: JVM vs. Non-JVM**
+The 11GB container is split into two main parts:
+1.  **Non-JVM Process (Overhead Memory - 1GB):** Used for **PySpark applications**, container management (takes ~300-400MB), and other non-JVM objects.
+2.  **JVM Process (Executor Memory - 10GB):** This is where the actual Spark engine runs.
+
+### **Internal JVM Memory Breakdown**
+The 10GB JVM memory is further divided into three layers:
+*   **Reserved Memory:** Fixed at **300MB**. It stores Spark's internal objects. **Rule:** Your executor size must be at least 1.5 times the reserved memory (approx. 450MB+), or Spark will throw an error.
+*   **User Memory (40% of remaining):** Approximately **3.8GB**. It stores **User-Defined Functions (UDFs)**, user-defined data structures, RDD operations, and Spark internal metadata.
+*   **Spark Memory (60% of remaining):** Approximately **5.8GB**. This is used for **Dataframe operations**.
+
+### **Spark Memory: Storage vs. Execution**
+The Spark Memory pool (5.8GB) is split 50/50 into two pools:
+1.  **Storage Memory Pool (2.9GB):** Used for caching data (`df.persist`, `df.cache`) and intermediate results. It uses an **LRU (Least Recently Used)** mechanism to evict old cache if space is needed.
+2.  **Execution Memory Pool (2.9GB):** Short-lived memory used for transformations, shuffles, joins, and **Hash Tables**.
+
+### **Memory Managers**
+*   **Static Memory Manager:** (Used in older versions < 1.6.0) It had hard boundaries between storage and execution.
+*   **Unified Memory Manager:** (Used in versions 1.6.0+) It allows for **flexible boundaries**. If the Execution pool needs more memory and Storage is empty, Execution can "borrow" memory from the Storage pool.
+
+### **The Big Question: Why OOM if Spilling exists?**
+Even though Spark can spill to disk, OOM occurs primarily due to **Data Skew**:
+*   **The Join Scenario:** Imagine joining `df1` and `df2` on an ID. If you have a **skewed key** (e.g., ID "1" has 3GB of data) but your Execution pool only has 2.9GB of physical space, Spark **must** bring all records of that same key to the same executor to perform the join.
+*   **The Failure:** Because that specific ID's data (3GB) exceeds the available physical memory (2.9GB), Spark cannot process it. You can't just spill "half" a key's join logic and get an accurate result.
+*   **Solution:** You need to use techniques like **Salting** or **Re-partitioning**.
+
+### **Task Splitting and Cores**
+The number of parallel tasks an executor runs depends on the **Cores**:
+*   If an executor has **4 cores**, it can run **4 tasks in parallel**.
+*   **Recommendation:** It is generally recommended to use **3 to 5 cores per executor**.
+*   **Risk:** If you use too many cores (>5), the overhead of managing many partitions and objects can lead to **Memory Overhead errors**.
+______________________________________
 https://www.youtube.com/watch?v=EEq9JxGGEZE&list=PLTsNSGeIpGnGkpfKMf7ilFmzfx6AjMKyT&index=20&t=856s
 spark submit
 Spark Submit is a command-line tool used to run Spark applications. It works by taking all necessary files and JARs, packaging them, and triggering the application on the cluster. 
