@@ -1,3 +1,7 @@
+Show the percent of patients that have 'M' as their gender. Round the answer to the nearest hundreth number and in percent form.
+
+SELECT SUM(CASE WHEN gender = 'M' THEN 1 ELSE 0 END) 1.0/COUNT(*) AS mal
+FROM patients
 
 __________________________________________________________________________________________________________
 We are looking for a specific patient. Pull all columns for the patient who matches the following criteria:
