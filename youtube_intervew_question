@@ -1,3 +1,253 @@
+
+_______________________________
+https://www.youtube.com/watch?v=vWSQIIiS8sg&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=16
+RDD
+---
+
+### **Q1. What is an RDD in Apache Spark?**
+
+**Answer:**
+RDD stands for **Resilient Distributed Dataset**.
+It is the **core data abstraction** of Apache Spark.
+
+An RDD is:
+
+* A **distributed collection of data**
+* Stored across multiple nodes in a **cluster**
+* Processed **in parallel in memory**
+
+Internally, **all Spark operations are ultimately executed on RDDs**, even when we use DataFrames or Datasets.
+
+---
+
+### **Q2. Why is RDD called “Resilient”?**
+
+**Answer:**
+RDD is called **Resilient** because it is **fault tolerant**.
+
+If a partition of an RDD is lost due to node or executor failure:
+
+* Spark uses **lineage information**
+* Lineage tells Spark how the RDD was created
+* Spark **recomputes the lost partitions automatically**
+
+This self-recovery mechanism makes RDD resilient.
+
+---
+
+### **Q3. Why is RDD called “Distributed”?**
+
+**Answer:**
+RDD is distributed because its data is **spread across multiple machines** in a cluster.
+
+Example:
+
+* If we have 500 MB of data
+* And the block size is 128 MB
+* The data will be split into **4 partitions**
+* Each partition is processed by a different executor
+
+This distribution enables **parallel processing** and improves performance.
+
+---
+
+### **Q4. What does “Dataset” mean in RDD?**
+
+**Answer:**
+Dataset refers to the **actual data** being processed.
+
+An RDD is not just metadata; it contains:
+
+* Real data
+* Which is processed using transformations and actions
+
+---
+
+### **Q5. Are RDDs mutable or immutable? Explain.**
+
+**Answer:**
+RDDs are **immutable**.
+
+Once an RDD is created, it **cannot be modified**.
+Any transformation applied to an RDD creates a **new RDD**.
+
+Example:
+
+* Applying a `filter` creates RDD1
+* Applying another filter on RDD1 creates RDD2
+* Original RDD remains unchanged
+
+Immutability helps Spark achieve fault tolerance and consistency.
+
+---
+
+### **Q6. What is Lazy Evaluation in RDD?**
+
+**Answer:**
+RDD transformations are **lazily evaluated**.
+
+This means:
+
+* Transformations are not executed immediately
+* Spark waits until an **action** (like `count`, `collect`, or `show`) is called
+
+Before execution:
+
+* Spark builds a **DAG (Directed Acyclic Graph)**
+* This DAG represents the **lineage** of transformations
+
+Execution starts only when an action is triggered.
+
+---
+
+### **Q7. How does RDD provide fault tolerance?**
+
+**Answer:**
+RDD provides fault tolerance using **lineage information**.
+
+If an RDD or its partition fails:
+
+* Spark traces back the lineage
+* Identifies the transformations used to create the RDD
+* Recomputes the missing data automatically
+
+This avoids the need for data replication.
+
+---
+
+### **Q8. What are the disadvantages of using RDD?**
+
+**Answer:**
+
+1. **No Automatic Optimization**
+
+   * Spark does not optimize RDD operations automatically
+   * The developer must manage performance manually
+
+2. **“How to” Instead of “What to”**
+
+   * RDD requires developers to specify *how* to process data
+   * DataFrames allow specifying *what* result is required
+
+3. **Complex Code**
+
+   * Operations like `groupBy` and `join` are verbose and complex in RDD
+   * Much simpler in DataFrames or SQL
+
+4. **Performance Limitations**
+
+   * Spark cannot reorder or optimize RDD operations
+   * Execution follows the developer-defined order
+
+---
+
+### **Q9. Explain the performance difference between RDD and DataFrame.**
+
+**Answer:**
+
+Example:
+Operations — `reduceByKey` followed by `filter`
+
+* **RDD**
+
+  * Spark first performs a full shuffle
+  * Then applies the filter
+  * This is computationally expensive
+
+* **DataFrame**
+
+  * Spark applies the filter first
+  * Reduces the dataset size
+  * Then performs shuffle
+  * This improves performance
+
+Reason: **Catalyst Optimizer**, which works only with DataFrames/Datasets.
+
+---
+
+### **Q10. Why should we avoid using RDD in most cases?**
+
+**Answer:**
+RDDs should generally be avoided because:
+
+* They lack automatic optimization
+* Code is more complex
+* Performance is usually lower compared to DataFrames
+
+Modern Spark applications prefer **DataFrames and Datasets**.
+
+---
+
+### **Q11. When should we use RDD?**
+
+**Answer:**
+RDDs are useful when:
+
+1. **Processing Unstructured Data**
+
+   * Text files
+   * Logs
+   * Raw data without schema
+
+2. **Type Safety is Required**
+
+   * RDD provides compile-time type checking
+   * DataFrames detect type errors at runtime
+
+3. **Full Low-Level Control is Needed**
+
+   * Custom transformations
+   * Fine-grained performance tuning
+
+---
+
+### **Q12. Are RDDs type-safe?**
+
+**Answer:**
+Yes, RDDs are **type-safe**.
+
+Type mismatches are detected at **compile time**, reducing runtime failures.
+
+---
+
+### **Q13. What is the relationship between RDD, DataFrame, and Dataset?**
+
+**Answer:**
+
+* DataFrames and Datasets are built **on top of RDDs**
+* Internally, Spark converts them into RDDs during execution
+* Understanding RDDs helps in understanding Spark internals
+
+---
+
+### **Q14. What is the current industry preference: RDD or DataFrame?**
+
+**Answer:**
+The industry strongly prefers:
+
+* **DataFrames**
+* **Datasets**
+
+Because they are:
+
+* Optimized
+* Easier to use
+* Suitable for both engineers and analysts
+
+---
+
+### **Final Interview Tip**
+
+Even though RDDs are used less in real projects today,
+**interviewers expect strong knowledge of RDDs** because they form the **foundation of Apache Spark**.
+
+
+
+
+
+
+
+____________________________________________________________________________________________________________________
 For each product, calculate the sales performance based on the average of the last 3 months (Rolling/Moving Average
 
 # Define Window
