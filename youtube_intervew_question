@@ -1,3 +1,93 @@
+For each product, calculate the sales performance based on the average of the last 3 months (Rolling/Moving Average
+
+# Define Window
+rolling_window = Window.partitionBy("product_id") \
+    .orderBy("sales_date") \
+    .rowsBetween(-2, 0) # Current row + 2 rows before
+
+# Calculate Rolling Average
+df_rolling = product_df.withColumn("rolling_avg", F.avg("sales").over(rolling_window))
+
+# Optional: Filter out first 2 months using row_number to ensure accurate 3-month data
+rn_window = Window.partitionBy("product_id").orderBy("sales_date")
+df_final_rolling = df_rolling.withColumn("rn", F.row_number().over(rn_window)) \
+    .filter(F.col("rn") > 2)
+
+df_final_rolling.show()
+___________________________
+Given a dataset of office entry/exit scans, identify employees who spent less than 8 hours in the office on any given day so an automated email can be sent to them. [21:51]
+
+# 1. Prepare Timestamps
+df_ts = emp_df.withColumn("full_timestamp", 
+    F.to_timestamp(F.concat(F.col("date"), F.lit(" "), F.col("time")), "dd-MM-yyyy HH:mm"))
+
+# 2. Define Window (Partition by Name AND Date)
+emp_window = Window.partitionBy("emp_name", "date") \
+    .orderBy("full_timestamp") \
+    .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+
+# 3. Get Entry (First) and Exit (Last)
+df_hours = df_ts.withColumn("entry_time", F.first("full_timestamp").over(emp_window)) \
+    .withColumn("exit_time", F.last("full_timestamp").over(emp_window))
+
+# 4. Calculate Difference in Hours
+df_final = df_hours.withColumn("hours_worked", 
+    (F.col("exit_time").cast("long") - F.col("entry_time").cast("long")) / 3600) \
+    .filter(F.col("hours_worked") < 8)
+
+df_final.distinct().show()
+____________________________________________
+For each product, find the difference between its sales in the very first month it was sold and its most recent (latest) month's sales
+from pyspark.sql import Window
+import pyspark.sql.functions as F
+
+# Define the Window
+window_spec = Window.partitionBy("product_id") \
+    .orderBy("sales_date") \
+    .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+
+# Calculate First and Latest Sales
+df_result = product_df.withColumn("first_sales", F.first("sales").over(window_spec)) \
+    .withColumn("latest_sales", F.last("sales").over(window_spec)) \
+    .withColumn("sales_diff", F.col("latest_sales") - F.col("first_sales"))
+
+df_result.show()
+
+from pyspark.sql import Window
+import pyspark.sql.functions as F
+
+# Window for first sale
+w_first = Window.partitionBy("product_id").orderBy("sales_date")
+
+# Window for latest sale
+w_last = Window.partitionBy("product_id").orderBy(F.col("sales_date").desc())
+
+df = (
+    product_df
+    .withColumn("rn_first", F.row_number().over(w_first))
+    .withColumn("rn_last", F.row_number().over(w_last))
+)
+
+first_sales = (
+    df.filter(F.col("rn_first") == 1)
+      .select("product_id", F.col("sales").alias("first_sales"))
+)
+
+latest_sales = (
+    df.filter(F.col("rn_last") == 1)
+      .select("product_id", F.col("sales").alias("latest_sales"))
+)
+
+result = (
+    first_sales
+    .join(latest_sales, "product_id")
+    .withColumn("sales_diff", F.col("latest_sales") - F.col("first_sales"))
+)
+
+result.show()
+________________________
+
+_________________________________________________
 https://www.youtube.com/watch?v=2Eb9mE7pfgs&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=39
 
 driver out of memory spark
