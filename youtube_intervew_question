@@ -1,4 +1,226 @@
 
+_____________________________________________________
+https://www.youtube.com/watch?v=a-YGzAZEt04&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=18
+---
+
+How to write dataframe to disk in spark 
+
+---
+
+### **Q1. How do you write a DataFrame to disk in Spark?**
+
+**Answer:**
+In Spark, a DataFrame is written to disk using the **DataFrameWriter API**, which is accessed via `df.write`.
+
+The general syntax is:
+
+```python
+df.write
+  .format("csv")
+  .option("header", "true")
+  .mode("overwrite")
+  .save("path/to/output")
+```
+
+This API is used after reading and transforming data, when we want to persist the processed data to storage.
+
+---
+
+### **Q2. What is the general structure of the DataFrameWriter API?**
+
+**Answer:**
+The general structure of the DataFrameWriter API is:
+
+1. **`df.write`** – Entry point to the writer API
+2. **`.format()`** – Specifies the file format (CSV, Parquet, JSON, etc.)
+3. **`.option()`** – Used for format-specific configurations
+4. **`.partitionBy()` / `.bucketBy()`** – Used for optimization
+5. **`.mode()`** – Defines how to handle existing data
+6. **`.save()`** – Triggers the write operation
+
+The `save()` method is an **action** and actually writes the data to disk.
+
+---
+
+### **Q3. What happens if you do not specify a format while writing a DataFrame?**
+
+**Answer:**
+If no format is specified, Spark uses **Parquet as the default format**.
+
+Example:
+
+```python
+df.write.save("path")
+```
+
+This will write the data in **Parquet format**.
+
+---
+
+### **Q4. What are the different save modes available in DataFrameWriter?**
+
+**Answer:**
+Spark provides **four save modes** when writing a DataFrame:
+
+1. **Append**
+2. **Overwrite**
+3. **ErrorIfExists**
+4. **Ignore**
+
+These modes define how Spark behaves when data already exists at the target location.
+
+---
+
+### **Q5. Explain Append mode in DataFrameWriter.**
+
+**Answer:**
+In **Append mode**:
+
+* If files already exist at the destination path
+* Spark **adds new data** to the existing files
+* Existing data is **not modified or deleted**
+
+This mode is commonly used in incremental data loads.
+
+---
+
+### **Q6. Explain Overwrite mode in DataFrameWriter.**
+
+**Answer:**
+In **Overwrite mode**:
+
+* Spark **deletes all existing files** at the target location
+* Writes only the new data
+
+If the DataFrame contains 5 records, only those 5 records will exist after the write operation.
+
+---
+
+### **Q7. What is ErrorIfExists mode?**
+
+**Answer:**
+In **ErrorIfExists mode**:
+
+* Spark checks if the output path already exists
+* If it exists, Spark throws an error and **stops execution**
+* No data is written
+
+This mode is useful when overwriting data is not allowed.
+
+---
+
+### **Q8. What is Ignore mode in DataFrameWriter?**
+
+**Answer:**
+In **Ignore mode**:
+
+* If the destination path already exists
+* Spark **skips the write operation**
+* No error is thrown and no new data is written
+
+This mode is useful when we want to avoid both overwriting and appending data.
+
+---
+
+### **Q9. How does partitioning affect the number of output files?**
+
+**Answer:**
+Spark writes **one output file per partition**.
+
+* If the DataFrame has **1 partition**, Spark writes **1 file**
+* If the DataFrame has **N partitions**, Spark writes **N files**
+
+Each output file is typically named:
+
+```
+part-00000
+part-00001
+```
+
+---
+
+### **Q10. How can you control the number of output files while writing a DataFrame?**
+
+**Answer:**
+The number of output files can be controlled by changing the number of partitions:
+
+* Use **`repartition(n)`** to increase or rebalance partitions
+* Use **`coalesce(n)`** to reduce partitions
+
+Example:
+
+```python
+df.repartition(3)
+  .write
+  .format("csv")
+  .save("path")
+```
+
+This will create **3 output files**.
+
+---
+
+### **Q11. Why does Spark create multiple files instead of a single file?**
+
+**Answer:**
+Spark is a **distributed processing engine**.
+
+* Each partition is processed independently
+* Each executor writes its own output file
+* This design improves **parallelism and performance**
+
+Writing a single file would reduce parallelism and cause a bottleneck.
+
+---
+
+### **Q12. How can you verify the output files after writing a DataFrame?**
+
+**Answer:**
+In Databricks, output files can be verified using:
+
+```python
+dbutils.fs.ls("path")
+```
+
+This command lists all files written to the destination directory.
+
+---
+
+### **Q13. Is writing a DataFrame to disk a transformation or an action?**
+
+**Answer:**
+Writing a DataFrame is an **action**.
+
+* Spark executes all lazy transformations
+* Data is finally written to disk only when `save()` is called
+
+---
+
+### **Q14. What are common interview topics related to DataFrame writing?**
+
+**Answer:**
+Common interview questions include:
+
+* Save modes in DataFrameWriter
+* Difference between `partitionBy` and `bucketBy`
+* Impact of partitions on output files
+* Default file format in Spark
+* Difference between `repartition` and `coalesce`
+
+---
+
+### **Final Interview Tip**
+
+Understanding **how Spark writes data**, **save modes**, and **partition behavior** is very important because these concepts directly impact **performance, storage layout, and data correctness** in production systems.
+
+If you want, I can next prepare:
+
+* **PartitionBy vs BucketBy (deep interview explanation)**
+* **Repartition vs Coalesce comparison**
+* **Spark file formats interview Q&A**
+
+Just tell me 👍
+
 _______________________________
 https://www.youtube.com/watch?v=vWSQIIiS8sg&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=16
 RDD
