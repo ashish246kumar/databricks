@@ -16,7 +16,7 @@ INSERT INTO icc_world_cup values('Aus','India','India');
 select * from icc_world_cup;
 
 select from icc_world_cup;
-select team_name, count(1) as no_of_matches_played, sum(win_flag) as no_of_matches_won, count (1) sum(win_flag) as no_of_losses
+select team_name, count(1) as no_of_matches_played, sum(win_flag) as no_of_matches_won, count (1) - sum(win_flag) as no_of_losses
 from (
 select team_1 as team_name, case when team_1=winner then 1 else e end as win_flag
 from icc_world_cup
@@ -25,8 +25,39 @@ select team_2 as team_name, case when team_2=winner then 1 else 0 end as win_fla
 from icc_world_cup) A
 group by team_name
 order by no_of_matches_won desc
+___________________________________
+when there is draw
+SELECT
+    team,
+    COUNT(*) AS matches_played,
+    SUM(CASE WHEN win_flag = 1 THEN 1 ELSE 0 END) AS wins,
+    SUM(CASE WHEN win_flag = 2 THEN 1 ELSE 0 END) AS draws,
+    SUM(CASE WHEN win_flag = 0 THEN 1 ELSE 0 END) AS losses
+FROM (
+    SELECT 
+        team_1 AS team,
+        CASE 
+            WHEN team_1 = winner THEN 1
+            WHEN winner = 'draw' THEN 2
+            ELSE 0
+        END AS win_flag
+    FROM icc_world_cup
 
-________________________
+    UNION ALL
+
+    SELECT 
+        team_2 AS team,
+        CASE 
+            WHEN team_2 = winner THEN 1
+            WHEN winner = 'draw' THEN 2
+            ELSE 0
+        END AS win_flag
+    FROM icc_world_cup
+) a
+GROUP BY team
+ORDER BY team;
+
+_______________________
 Json explode 
 https://www.youtube.com/watch?v=sTk1hflzPYc&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=41
 from pyspark.sql.functions import explode, explode_outer
