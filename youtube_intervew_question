@@ -1,5 +1,262 @@
--______________________________--
 
+______________________________________
+https://www.youtube.com/watch?v=bf7_ek6SqJs&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=19
+---
+
+# **Apache Parquet – Interview Questions & Answers**
+
+---
+
+## **Q1. What is Parquet and why is it widely used in Data Engineering?**
+
+**Answer:**
+Parquet is a **columnar, binary file format** designed for **analytical workloads (OLAP)**.
+
+It is widely used because:
+
+* Data is written once and read many times
+* Storage cost is reduced through compression
+* Query performance is significantly faster than row-based formats
+
+Parquet cannot be read directly using a text editor because it is a **binary format**.
+
+---
+
+## **Q2. What is the difference between row-based and column-based storage?**
+
+**Answer:**
+
+### **Row-Based Storage (CSV, Text)**
+
+* Data is stored row by row
+* Entire rows are read even if only one column is required
+* Leads to unnecessary I/O
+* Better suited for transactional systems (OLTP)
+
+### **Column-Based Storage (Parquet)**
+
+* Data is stored column by column
+* Only required columns are read
+* Reduces disk I/O and improves performance
+* Ideal for analytical queries (OLAP)
+
+---
+
+## **Q3. Why is Parquet better for Big Data analytics?**
+
+**Answer:**
+In analytics, queries typically:
+
+* Read only a few columns
+* Scan large datasets
+
+Parquet allows:
+
+* Reading only required columns (**projection pruning**)
+* Skipping irrelevant data using metadata (**predicate pushdown**)
+* Faster query execution with lower storage cost
+
+---
+
+## **Q4. What is the difference between OLTP and OLAP systems, and how does Parquet fit in?**
+
+**Answer:**
+
+| Feature        | OLTP                   | OLAP               |
+| -------------- | ---------------------- | ------------------ |
+| Purpose        | Transactions           | Analytics          |
+| Operations     | Insert, Update, Delete | Select, Aggregate  |
+| Data Access    | Full row               | Few columns        |
+| Storage Format | Row-based              | Columnar (Parquet) |
+
+Parquet is designed for **OLAP systems**, not OLTP systems.
+
+---
+
+## **Q5. Is Parquet purely columnar? Explain its internal structure.**
+
+**Answer:**
+Parquet uses a **hybrid storage model**.
+
+### **File Structure:**
+
+1. **File** – The main container
+2. **Row Groups** – Horizontal partitions of data
+
+   * Default size is **128 MB**
+   * Contains a subset of rows
+3. **Column Chunks** – Column-wise storage inside a row group
+4. **Pages** – Actual data storage units
+
+   * Each page contains metadata (min, max, count)
+
+This hybrid approach avoids excessive column jumping and improves performance.
+
+---
+
+## **Q6. What are Row Groups in Parquet and why are they important?**
+
+**Answer:**
+Row Groups are **horizontal partitions** of data.
+
+Benefits:
+
+* Allow partial file reads
+* Enable skipping large chunks of data
+* Improve performance during filtering
+* Reduce disk I/O
+
+Spark scans only the required row groups instead of the entire file.
+
+---
+
+## **Q7. What metadata does Parquet store?**
+
+**Answer:**
+Parquet is a **self-describing format**.
+
+It stores metadata such as:
+
+* Schema information
+* Number of row groups
+* Column statistics (min, max, null count)
+* Encoding and compression details
+
+This metadata is critical for query optimization.
+
+---
+
+## **Q8. How does Parquet reduce file size?**
+
+**Answer:**
+Parquet reduces file size using **encoding techniques** before applying compression.
+
+### **1. Dictionary Encoding**
+
+* Replaces repeated string values with integer keys
+* Stores mapping in a dictionary
+
+### **2. Run Length Encoding (RLE)**
+
+* Compresses repeated values
+* Example: `A, A, A, B, B` → `A3, B2`
+
+### **3. Bit Packing**
+
+* Stores small integers using fewer bits
+* Avoids using 32 or 64 bits unnecessarily
+
+After encoding, compression algorithms like **Snappy or Gzip** are applied.
+
+---
+
+## **Q9. What is Projection Pruning in Parquet?**
+
+**Answer:**
+Projection pruning means **reading only the columns required by the query**.
+
+Example:
+
+```sql
+SELECT name FROM employees
+```
+
+Parquet reads only the `name` column and ignores all others.
+
+This significantly reduces disk I/O.
+
+---
+
+## **Q10. What is Predicate Pushdown in Parquet?**
+
+**Answer:**
+Predicate pushdown allows Spark to **filter data at the storage level** using metadata.
+
+Before reading data:
+
+* Spark checks min/max values in row group metadata
+* If the filter condition cannot be satisfied
+* The entire row group is skipped
+
+Example:
+
+```sql
+SELECT * FROM table WHERE age < 18
+```
+
+If a row group has `min age = 22`, Spark skips it completely.
+
+---
+
+## **Q11. Why is Predicate Pushdown important?**
+
+**Answer:**
+Predicate pushdown:
+
+* Avoids reading unnecessary data
+* Saves disk I/O
+* Improves query performance drastically
+* Is one of the biggest advantages of Parquet
+
+---
+
+## **Q12. How does Parquet compare to CSV in performance?**
+
+**Answer:**
+
+| Aspect             | CSV       | Parquet       |
+| ------------------ | --------- | ------------- |
+| Format             | Row-based | Columnar      |
+| Compression        | Poor      | Excellent     |
+| Metadata           | None      | Rich metadata |
+| Predicate Pushdown | ❌         | ✅             |
+| Projection Pruning | ❌         | ✅             |
+| Performance        | Slow      | Very fast     |
+
+Parquet queries can be **multiple times faster** than CSV.
+
+---
+
+## **Q13. Can Parquet be used without Spark?**
+
+**Answer:**
+Yes, Parquet can be read using:
+
+* Spark
+* Hive
+* Presto
+* Trino
+* Impala
+
+However, it **cannot be read using a text editor** due to its binary format.
+
+---
+
+## **Q14. When should Parquet NOT be used?**
+
+**Answer:**
+Parquet should not be used when:
+
+* Data requires frequent updates or deletes
+* Low-latency transactional workloads are needed
+* OLTP systems are involved
+
+---
+
+## **Final Interview Tip**
+
+Interviewers expect you to explain:
+
+* **Why Parquet exists**
+* **How it stores data**
+* **How it optimizes queries**
+
+A strong answer always connects:
+
+> Columnar Storage → Metadata → Pruning → Performance
+
+-______________________________--
+https://www.youtube.com/watch?v=bf7_ek6SqJs&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=19
 # **Apache Spark – Partitioning & Bucketing (Interview Q&A)**
 
 ---
