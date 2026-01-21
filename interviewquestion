@@ -1,3 +1,79 @@
+What testing did you perform on your dtarick  pipelines? 
+
+Tested individual notebook logic and transformations
+Validated schema, null checks, and business rules
+Used sample test data to verify outputs
+Compared source vs target counts
+Validated data completeness, uniqueness, and accuracy
+
+_______________________________________
+What Azure services have you worked with?
+
+Data Processing
+Azure Databricks
+Azure Key Vault
+Azure Data Lake Storage Gen2 (ADLS Gen2)
+
+Azure PIM
+it activate roles only when needed and for a limited time
+It improves security and compliance
+
+Azure Function App is a serverless compute service used to run small pieces of code without managing servers
+__________________________
+What is a Databricks Notebook
+A Databricks notebook is an interactive workspace 
+in Azure Databricks where we write, execute, and manage data processing code using languages like Python, SQL, Scala, and R.
+__________________________________________
+How do you create jobs in Azure Databricks
+
+
+In Azure Databricks, jobs are automated workflows that run notebooks, Python scripts, JAR files, or other code on a schedule or on-demand.
+Through the Databricks UI - This is the most straightforward approach. You navigate to the Workflows section (or Jobs tab in older versions), click 'Create Job', configure the task type, select your notebook or code, choose a cluster, and set up scheduling if needed.
+Using the Databricks CLI - For automation and CI/CD pipelines, you can use command-line tools to create and manage jobs programmatically.
+Add key configuration elements:
+"When creating a job, you need to specify:
+
+The task to run (notebook path, Python file, JAR, etc.)
+The cluster configuration (new cluster vs existing)
+Schedule or trigger conditions
+Parameters to pass to the task
+Dependencies between tasks for multi-task jobs
+Alerts and notifications for failures or completion"
+
+
+___________________________________________________________
+What is Apache Spark, and why do we use it?
+
+Apache Spark is an open-source distributed data processing framework used to process large volumes of data quickly and efficiently.
+Why do we use Apache Spark?
+
+High Performance
+Spark processes data in memory, making it 10–100x faster than MapReduce for many use cases.
+
+Distributed & Scalable
+It can process data across multiple machines (clusters) and easily scale from a single server to thousands of nodes.
+
+Unified Analytics Platform
+Spark supports:
+
+Batch processing
+
+Real-time streaming
+
+SQL queries
+
+Machine learning
+— all in one framework.
+
+Easy to Use
+Provides high-level APIs in Java, Scala, Python, and R, which reduces development complexity.
+
+Fault Tolerant
+If a node fails, Spark automatically recomputes lost data using its lineage mechanism.
+
+
+
+________________________________________________________
 | Aspect      | Data Lake                                 | Data Warehouse          |
 | ----------- | ----------------------------------------- | ----------------------- |
 | Data Type   | Structured, semi-structured, unstructured | Structured only         |
