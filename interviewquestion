@@ -1,3 +1,54 @@
+What is Partition Pruning in Spark?
+
+Answer:
+Partition Pruning is an optimization where Spark skips reading unnecessary partitions based on filter conditions.
+If data is partitioned by a column used in the WHERE clause, Spark reads only the matching folders instead of scanning the entire dataset.
+
+3️⃣ What is Predicate Pushdown?
+
+Answer:
+Predicate Pushdown means pushing filter conditions as close to the data source as possible so that unnecessary data is not read into memory.
+Instead of filtering after loading data, Spark applies filters during the scan phase itself.
+
+4️⃣ Difference between Partition Pruning and Predicate Pushdown?
+
+Answer:
+
+Partition Pruning	Predicate Pushdown
+Skips entire directories	Filters rows within files
+Works on partition columns	Works on non-partition columns
+Happens at file-selection level	Happens at scan level
+Reduces I/O significantly	Reduces memory & CPU usage
+🔹 Execution & Performance Questions
+5️⃣ How does Spark know which partitions to skip?
+
+Answer:
+Spark uses metadata from the table schema and filter conditions. During query planning, Spark checks if the filter column matches the partition column and prunes directories accordingly.
+
+6️⃣ How can you verify partition pruning in Spark?
+
+Answer:
+By checking the Physical Plan using:
+
+df.explain(True)
+
+
+If partition pruning is applied, you will see:
+
+PartitionFilters:
+
+7️⃣ What happens if data is not partitioned properly?
+
+Answer:
+Spark performs a full table scan, reading all files and then filtering in memory. This increases:
+
+Disk I/O
+
+Execution time
+
+Memory usage
+
+___________________
 What testing did you perform on your dtarick  pipelines? 
 
 Tested individual notebook logic and transformations
