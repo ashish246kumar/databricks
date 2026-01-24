@@ -1,3 +1,36 @@
+
+_________________________________
+CREATE OR REFRESH STREAMING LIVE TABLE bronze_customers_ingestion_cleaned
+(
+CONSTRAINT
+ULL valid_customer_id EXPECT (customer_id IS NOT NULL ON VIOLATION FAIL UPDATE,
+CONSTRAINT valid_name
+EXPECT (name IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT valid_dob
+EXPECT (dob IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT valid_city
+EXPECT (city IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT valid_join_date
+EXPECT (join_date IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT valid_email
+EXPECT (email IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT valid_phone
+EXPECT (phone_number IS NOT NULL)ON VIOLATION DROP ROW,
+CONSTRAINT valid_channel
+EXPECT (preferred_channel IS NOT NULL AND UPPER (preferred_channel) IN ('MOBILE', 'ONLINE', 'BRANCH', 'ATM')) ON VIOLATION DROP ROW
+CONSTRAINT valid_occupation
+EXPECT (occupation IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT valid_income EXPECT (income_range IS NOT NULL AND UPPER (income_range) IN ('LOW', 'MEDIUM', 'HIGH', 'VERY HIGH')) ON VIOLATION DROP ROW,
+CONSTRAINT valid_risk_segment EXPECT (risk_segment IS NOT NULL AND UPPER(risk_segment) IN ('LOW', 'MEDIUM', 'HIGH')) ON VIOLATION DROP ROW,
+CONSTRAINT valid_gender
+EXPECT EXPECT (gender IS NOT NULL),
+CONSTRAINT valid_status EXPECT (status IS NOT NULL)
+COMMENT 'Cleaned customers data'
+TBLPROPERTIES ('quality'='bronze')
+AS
+SELECT *
+FROM STREAM(LIVE.landing_customers_incremental);
+___________________
 Ingesting Data (Batch vs. Streaming)
 Create Table (Batch Load - Non-Incremental)
 CREATE OR REFRESH LIVE TABLE table_name
