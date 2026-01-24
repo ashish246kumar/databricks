@@ -1,4 +1,55 @@
+Ingesting Data (Batch vs. Streaming)
+Create Table (Batch Load - Non-Incremental)
+CREATE OR REFRESH LIVE TABLE table_name
+AS SELECT * FROM read_files(
+  'path/to/volume/files',
+  format => 'csv',
+  header => true
+);
 
+____
+Copy Into (Incremental Batch) Loads only new files from a directory into a Delta table. Note that this is usually run manually or via a workflow rather than inside a DLT pipeline.
+COPY INTO delta.`/path/to/target_volume`
+FROM '/path/to/source_volume'
+FILEFORMAT = CSV
+FORMAT_OPTIONS ('header' = 'true');
+_____________
+Autoloader (Streaming Incremental Load) The most powerful method for continuous ingestion.
+
+SQL
+CREATE OR REFRESH STREAMING LIVE TABLE table_name
+AS SELECT * FROM cloud_files(
+  'path/to/volume/files',
+  'csv',
+  map('header', 'true', 'inferColumnTypes', 'true')
+);
+______--
+Dataset Types (Building Blocks)
+Streaming Table (Live Feed) [31:36] Used for the "Landing" or "Bronze" layer to catch new data incrementally.
+
+CREATE OR REFRESH STREAMING LIVE TABLE raw_data_table
+COMMENT 'Ingesting raw data incrementally'
+AS SELECT * FROM cloud_files(
+  '/Volumes/catalog/schema/volume/folder',
+  'csv',
+  map('header', 'true', 'inferColumnTypes', 'true')
+);
+_____________
+Materialized View (Snapshot/Aggregated)
+CREATE OR REFRESH LIVE TABLE customer_summary
+COMMENT 'Aggregated customer snapshot'
+AS SELECT 
+    customer_id, 
+    sum(transaction_amount) as total_spent 
+FROM live.raw_data_table
+GROUP BY customer_id;
+____________
+Temporary View (Scratchpad)
+
+CREATE OR REFRESH LIVE VIEW filtered_data_view
+AS SELECT * FROM live.streaming_table_name
+WHERE status = 'active';
+____________________________
 
 
 
