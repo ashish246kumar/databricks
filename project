@@ -1,0 +1,180 @@
+Nice summary, Ashish 👍
+Based strictly on *what’s covered in your first 15 minutes* (theory + platform overview + why DLT exists), here are **high-quality interview questions with crisp, interview-ready answers**. These are exactly the kind of questions Databricks / data-engineering interviews love.
+
+---
+
+## 1️⃣ What problem do Lakeflow Declarative Pipelines (DLT) solve?
+
+**Answer:**
+Lakeflow Declarative Pipelines solve the operational complexity of traditional data pipelines. Earlier, engineers had to manually manage checkpoints, orchestration, backfills, schema changes, and infrastructure. DLT allows engineers to **declare what transformations they want**, and Databricks automatically handles checkpointing, incremental processing, dependency management, retries, and scaling.
+
+---
+
+## 2️⃣ Why are they called *Declarative* pipelines?
+
+**Answer:**
+They are called declarative because the engineer only specifies **what the final tables should look like**, not **how to execute each step**. Databricks automatically figures out execution order, parallelism, retries, and optimizations like incremental computation.
+
+---
+
+## 3️⃣ How did pipeline development work before DLT?
+
+**Answer:**
+Before DLT:
+
+* Checkpoints had to be manually configured
+* Full table recomputation was common even for small data changes
+* DAGs and dependencies were manually managed
+* Backfills and late data required custom logic
+* Data quality checks were ad hoc
+* Infrastructure and Spark tuning were manually handled
+
+This resulted in brittle pipelines and high operational overhead.
+
+---
+
+## 4️⃣ How does DLT handle checkpointing and failures?
+
+**Answer:**
+DLT automatically manages checkpoints internally. If a pipeline fails, it restarts from the last successful checkpoint, ensuring **exactly-once processing** and avoiding duplicate or missing data without manual intervention.
+
+---
+
+## 5️⃣ What is incremental processing in Lakeflow?
+
+**Answer:**
+Incremental processing means DLT processes **only new or changed data**, instead of recomputing the entire dataset. This significantly improves performance and reduces compute cost.
+
+---
+
+## 6️⃣ How does DLT manage dependencies between tables?
+
+**Answer:**
+DLT automatically builds the **DAG (Directed Acyclic Graph)** by analyzing live table references in the code. If one table depends on another, Databricks ensures the correct execution order and parallelism without manual orchestration.
+
+---
+
+## 7️⃣ How does Lakeflow handle late-arriving data?
+
+**Answer:**
+Lakeflow natively supports late-arriving data by reprocessing only affected records using its incremental and checkpoint-based execution model. No separate backfill jobs are required.
+
+---
+
+## 8️⃣ How is schema evolution handled in DLT?
+
+**Answer:**
+DLT supports **automatic schema evolution** on Delta Lake. Schema changes do not break downstream pipelines, and Databricks handles compatibility safely without requiring manual fixes.
+
+---
+
+## 9️⃣ How does DLT ensure data quality?
+
+**Answer:**
+DLT allows defining **data quality rules (expectations)** directly in the pipeline using `EXPECT` or `CONSTRAINT`. Invalid records can be dropped, logged, or allowed based on configuration, ensuring data quality is enforced inline.
+
+---
+
+## 🔟 What role does Unity Catalog play in Lakeflow?
+
+**Answer:**
+Unity Catalog provides:
+
+* Centralized governance
+* Fine-grained access control
+* End-to-end lineage tracking
+* Auditing and data discovery
+
+It integrates directly with DLT, making pipelines secure and compliant by default.
+
+---
+
+## 1️⃣1️⃣ What is the underlying storage layer for DLT?
+
+**Answer:**
+DLT is built on **Delta Lake**, which provides ACID transactions, schema evolution, time travel, and reliable streaming and batch unification.
+
+---
+
+## 1️⃣2️⃣ What execution engine does Lakeflow use?
+
+**Answer:**
+Lakeflow runs on **Apache Spark** and uses **Photon**, Databricks’ vectorized execution engine, for faster SQL performance and optimized query execution.
+
+---
+
+## 1️⃣3️⃣ Explain the three-layer architecture of Lakeflow.
+
+**Answer:**
+Lakeflow follows a **three-layer architecture**:
+
+1. **Connect (Ingestion Layer):** Ingests data from sources using connectors and Autoloader
+2. **Declarative Pipelines (Transform Layer):** Applies transformations, data quality, and business logic
+3. **Jobs (Orchestration Layer):** Schedules, monitors, and orchestrates pipeline execution
+
+---
+
+## 1️⃣4️⃣ What is Autoloader and where does it fit?
+
+**Answer:**
+Autoloader belongs to the **Connect (Ingestion)** layer. It incrementally ingests files from cloud storage, handles schema inference, schema evolution, retries, and deduplication automatically.
+
+---
+
+## 1️⃣5️⃣ How is orchestration handled in the new Databricks platform?
+
+**Answer:**
+Orchestration is handled through **Jobs (Workflows)**. Jobs allow scheduling pipelines, chaining tasks (like dashboards after pipelines), configuring retries, and setting alerts for failures or success.
+
+---
+
+## 1️⃣6️⃣ What languages can be used to build DLT pipelines?
+
+**Answer:**
+DLT pipelines can be built using **SQL or Python**. SQL is commonly preferred for declarative, transformation-heavy pipelines.
+
+---
+
+## 1️⃣7️⃣ How does DLT reduce operational overhead?
+
+**Answer:**
+DLT removes the need for:
+
+* Manual cluster management
+* Spark tuning
+* Retry logic
+* Dependency tracking
+* Checkpoint configuration
+
+Everything is handled by Databricks’ managed or serverless infrastructure.
+
+---
+
+## 1️⃣8️⃣ What is the main benefit of using Jobs with DLT?
+
+**Answer:**
+Jobs ensure pipelines run **reliably and in the correct sequence**, support scheduling, monitoring, retries, and allow integration with dashboards, ML workflows, and downstream tasks.
+
+---
+
+## 1️⃣9️⃣ Can DLT support both batch and streaming?
+
+**Answer:**
+Yes. DLT supports **batch and streaming pipelines** using the same declarative code, powered by Delta Lake and Spark Structured Streaming.
+
+---
+
+## 2️⃣0️⃣ Give a one-line summary of Lakeflow Declarative Pipelines.
+
+**Answer:**
+Lakeflow Declarative Pipelines let data engineers **declare transformations and data quality rules**, while Databricks automatically manages execution, scaling, reliability, and governance.
+
+---
+
+If you want next:
+
+* 🔥 **SQL-specific DLT interview questions**
+* 🔥 **Scenario-based questions (banking / real-world pipelines)**
+* 🔥 **Hands-on coding questions with DLT SQL**
+
+Just tell me which one you want.
