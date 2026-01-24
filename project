@@ -1,5 +1,232 @@
-Nice summary, Ashish 👍
-Based strictly on *what’s covered in your first 15 minutes* (theory + platform overview + why DLT exists), here are **high-quality interview questions with crisp, interview-ready answers**. These are exactly the kind of questions Databricks / data-engineering interviews love.
+
+
+
+
+## 1️⃣ What are the three layers of the Lakeflow pipeline system?
+
+**Answer:**
+Lakeflow organizes data engineering into three layers:
+
+1. **Connect (Ingestion):** Used to ingest data from external systems like Salesforce, SAP, files, or partner tools such as Fivetran.
+2. **Transform (ETL / DLT):** This is where Declarative Pipelines live. We clean, transform, aggregate, and enforce data quality using SQL or Python.
+3. **Orchestrate (Jobs):** Used to schedule pipelines, manage dependencies, triggers, alerts, and downstream tasks like dashboards or ML jobs.
+
+---
+
+## 2️⃣ What is the difference between Batch and Streaming ingestion?
+
+**Answer:**
+
+* **Batch processing** handles data in fixed intervals (daily/hourly). It is simpler but introduces latency.
+* **Streaming processing** ingests data continuously as it arrives, enabling near real-time analytics but requiring more monitoring.
+
+Lakeflow supports **both in a unified way** using the same pipeline.
+
+---
+
+## 3️⃣ What are the different ways to ingest data into DLT using SQL?
+
+**Answer:**
+There are three main ingestion methods:
+
+1. **CREATE LIVE TABLE + read_files** → Full batch reload
+2. **COPY INTO** → Incremental batch load (outside DLT)
+3. **Autoloader (cloud_files)** → Streaming incremental ingestion
+
+Each method is chosen based on data volume, frequency, and latency needs.
+
+---
+
+## 4️⃣ When should you use `CREATE OR REFRESH LIVE TABLE`?
+
+**Answer:**
+This method is best for **small, static, or reference datasets**.
+It performs a **full reload every time the pipeline runs**, meaning it is **not incremental**.
+
+Example use cases:
+
+* Country codes
+* Product master data
+* Lookup tables
+
+---
+
+## 5️⃣ Why is `CREATE TABLE` not incremental in DLT?
+
+**Answer:**
+Because `read_files()` reads **all files every time the pipeline runs**, DLT cannot track what has already been processed. As a result, the entire dataset is reloaded.
+
+---
+
+## 6️⃣ What is `COPY INTO` and how does it differ from DLT ingestion?
+
+**Answer:**
+`COPY INTO` is an **incremental batch ingestion** mechanism that loads **only new files** and skips already processed files.
+
+Key difference:
+
+* `COPY INTO` is **not automatically orchestrated by DLT**
+* It must be run manually or scheduled via **Jobs / Workflows**
+
+---
+
+## 7️⃣ Why is `COPY INTO` usually not used inside DLT pipelines?
+
+**Answer:**
+Because DLT already provides **built-in incremental ingestion and checkpointing** using Autoloader.
+`COPY INTO` is better suited for **one-time or scheduled batch ingestion**, not continuous declarative pipelines.
+
+---
+
+## 8️⃣ What is Autoloader and why is it preferred?
+
+**Answer:**
+Autoloader is a **streaming file ingestion mechanism** built on Spark Structured Streaming.
+
+Key advantages:
+
+* Automatically detects new files
+* Handles schema drift
+* Scales efficiently
+* Fault-tolerant
+* Incremental by default
+
+This makes it the **recommended ingestion method** for most production pipelines.
+
+---
+
+## 9️⃣ What SQL keyword makes a table streaming in DLT?
+
+**Answer:**
+The keyword **`STREAMING`**.
+
+```sql
+CREATE OR REFRESH STREAMING LIVE TABLE table_name
+```
+
+Without `STREAMING`, the table becomes a materialized view.
+
+---
+
+## 🔟 What is the difference between `read_files` and `cloud_files`?
+
+**Answer:**
+
+| Feature         | read_files  | cloud_files          |
+| --------------- | ----------- | -------------------- |
+| Processing Type | Batch       | Streaming            |
+| Incremental     | ❌ No        | ✅ Yes                |
+| Schema Drift    | ❌ Limited   | ✅ Supported          |
+| Use Case        | Static data | Continuous ingestion |
+
+---
+
+## 1️⃣1️⃣ Explain Lakeflow using the “Pizza” analogy.
+
+**Answer:**
+DLT is declarative like ordering food at a restaurant.
+You say **“I want a pizza” (what)**, not how to knead the dough or bake it (how).
+Similarly, in DLT, we define *what data we want*, and Databricks handles orchestration, retries, scaling, and checkpoints.
+
+---
+
+## 1️⃣2️⃣ What are the three dataset types in DLT?
+
+**Answer:**
+DLT provides three dataset types:
+
+1. **Streaming Table**
+2. **Materialized View**
+3. **Temporary View**
+
+Each serves a different role in the pipeline.
+
+---
+
+## 1️⃣3️⃣ What is a Streaming Table? (CCTV analogy)
+
+**Answer:**
+A streaming table behaves like a **CCTV camera**—it continuously captures new data as it arrives.
+
+* Incremental
+* Appends only new records
+* Typically used in **Bronze / Landing layer**
+
+---
+
+## 1️⃣4️⃣ What is a Materialized View? (Photo album analogy)
+
+**Answer:**
+A materialized view is like a **photo album snapshot**.
+
+* Stores computed results
+* Refreshes when pipeline runs
+* Represents the **current full state**
+* Used in **Gold / Analytics layer**
+
+---
+
+## 1️⃣5️⃣ What is a Temporary View? (Rough sketch analogy)
+
+**Answer:**
+A temporary view is a **scratchpad**.
+
+* Not persisted to storage
+* Used for intermediate transformations
+* Helpful for debugging and joins
+
+---
+
+## 1️⃣6️⃣ How do Streaming Tables behave across pipeline runs?
+
+**Answer:**
+
+* **First run:** Reads all existing data
+* **Subsequent runs:** Reads **only new incoming records**
+
+This makes them efficient and cost-effective.
+
+---
+
+## 1️⃣7️⃣ How do Materialized Views behave across pipeline runs?
+
+**Answer:**
+Materialized views **recompute the result** to represent the **current state of the data**, combining old and new records.
+
+Example:
+
+* 900 existing records
+* 200 new records
+* Result = 1100 total records
+
+---
+
+## 1️⃣8️⃣ Can a DLT pipeline mix batch and streaming tables?
+
+**Answer:**
+Yes.
+DLT supports **unified batch and streaming pipelines**, where streaming tables can feed materialized views seamlessly.
+
+---
+
+## 1️⃣9️⃣ Where are Streaming Tables typically used in a Medallion Architecture?
+
+**Answer:**
+Streaming tables are typically used in the **Bronze / Landing layer**, where raw data is ingested incrementally and stored with minimal transformation.
+
+---
+
+## 2️⃣0️⃣ Give a one-line summary of Streaming Table vs Materialized View.
+
+**Answer:**
+
+* **Streaming Table:** Captures only new data incrementally
+* **Materialized View:** Represents the complete current state of data
+
+---
+
+
+
 
 ---
 
