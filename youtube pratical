@@ -1,0 +1,106 @@
+
+
+_________________________________________________
+
+https://www.youtube.com/watch?v=EveYBUZP__4&t=115s
+
+
+### 1. Initial Data Setup
+
+The video uses a sample CSV dataset provided by Databricks.
+
+```sql
+-- Read CSV file using the read_files utility
+SELECT * FROM read_files(
+  'dbfs:/databricks-datasets/adventure-works/raw/sales.csv',
+  header => true,
+  format => 'csv'
+);
+
+-- Create a Delta table using CTAS (Create Table As Select)
+CREATE TABLE dev.bronze.sales AS
+SELECT * FROM read_files(
+  'dbfs:/databricks-datasets/adventure-works/raw/sales.csv',
+  header => true,
+  format => 'csv'
+);
+
+-- Verify the data and check metadata
+SELECT * FROM dev.bronze.sales;
+
+DESCRIBE EXTENDED dev.bronze.sales;
+
+```
+
+---
+
+### 2. Deletion Vectors
+
+Deletion vectors allow for "soft deletes" by flagging rows as deleted rather than rewriting the entire Parquet file immediately.
+
+```sql
+-- Disable Deletion Vectors (to see default behavior) [00:04:25]
+ALTER TABLE dev.bronze.sales SET TBLPROPERTIES ('delta.enableDeletionVectors' = false);
+
+-- Delete records (without Deletion Vectors, files are rewritten) [00:05:04]
+DELETE FROM dev.bronze.sales WHERE InvoiceNumber = '5464';
+
+-- Check history to see "numRemovedFiles" and "numAddedFiles" [00:05:30]
+DESCRIBE HISTORY dev.bronze.sales;
+
+-- Re-enable Deletion Vectors [00:06:35]
+ALTER TABLE dev.bronze.sales SET TBLPROPERTIES ('delta.enableDeletionVectors' = true);
+
+-- Delete records (with Deletion Vectors enabled, no files are rewritten) [00:07:07]
+DELETE FROM dev.bronze.sales WHERE InvoiceNumber = 'some_other_id';
+
+-- Check history to see "deletionVectorAdded" in operation metrics [00:07:13]
+DESCRIBE HISTORY dev.bronze.sales;
+
+-- Run maintenance to physically remove deleted rows [00:07:57]
+OPTIMIZE dev.bronze.sales;
+
+```
+
+---
+
+### 3. Liquid Clustering
+
+Liquid clustering replaces traditional partitioning and Z-Ordering, allowing the table to self-optimize as data grows.
+
+#### On an existing table:
+
+```sql
+-- Enable Liquid Clustering on an existing table [00:09:42]
+ALTER TABLE dev.bronze.sales CLUSTER BY (InvoiceNumber);
+
+-- Check history to see the clustering column added [00:10:07]
+DESCRIBE HISTORY dev.bronze.sales;
+
+-- To remove clustering [00:10:26]
+ALTER TABLE dev.bronze.sales CLUSTER BY NONE;
+
+```
+
+#### On a new table:
+
+```sql
+-- Create a new table with clustering enabled [00:10:48]
+CREATE TABLE dev.bronze.sales_clustered 
+CLUSTER BY (InvoiceNumber)
+AS SELECT * FROM dev.bronze.sales;
+
+-- Verify clustering columns in metadata [00:11:18]
+DESCRIBE EXTENDED dev.bronze.sales_clustered;
+
+-- Querying using the clustering column for high performance [00:11:48]
+SELECT * FROM dev.bronze.sales_clustered 
+WHERE InvoiceNumber = '536365';
+
+```
+
+### Key Requirements Mentioned:
+
+* **Deletion Vectors:** Requires Delta Lake 2.3.0+ or Databricks Runtime 12.2 LTS+.
+* **Liquid Clustering:** Requires Delta Lake 3.1.0+ or Databricks Runtime 13.3 LTS+.
+* **Limitation:** Clustering columns must be within the first 32 columns of the table [[11:32](http://www.youtube.com/watch?v=EveYBUZP__4&t=692)].
