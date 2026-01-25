@@ -1291,46 +1291,204 @@ The YouTuber highlights several "famous" questions addressed in the video:
 *   How are **tasks split** inside an executor?
 *   What is the use of **Overhead Memory** (usually 10%)?
 *   What are the different **Memory Managers** in Spark?
+Got it 👍
+Below is the **same content rewritten cleanly in Interview Q&A format**, crisp enough to speak in an interview, but still technically solid. You can treat this as a **ready-to-revise cheat sheet** for Spark memory management & Executor OOM questions.
 
-### **Executor Architecture & Container Size**
-When you request a 10GB executor, Spark doesn't just give you 10GB; it creates a container that includes **Overhead Memory**.
+---
 
-*   **Configuration:** `spark.executor.memory` (e.g., 10GB) + `spark.executor.memoryOverhead` (10% of executor memory, min 384MB).
-*   **Total Container Size:** In the example of a 10GB executor, the total size becomes **11GB** (10GB + 1GB overhead).
-*   **Physical Limit:** You cannot exceed this 11GB limit. If the process crosses this physical memory limit, you will get an **OOM exception**.
+## **1. Why do we get Executor Out Of Memory (OOM) even though Spark can spill data to disk?**
 
-### **Memory Division: JVM vs. Non-JVM**
-The 11GB container is split into two main parts:
-1.  **Non-JVM Process (Overhead Memory - 1GB):** Used for **PySpark applications**, container management (takes ~300-400MB), and other non-JVM objects.
-2.  **JVM Process (Executor Memory - 10GB):** This is where the actual Spark engine runs.
+**Answer:**
+Spark spills data to disk only for **certain operations**, but **not all memory usage is spillable**.
 
-### **Internal JVM Memory Breakdown**
-The 10GB JVM memory is further divided into three layers:
-*   **Reserved Memory:** Fixed at **300MB**. It stores Spark's internal objects. **Rule:** Your executor size must be at least 1.5 times the reserved memory (approx. 450MB+), or Spark will throw an error.
-*   **User Memory (40% of remaining):** Approximately **3.8GB**. It stores **User-Defined Functions (UDFs)**, user-defined data structures, RDD operations, and Spark internal metadata.
-*   **Spark Memory (60% of remaining):** Approximately **5.8GB**. This is used for **Dataframe operations**.
+The most common reason for OOM is **data skew**.
 
-### **Spark Memory: Storage vs. Execution**
-The Spark Memory pool (5.8GB) is split 50/50 into two pools:
-1.  **Storage Memory Pool (2.9GB):** Used for caching data (`df.persist`, `df.cache`) and intermediate results. It uses an **LRU (Least Recently Used)** mechanism to evict old cache if space is needed.
-2.  **Execution Memory Pool (2.9GB):** Short-lived memory used for transformations, shuffles, joins, and **Hash Tables**.
+For example, during a **join**, all records of the same key must come to **one executor**. If a single key holds **3GB of data** but the **execution memory pool is only ~2.9GB**, Spark **cannot partially spill that key**.
+As a result, the executor exceeds its physical memory limit and crashes with OOM.
 
-### **Memory Managers**
-*   **Static Memory Manager:** (Used in older versions < 1.6.0) It had hard boundaries between storage and execution.
-*   **Unified Memory Manager:** (Used in versions 1.6.0+) It allows for **flexible boundaries**. If the Execution pool needs more memory and Storage is empty, Execution can "borrow" memory from the Storage pool.
+👉 Spilling helps, but **Spark still needs enough physical memory per task**.
 
-### **The Big Question: Why OOM if Spilling exists?**
-Even though Spark can spill to disk, OOM occurs primarily due to **Data Skew**:
-*   **The Join Scenario:** Imagine joining `df1` and `df2` on an ID. If you have a **skewed key** (e.g., ID "1" has 3GB of data) but your Execution pool only has 2.9GB of physical space, Spark **must** bring all records of that same key to the same executor to perform the join.
-*   **The Failure:** Because that specific ID's data (3GB) exceeds the available physical memory (2.9GB), Spark cannot process it. You can't just spill "half" a key's join logic and get an accurate result.
-*   **Solution:** You need to use techniques like **Salting** or **Re-partitioning**.
+---
 
-### **Task Splitting and Cores**
-The number of parallel tasks an executor runs depends on the **Cores**:
-*   If an executor has **4 cores**, it can run **4 tasks in parallel**.
-*   **Recommendation:** It is generally recommended to use **3 to 5 cores per executor**.
-*   **Risk:** If you use too many cores (>5), the overhead of managing many partitions and objects can lead to **Memory Overhead errors**.
-______________________________________
+## **2. How does Spark manage Executor memory internally?**
+When you request an executor, Spark divides memory in **multiple layers**:
+ **Step 1: Container Memory**
+
+```
+spark.executor.memory + spark.executor.memoryOverhead
+```
+
+Example:
+
+* Executor memory = **10GB**
+* Overhead (10%) = **1GB**
+* **Total container size = 11GB**
+
+If Spark exceeds **11GB**, the container is killed → **OOM**.
+
+---
+
+## **3. What is Overhead Memory and why is it needed?**
+
+**Answer:**
+**Overhead memory** is **non-JVM memory** used for:
+
+* PySpark processes
+* JVM native memory
+* Container management
+* Serialization buffers
+* OS-level memory usage
+
+By default:
+
+```
+spark.executor.memoryOverhead = max(10% of executor memory, 384MB)
+```
+
+Without enough overhead memory, executors fail even when JVM memory looks fine.
+
+---
+
+## **4. How is Executor JVM memory divided internally?**
+
+**Answer:**
+Executor JVM memory is split into **three parts**:
+
+### **1. Reserved Memory (Fixed – ~300MB)**
+
+* Used by Spark’s internal system objects
+* Executor must be at least **1.5× reserved memory**
+* Otherwise Spark won’t start
+
+---
+
+### **2. User Memory (~40% of remaining)**
+
+Used for:
+
+* UDFs
+* User-defined objects
+* RDD metadata
+* Broadcast variables
+
+This memory **cannot be spilled**.
+
+---
+
+### **3. Spark Memory (~60% of remaining)**
+
+Used for **DataFrame and SQL operations**
+
+---
+
+## **5. What is Spark Memory and how is it divided?**
+
+**Answer:**
+Spark Memory is split into **two pools**:
+
+### **1. Storage Memory**
+
+* Used for `cache()` / `persist()`
+* Stores cached DataFrames & RDDs
+* Uses **LRU eviction** when full
+
+### **2. Execution Memory**
+
+* Used for:
+
+  * Shuffles
+  * Joins
+  * Aggregations
+  * Hash tables
+
+Execution memory is **short-lived but critical**.
+
+---
+
+## **6. What are Spark Memory Managers?**
+
+**Answer:**
+
+### **Static Memory Manager (Spark < 1.6)**
+
+* Fixed boundaries between storage & execution
+* Inefficient
+* Causes frequent OOM
+
+### **Unified Memory Manager (Spark ≥ 1.6)**
+
+* Flexible boundaries
+* Execution can **borrow memory** from storage if needed
+* Much better memory utilization
+
+---
+
+## **7. If Unified Memory Manager exists, why does OOM still happen?**
+
+**Answer:**
+Because **physical memory limits still apply**.
+
+Even with borrowing:
+
+* A **single task** cannot exceed executor memory
+* Large joins, skewed keys, or huge hash maps still cause OOM
+* Borrowing does **not increase total memory**
+
+---
+
+## **8. How are tasks split inside an executor?**
+
+**Answer:**
+Tasks are split based on **cores per executor**.
+* 1 core = 1 task at a time
+* 4 cores = 4 parallel tasks
+
+Each task consumes:
+* Execution memory
+* User memory
+* Overhead memory
+
+More parallel tasks → **more memory pressure**.
+
+---
+
+## **9. How many cores should an executor have and why?**
+
+**Answer:**
+**Recommended: 3–5 cores per executor**
+Reason:
+* Too few cores → underutilization
+* Too many cores → high memory contention
+
+With more than 5 cores:
+* Many tasks run in parallel
+* Memory overhead increases
+* Leads to **Executor OOM**
+
+---
+
+## **10. What are common real-world reasons for Executor OOM?**
+* Data skew
+* Large joins without repartitioning
+* Excessive caching
+* Too many cores per executor
+* Insufficient memory overhead
+* Heavy UDF usage
+* Large broadcast variables
+
+---
+
+## **11. How do you prevent Executor OOM in Spark?**
+
+**Answer:**
+
+* Handle **data skew** (salting, repartitioning)
+* Increase executor memory or overhead
+* Reduce cores per executor
+* Avoid unnecessary caching
+* Use broadcast joins wisely
+* Monitor Spark UI (Storage & Executors tab)
+_________________
 https://www.youtube.com/watch?v=EEq9JxGGEZE&list=PLTsNSGeIpGnGkpfKMf7ilFmzfx6AjMKyT&index=20&t=856s
 spark submit
 Spark Submit is a command-line tool used to run Spark applications. It works by taking all necessary files and JARs, packaging them, and triggering the application on the cluster. 
@@ -1441,81 +1599,196 @@ main.py
 ________________________________
 cache vs persist
 https://www.youtube.com/watch?v=Pw1vn82wEBE&list=PLTsNSGeIpGnFiErPovNizG_2IP2RvrgnK&index=45
-Chaliye, main aapko bilkul usi flow aur tone mein samjhata hoon jaise video mein explain kiya gaya hai using HinEnglish.
 
-### 1. Basic Concept aur Memory Management Recap
-Sabse pehle, Caching kya hai? Ye ek optimization technique hai jo hamare **intermediate results** ko store karke rakhta hai.
 
-Isko samajhne ke liye humne Spark Memory Management (Executor wala part) ko recap kiya tha. Executor ke container ke andar teen cheezein hoti hain: User Memory, Spark Memory, aur Reserved Memory. Spark Memory ke andar do pools hote hain:
-1.  **Storage Memory Pool**
-2.  **Executor Memory Pool**
 
-Jab bhi hum data ko cache karte hain, toh wo data sirf aur sirf **Storage Memory Pool** mein jaake store hota hai. Agar Execution pool (jahan calculation hoti hai) ko memory ki zaroorat padti hai, toh wo Storage pool se data ko "evict" (udha) kar sakta hai LRU (Least Recently Used) fashion mein.
+# **Apache Spark – Cache & Persist (Interview Questions & Answers | Hinglish)**---
 
-### 2. Example: Caching ki zaroorat kyun hai? (The "Why")
-Ab main aapko code example se samjhata hoon ki humein iski actual need kyun padti hai.
+## **Q1. What is caching in Spark?**
 
-Imagine kijiye humne ek code likha:
-*   Pehle `df` banaya ek file load karke.
-*   Phir `df2` banaya jisme `df` ko join kiya `df1` ke saath.
-*   Phir `df4` banaya jisme usi `df` ko join kiya `df3` ke saath.
+**Answer:**
+Caching Spark ki ek **optimization technique** hai jisme hum **intermediate results** ko memory mein store kar dete hain taaki unko baar-baar re-calculate na karna pade.
 
-Spark mein DataFrames immutable hote hain aur operations **Lazily Evaluated** hote hain. `df` jo hai wo Executor ki "short-lived memory" mein banta hai.
-*   Jab `df2` ke liye action call hoga, `df` calculate hoga aur use ho jayega.
-*   Lekin jab `df4` banega, toh kyunki `df` memory se chala gaya tha (short-lived tha), Spark wapas jayega aur DAG (Directed Acyclic Graph) ke through `df` ko **re-calculate** karega.
+## **Q2. Spark mein cached data memory ke kis part mein store hota hai?**
 
-Isse hamara time waste hoga. Isiliye hum `df.cache()` use karte hain. Jaise hi hum `.cache()` likhte hain, data short-lived memory se uth kar **Storage Memory Pool** mein aa jata hai jo long-term ke liye rehta hai (jab tak application chal rahi hai). Isse baar-baar re-calculation nahi karni padti.
+**Answer:**
+Spark Executor memory ke 3 parts hote hain:
 
-### 3. Partition aur Storage Logic
-Yahan ek bahut important interview question banta hai. Maan lijiye aapke paas 2GB ka storage pool hai lekin data 2.5GB ka hai.
-*   Spark kabhi bhi **half partition** store nahi karega. Agar wo 12 partitions store kar pa raha hai aur 13th partition aadha fit ho raha hai, toh wo us aadhe ko store nahi karega.
-*   Jo partitions fit nahi honge, unhein ya toh disk pe bheja jayega (agar level waisa hai) ya phir unhein **re-calculate** kiya jayega.
-*   Agar koi partition galti se **lost** ho jata hai, toh DAG usse wapas re-calculate kar leta hai.
+1. User Memory
+2. Spark Memory
+3. Reserved Memory
 
-### 4. Cache vs Persist
-Bahut baar pucha jata hai: **Difference between Cache and Persist?**
-Seedha sa answer hai: `Persist` hi main function hai. `Cache` bas `Persist` ke upar likha gaya ek wrapper hai.
-*   **Cache:** Jab hum `.cache()` call karte hain, toh wo internal `.persist()` ko call karta hai ek fixed default storage level ke saath (Video mein bataya gaya hai ki default `MEMORY_AND_DISK` set hota hai).
-*   **Persist:** `.persist()` humein flexibility deta hai ki hum arguments pass kar sakein, yaani hum apna **Storage Level** khud choose kar sakte hain.
+Spark Memory ke andar do pools hote hain:
 
-### 5. Storage Levels (In-Depth)
-Humne alag-alag storage levels discuss kiye jo aap `.persist()` mein use kar sakte hain:
+* **Storage Memory Pool** → Cache/Persist yahin hota hai
+* **Execution Memory Pool** → Join, shuffle, aggregation yahin hoti hai
 
-*   **MEMORY_ONLY:**
-    *   Ye data ko sirf RAM mein rakhta hai **Deserialized** form mein.
-    *   **Advantage:** Process fast hota hai.
-    *   **Disadvantage:** Memory utilization bahut high hoti hai.
-*   **MEMORY_AND_DISK:**
-    *   Pehle RAM mein try karega. Agar RAM full ho gayi, toh bacha hua data **Disk** pe bhej dega.
-    *   Disk pe data hamesha **Serialized** form mein rehta hai.
-    *   Disk se read/write karne mein time lagta hai aur CPU usage high ho sakta hai kyunki data ko wapas deserialize karna padega.
-*   **DISK_ONLY:**
-    *   Sara data disk pe rahega. Ye slow hota hai.
-*   **_SER (Serialized) levels (e.g., MEMORY_ONLY_SER):**
-    *   Data ko byte stream (Serialized) mein rakhta hai.
-    *   **Benefit:** Space bachta hai (e.g., 5GB data compress hoke kam jagah lega).
-    *   **Drawback:** Jab use karna hoga toh CPU usage high hoga kyunki De-serialization karna padega.
-    *   *Note:* Video ke end mein bataya tha ki ye Serialization wala feature mainly **Java aur Scala** mein kaam karta hai, Python mein directly aise nahi dikhta.
-*   **_2 (Replication) levels (e.g., MEMORY_ONLY_2):**
-    *   Ye data ki 2 copies rakhta hai alag-alag nodes pe.
-    *   Agar ek worker node down ho gaya, toh doosre node se data le lega taaki re-calculation na karna pade.
+👉 Cached data **sirf Storage Memory Pool** mein store hota hai.
 
-### 6. Practical Demo aur "Show" vs "Count" ka catch
-Humne code run karke bhi dekha Spark UI pe.
-*   Jab humne `df.cache()` ke baad sirf `df.show()` kiya: Spark UI ke Storage tab mein sirf **1 Partition** cache hua dikha. Kyunki Spark intelligent hai, usne dekha ki `show()` ke liye sirf top rows chahiye, toh poora data kyu cache karein?.
-*   Jab humne `df.count()` kiya: Tab saare partitions (4 partitions) cache huye kyunki count ke liye poora data chahiye tha.
-*   UI mein humne dekha ki **Serialized (Disk)** data ka size (1.2 MB) kam tha as compared to **Deserialized (Memory)** data (3.3 MB).
+---
+ **Q3. Agar Execution memory ko space chahiye ho toh kya hota hai?**
 
-### 7. Unpersist aur Conclusion
-Last mein, agar data ko memory se hatana hai toh kya karein?
-Simple, `df.unpersist()` method call kar dijiye, data cache se hatt jayega.
+**Answer:**
+Execution pool, Storage pool se memory **LRU (Least Recently Used)** fashion mein **evict** kar sakta hai. Matlab jo data least recently use hua hai, wo pehle remove hoga.
+## **Q4. Caching ki zarurat kyun padti hai? (Why cache?)**
 
-Toh ye thi saari kahani Cache aur Persist ki. Maine koshish ki hai ki koi bhi detail miss na ho. Agar aap ye saare points (Intermediate results, Lazy evaluation example, Partition logic, Storage levels difference) interview mein bol denge, toh I don't think koi aapko phasa payega.
+**Answer:**
+Spark mein:
 
-**Link:** Description mein documentation ka link mil jayega, wahan se aur detail padh lena.
+* DataFrames **immutable** hote hain
+* Operations **lazy evaluation** follow karte hain
 
-Chaliye, milte hain agle video mein. Tab tak ke liye, Bye Bye!
+Agar ek DataFrame (`df`) ko multiple jagah reuse kiya ja raha hai (joins, transformations), toh bina cache ke Spark:
 
+* Har action pe DAG ke through data **re-calculate** karega
+* Isse time aur resources waste hote hain
+ `df.cache()` lagane se data **long-lived Storage Memory** mein aa jata hai aur re-calculation avoid hota hai.
+
+
+# **Q6. Agar Storage Memory 2GB hai aur data 2.5GB ka ho toh Spark kya karega?**
+
+**Answer:**
+Ye bahut common interview question hai:
+
+* Spark **kabhi half partition cache nahi karta**
+* Agar 12 partitions fit ho rahe hain aur 13th aadha fit ho raha hai → wo store nahi hoga
+* Jo partitions fit nahi honge:
+
+  * Ya toh disk pe jayenge (agar storage level allow karta ho)
+  * Ya phir unko dobara **re-calculate** kiya jayega
+* Agar koi cached partition **lost** ho jaye, Spark DAG se usse wapas calculate kar leta hai
+
+---
+
+## **Q7. Cache aur Persist mein difference kya hai?**
+
+**Answer:**
+Short answer: **Persist main method hai, Cache uska shortcut hai.**
+
+| Cache                       | Persist               |
+| --------------------------- | --------------------- |
+| Wrapper method              | Actual implementation |
+| Fixed default storage level | Custom storage level  |
+| Simple use                  | More control          |
+
+`cache()` internally call karta hai:
+
+persist(MEMORY_AND_DISK)
+## **Q8. Spark ka default storage level kya hota hai?**
+**Answer:**
+Default storage level hota hai:
+**MEMORY_AND_DISK**
+## **Q9. MEMORY_ONLY storage level ka behaviour kya hai?**
+
+**Answer:**
+
+* Data sirf **RAM** mein hota hai
+* Data **deserialized form** mein rehta hai
+
+✅ Fast processing
+❌ High memory consumption
+❌ Agar memory full ho gayi toh data re-calculate hota hai
+
+## **Q10. MEMORY_AND_DISK storage level kaise kaam karta hai?**
+
+**Answer:**
+ Pehle RAM mein store karta hai
+* Agar RAM full ho gayi → bacha hua data **Disk** pe chala jata hai
+* Disk pe data **serialized form** mein hota hai
+
+❌ Disk I/O slow hota hai
+❌ CPU usage zyada hota hai due to serialization / deserialization
+
+-## **Q11. DISK_ONLY storage level kab use karte hain?**
+
+**Answer:**
+
+* Jab memory bilkul limited ho
+* Data sirf disk pe store hota hai
+* Performance slow hoti hai
+  Generally production mein avoid kiya jata hai
+
+## **Q12. Serialized (_SER) storage levels kya hote hain?**
+
+**Answer:**
+Example: `MEMORY_ONLY_SER`
+
+* Data **byte stream (serialized)** form mein hota hai
+* Memory kam lagti hai (compression benefit)
+ Memory efficient
+❌ CPU intensive (deserialize karna padta hai)
+
+📌 Mostly **Java/Scala** mein effective, Python mein itna clearly visible nahi hota
+
+---
+
+## **Q13. Replication (_2) storage levels ka use kya hai?**
+
+**Answer:**
+Example: `MEMORY_ONLY_2`
+
+* Same data ki **2 copies** alag-alag worker nodes pe store hoti hain
+* Agar ek node down ho gaya, toh doosre se data mil jata hai
+
+✅ Fault tolerance
+❌ Memory usage double
+
+---
+
+## **Q14. Cache ke baad show() aur count() mein kya difference dikhta hai?**
+
+**Answer:**
+
+* `df.show()`:
+
+  * Spark sirf **required partitions** cache karta hai
+  * Kyunki show ko sirf top rows chahiye hoti hain
+
+* `df.count()`:
+
+  * Spark **saare partitions** cache karta hai
+  * Kyunki count ke liye poora data scan hota hai
+
+👉 Spark intelligent hai, wo unnecessary caching avoid karta hai
+
+---
+
+## **Q15. Serialized aur Deserialized data ka size difference kyun hota hai?**
+
+**Answer:**
+
+* **Deserialized (Memory)** data readable objects hota hai → size zyada
+* **Serialized (Disk)** data compressed byte stream hota hai → size kam
+
+Isiliye UI mein disk size kam aur memory size zyada dikhta hai
+
+---
+
+## **Q16. Cached data ko memory se kaise hataate hain?**
+
+**Answer:**
+Simple:
+
+```scala
+df.unpersist()
+```
+
+Ye data ko Storage Memory Pool se remove kar deta hai
+
+---
+
+## **One-Line Interview Summary**
+
+> **Cache Spark ke intermediate results ko Storage Memory mein store karta hai taaki lazy evaluation ke wajah se baar-baar DAG re-run na ho, aur persist hume storage level choose karne ka control deta hai.**
+
+---
+
+Agar chaho toh main:
+
+* 🔹 **30-second short answers**
+* 🔹 **Tricky follow-up interview questions**
+* 🔹 **Spark UI based explanation**
+* 🔹 **Real production scenarios**
 __________________________________________________________________________
 Delta Tables Liquid Clustering and Deletion Vectors
 https://www.youtube.com/watch?v=EveYBUZP__4&t=115s
