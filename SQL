@@ -1,4 +1,8 @@
-
+Employee Salary More than Manager's Salary
+select e emp_id,e.emp_name,m.emp_name as manager_name, e salary, m.salary as manager_salary
+from emp e
+inner join emp mon e manager_id=m.emp_id
+where e salary > m. salary
 ___________________________________
 Complex SQL Query 1 | Derive Points table for ICC tournament
 create table icc_world_cup
