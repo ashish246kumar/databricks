@@ -1,4 +1,8 @@
-
+Feature,Z-Order,Liquid Clustering
+Stability,"Static. If you add data, you must re-run OPTIMIZE to Z-Order the new data.", Dynamic. It is incremental and clusters new data much more efficiently.
+Maintenance,High. You have to manage file sizes and decide when to re-optimize.,Low.                 It handles data skew and changing data patterns automatically.
+Flexibility,You can't easily change Z-Order columns without rewriting the table.                ,You can change clustering columns using ALTER TABLE without a full rewrite.
+Overlap,"Files can still have overlapping data ranges (Min-Max), reducing pruning.",       "Significantly reduces file overlap, leading to better data skipping."
 __________________
 Data Lake vs Delta Lake vs DLT (Delta Live Tables)
 
