@@ -1,0 +1,22 @@
+
+
+**Question 28 of 55**
+A data engineer is implementing liquid clustering on a Delta Lake table and needs to understand how it affects data management operations. The table will be updated frequently with new data. The table is an external table and not managed by Unity Catalog.
+
+**How does liquid clustering in Delta Lake handle new data that is inserted after the initial table creation?**
+
+* **A.** New data is written to a staging area and clustered during scheduled maintenance.
+* **B.** New data is automatically clustered during write operations.
+* **C. New data remains unclustered until the next OPTIMIZE operation.**
+* **D.** New data is rejected if it doesn't match the clustering pattern.
+
+---
+
+### **Key Takeaway for the Exam**
+
+The exam often tests your knowledge of **write-amplification**. If Databricks forced clustering on every single write (Option B), small frequent updates would become incredibly slow and expensive because the system would constantly be rewriting files to maintain the cluster key.
+
+By leaving new data unclustered until an `OPTIMIZE` command is run, Databricks prioritizes **ingestion speed** while giving you control over when to spend the compute power to reorganize the data for **query performance**.
+
+Would you like to review how to actually trigger that `OPTIMIZE` command in PySpark, or should we look at another practice question?
+____________________
