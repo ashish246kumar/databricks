@@ -1,5 +1,5 @@
 
-
+______________________
 **Question 28 of 55**
 A data engineer is implementing liquid clustering on a Delta Lake table and needs to understand how it affects data management operations. The table will be updated frequently with new data. The table is an external table and not managed by Unity Catalog.
 
