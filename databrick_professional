@@ -20,3 +20,320 @@ By leaving new data unclustered until an `OPTIMIZE` command is run, Databricks p
 
 Would you like to review how to actually trigger that `OPTIMIZE` command in PySpark, or should we look at another practice question?
 ____________________
+A data engineer wants to ensure that a Delta Live Tables (DLT) pipeline stops immediately if a primary key column contains any NULL values. Which expectation should be used?
+
+__________________
+
+Scenario: A faulty IoT sensor in a factory reports a temperature of -500, causing the LDP pipeline to fail the expectation, which only allows values between -100 and 200 degrees Celsius. The data engineer would like to further analyze the faulty data to better understand the reason behind this.
+Question: How should the data engineer resolve the faulty data while ensuring data quality standards are maintained?
+
+Options:
+
+A. Remove all expectations from the pipeline to prevent any future failures, regardless of data quality.
+B. Fix the pipeline code and implement a quarantine logic to isolate the faulty data before re-running the pipeline.
+C. Change the expectation action from fail to warn so that invalid records are included in the output and the pipeline does not fail.
+D. Ignore the error and simply re-run the pipeline, as Databricks will automatically skip the problematic record on the next run
+
+why Option B is Correct
+The scenario describes a data quality failure where an expectation (range between -100 and 200) is being violated by an outlier (-500).
+Isolation for Analysis: By implementing a quarantine logic, you redirect the "bad" records to a separate table or folder. This allows you to analyze the faulty sensor data without stopping the entire production pipeline.
+Maintaining Standards: Unlike Option C (which just downgrades the error to a warning), quarantine ensures that only "clean" data reaches your Silver/Gold layers, preserving the integrity of your downstream analytics.
+Actionable Debugging: Once the data is quarantined, you can investigate if it’s a hardware failure (faulty sensor) or a software bug, then re-process only those specific records once fixed.
+_____________________________
+A data engineer is evaluating tools to build a production-grade data pipeline. The team must process change data from cloud object storage, filter out or isolate invalid records, and ensure the timely delivery of clean data to downstream consumers. The team is small, under tight deadlines, and wants to minimize operational overhead while keeping pipelines auditable and maintainable.
+Which approach should the data engineer implement?
+
+A. Use a hybrid approach: Ingest with Auto Loader into Bronze tables, then process using SQL queries in Databricks Workflows to generate cleaned Silver and Gold tables on a schedule.
+B. Ingest data directly into Delta tables via Spark jobs, apply data quality filters using UDFs, and use LDP for creating Materialized Views.
+C. Implement ingestion using Auto Loader with Structured Streaming, and manage invalid data handling and table updates using checkpoints and merge logic.
+D. Use LDP to build declarative pipelines with Streaming Tables and Materialized Views, leveraging built-in support for data expectations and incremental processing.
+
+Why D is the best fit:
+The question emphasizes four key needs that point directly toward Delta Live Tables (DLT) (which the question refers to as LDP - Live Data Pipelines):
+Minimize Operational Overhead: DLT is a declarative framework. You define the "what" (the end state of the data), and Databricks manages the "how" (orchestration, cluster scaling, and dependencies).
+Filter/Isolate Invalid Records: Option D mentions "data expectations." This refers to DLT Expectations, which allow you to define data quality constraints (like CONSTRAINT valid_id EXPECT (id IS NOT NULL) ON VIOLATION DROP ROW) simply and natively.
+Auditable and Maintainable: Declarative pipelines in DLT provide built-in lineage and monitoring, making them much easier to audit than manual Spark UDFs or complex merge logic.
+Incremental Processing: DLT's Streaming Tables and Materialized Views are designed specifically to handle incremental data ingestion and updates efficiently without writing manual "upsert" logic
+__________________
+"What describes a primary technical challenge in ensuring consistent PII masking across all nodes in large-scale, distributed Databricks batch and streaming pipelines?"
+
+Correct Answer: A
+Masking functions must be standardized and managed through Unity Catalog, with enforcement applied across all relevant datasets to avoid any data inconsistency.
+Why this is the correct choice:
+In a large-scale, distributed environment, the main challenge is consistency. Without a centralized governance tool, different pipelines might apply different masking logic (e.g., one pipeline hashes an email while another replaces it with "REDACTED"), leading to data silos and security gaps.
+Unity Catalog solves this by providing Dynamic Data Masking. It allows you to define a masking policy once and apply it to a column; whether the data is accessed via a batch job, a streaming pipeline, or a SQL query, the same policy is enforced at the metadata level.
+
+Why the other options are incorrect:
+B: Dynamic data masking is actually applied at query time (execution), not just at rest. While there is a slight overhead, saying it "does not affect performance" is technically a secondary concern compared to the challenge of consistency.
+C: PII masking is required for both direct identifiers (like Social Security numbers) and indirect/quasi-identifiers (like zip codes combined with birth dates) to prevent re-identification.
+D: Native masking does not "automatically synchronize" with external systems outside of the Databricks/Unity Catalog ecosystem without manual configuration or specific connectors.
+____________________________________________________
+A data engineer is using Auto Loader to read in JSON data as it arrives. They have configured Auto Loader to quarantine invalid JSON records. They are noticing that over time, some records are being quarantined even though they are well-formed JSON.
+
+df = (spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "json")
+    .option("badRecordsPath", "/tmp/somewhere/badRecordsPath")
+    .schema("a int, b int")
+    .load("/Volumes/catalog/schema/raw_data/")
+)
+What is the cause of the missing data?
+A. The source data is valid JSON, but doesn't conform to their defined schema in some way.
+B. The badRecordsPath location is accumulating many small files.
+C. At some point, the upstream data provider switched everything to multi-line JSON.
+D. The engineer forgot to set the option "cloudFiles.quarantineMode", "rescue"
+
+Why Option C is the Winner
+By default, Spark and Auto Loader expect JSON Lines (LDJSON), where each individual record is on a single line.
+If the upstream provider starts sending "pretty-printed" JSON (where one record spans multiple lines), Auto Loader will fail to parse it correctly
+and send those records to the badRecordsPath
+____________________________________
+Databricks Certification Practice Question
+Question: A company processes semi-structured JSON files from an external source using Auto Loader in a classic Databricks job. Occasionally, records arrive with null critical fields, invalid types, or unexpected nested schema variations. The engineer must ensure that malformed or non-conforming records are not dropped silently and are captured in a separate quarantine table. The pipeline should continue processing good records into the Bronze layer without failing the job, and the approach must support both batch and streaming ingestion.
+Which approach fulfills the quarantine mechanism in this ingestion architecture?
+
+A. Use Auto Loader with failFast mode set to false, and enable schema evolution; invalid records will be silently ignored during ingestion and rely on audit logs for malformed data.
+B. Use Lakeflow Spark Declarative Pipelines with a SQL pipeline; configure it to drop rows with nulls using where critical_field is not null.
+C. Use Auto Loader with DLT and implement an EXPECT() constraint with a record audit logic to route bad records.
+D. Create a notebook job with inferSchema=True, write a streaming query with .foreachBatch() and catch exceptions using try/except to redirect failed batches to quarantine.
+____________________________
+A data engineer is reviewing the PySpark code to copy a part of the production 
+dataset to the sandbox environment and needs to ensure that no Personally Identifiable Information (PII) data is being copied. 
+After checking the sales table, the data engineer notices that it has user_email as the only PII data included, as well as being the only column to identify the user.
+
+from pyspark.sql import functions as F
+
+# Load data from a table in the production environment
+df = spark.read.table("production_catalog.production_schema.sales").sample(fraction=0.1)
+
+# Anonymize the data before saving it to the sandbox
+# sandbox_df = << fill in >>
+
+# Write the anonymized data to a table in the sandbox environment
+sandbox_df.write.format("delta").mode("overwrite").saveAsTable("sandbox_catalog.sandbox_schema.sales")
+hich anonymized code should be used to achieve the required outcome?
+A) df.withColumn("user_email", F.sha2("user_email", 256))
+B) df.withColumn("hashed_email", F.sha2("user_email", 256))
+C) df.withColumn("user_email", F.regexp_replace("user_email", "@.*", "@anonymized.com"))
+D) df.withColumn("user_email", F.expr("uuid()"))
+_____________________
+Question 21 of 59: When monitoring a complex workload, being able to see the query plan is critical to understanding what the workload is doing.
+Where can the visualization of the query plan be found?
+
+A. In the Query Profiler, under Query Source
+B. In the Query Profiler, under the Stages tab
+C. In the Spark UI, under the Jobs tab
+D. In the Spark UI, under the SQL/DataFrame tab
+
+Why Choice D is the Standard Answer
+In the Databricks and Apache Spark ecosystem, the SQL/DataFrame tab is the specific location that renders the DAG (Directed Acyclic Graph).
+When you click into a specific execution ID on that tab, you get a visual representation of the entire plan, showing:
+Scan nodes: Where data is read from Delta/Parquet.
+Exchange nodes: Where data is being shuffled across the cluster.
+Join nodes: Which join strategy (Broadcast vs. SortMerge) is being utilized.
+__________________
+A company stores account transactions in a Delta Lake table. The company needs to apply frequent account-level corrections (e.g., UPDATE statements) but wants to avoid rewriting entire Parquet files for each change to reduce file churn and improve write performance.
+
+Which Delta Lake feature should they enable?
+A. Partition the Delta table by account_id
+B. Enable automatic file compaction on writes
+C. Enable deletion vectors on the Delta table
+D. Enable change data feed on the Delta table
+
+Key Takeaway for the Exam
+When you see "avoid rewriting entire Parquet files" or "reduce file churn" specifically in the context of UPDATE or DELETE operations, the answer is almost always Deletion Vectors.
+In a typical "Copy-on-Write" scenario (without deletion vectors), updating 1 row in a 100MB file requires writing a brand new 100MB file. 
+With Deletion Vectors (Merge-on-Read), you only write a few bytes to a bitmapped file to "mask" the old row, making the operation significantly faster.
+
+In standard Delta Lake (and Parquet) operations, when you perform an UPDATE or DELETE, Spark uses a "copy-on-write" strategy. This means it has to read the entire Parquet file containing the target record, rewrite the whole file with the change applied, and then mark the old file as tombstoned. This causes significant file churn and slow write performance, especially for frequent, small corrections.
+The Solution: Deletion Vectors
+Deletion vectors change the way updates and deletes work by shifting to a "merge-on-read" approach:
+Instead of rewriting the whole Parquet file immediately, Delta Lake creates a small companion file (the deletion vector) that simply notes which rows in the original file have been deleted or changed.
+The original Parquet file remains untouched, eliminating the expensive "write" overhead for every small correction.
+When a user queries the table, Databricks uses the deletion vector to skip the "deleted" rows on the fly.
+________________________
+Question 19 of 55 A data engineer needs to design an efficient pipeline that automatically processes new CSV files as they arrive in S3 storage.
+
+Which Databricks feature should the data engineer use to meet these requirements?
+A. Streaming from cloud storage using standard Spark readStream with format("csv") and format("json")
+B. Auto Loader with schema inference and evolution enabled
+C. COPY INTO SQL command with parameters to track processed files
+D. Traditional batch processing with scheduled Databricks Jobs
+
+Key Concepts for the Professional Exam
+Since this is the Professional level exam, they are looking for you to distinguish between "working" solutions and "optimized" solutions.
+Scalability: Standard readStream (Option A) has to list all files in a directory to identify new ones. If you have 100,000 files in S3, that "listing" operation becomes incredibly slow and expensive. Auto Loader uses File Notification (via AWS SNS/SQS) or Directory Listing with optimized caching to solve this.
+Schema Evolution: In a production environment, CSVs often change. Auto Loader’s ability to catch "rescued data" (columns you didn't expect) is a major reason why it's the right answer for this specific scenario.
+
+Efficiency & Scalability: Unlike standard readStream, Auto Loader uses cloud files to incrementally and efficiently process new data files as they arrive in cloud storage (S3, ADLS, GCS) without needing to list all files, which gets very slow as the number of files grows.
+Automatic Ingestion: It is specifically designed for the pattern of "new files arriving in storage."
+Schema Evolution: One of its "superpowers" is handling changes in data structure (like new columns in those CSVs) without breaking the entire pipeline.
+Checkpointing: It automatically keeps track of which files have already been processed using RocksDB, so it doesn't re-process data
+__________________-
+18 of 59. A data engineer wants to enforce the principle of least privilege when configuring ACLs for Databricks jobs in a collaborative workspace.
+
+Which approach should the data engineer use?
+A. Use only folder-level permissions and avoid setting permissions on individual jobs.
+B. Grant CAN RUN permission to everyone and CAN MANAGE to a single admin group.
+C. Grant all users CAN MANAGE permission on all jobs to avoid access issues.
+D. Assign users only the minimum permission level (e.g., CAN RUN or CAN VIEW) required for their role on each job.
+
+NO ACCESS	Cannot see the job or its details.
+CAN VIEW	Can view job settings and run history.
+CAN MANAGE RUN	Can view settings, trigger a manual run, or cancel a run.
+IS OWNER	Full control; can edit, delete, and manage permissions.
+The Principle of Least Privilege dictates that a user, program, or process should have only the specific permissions necessary to perform its intended function—and nothing more.
+Granularity: By assigning specific roles like CAN RUN or CAN VIEW on a per-job basis, you minimize the "blast radius" if an account is compromised.
+Security: It prevents users from accidentally (or intentionally) modifying job configurations or accessing data they aren't authorized to see.
+_______________
+Scenario: While reviewing a query’s execution in the Databricks Query Profile, a data engineer observes that the "Top operators" panel shows a sort operator with high "Time spent" and "Memory peak" metrics, and the Spark UI reports frequent data spilling.
+
+Question: How should the data engineer address this issue?
+
+A. Repartition the DataFrame to a single partition before sorting.
+B. Increase the number of shuffle partitions to better distribute data.
+C. Convert the sort operation to a filter operation.
+D. Switch to a broadcast join to reduce memory usage.
+
+(
+The "Top operators" panel shows high "Time spent" and "Memory peak" for a sort operator, combined with frequent data spilling. Here is the breakdown of why option B addresses this:
+The Problem (Spilling): Spilling happens when the data allocated to a single task (a partition) is too large to fit into the executor's memory (the "memory fraction" reserved for execution/sorts). Spark is forced to write that data to disk, which is significantly slower.
+The Fix: By increasing spark.sql.shuffle.partitions, you break the data into more, smaller pieces.
+Smaller partitions = smaller memory footprint per task.
+This allows the sort to happen entirely in-memory without exceeding the "Memory peak" threshold that triggers a spill to disk.
+)
+________________________
+Scenario: A data company uses Databricks Unity Catalog and has multiple enterprise data sources, including PostgreSQL, Snowflake, and SQL Server. The central data platform team wants to configure 
+Lakehouse Federation so analysts can query external tables directly in Databricks using Databricks SQL, without duplicating data.
+
+Question: Which steps are necessary to configure Lakehouse Federation in a secure and governed manner?
+
+Options:
+
+A. Create external locations and storage credentials to connect to each database, then register foreign tables in Unity Catalog.
+B. Mirror the external datasets into Delta Lake using Auto Loader, and govern them using Data Lineage and System Tables.
+C. Use Partner Connect to create linked datasets, and apply table ACLs at the source system to govern access through Databricks.
+D. Configure connections and foreign catalogs in Unity Catalog, then grant access to foreign catalogs, schemas, and tables using Unity Catalog permissions.
+
+Configure connections and foreign catalogs in Unity Catalog, then grant access to foreign catalogs, schemas, and tables using Unity Catalog permissions.
+
+Why this is the right approach:
+Lakehouse Federation is specifically designed to let Databricks query external databases as if they were local tables. Here is the workflow:
+Create a Connection: You define an object in Unity Catalog that contains the credentials and path to the external database (e.g., Snowflake).
+Create a Foreign Catalog: This catalog "mirrors" the external database's structure. You don't move the data; Unity Catalog just maps the external schemas and tables into your Databricks workspace.
+Unified Governance: Because these objects now exist within Unity Catalog, you use standard GRANT and REVOKE statements to control who can see that data. This fulfills the "secure and governed" requirement mentioned in the prompt.
+___________
+Question: What describes a primary technical challenge in ensuring consistent PII masking across all nodes in large-scale, distributed Databricks batch and streaming pipelines?
+
+A. Masking functions must be standardized and managed through Unity Catalog, with enforcement applied across all relevant datasets to avoid any data inconsistency.
+B. Dynamic data masking is applied only at rest, so it does not affect query performance.
+C. PII masking is only required for direct identifiers.
+D. Native masking in Databricks automatically synchronizes with all downstream external Databricks systems.
+
+Correct Answer: A
+The primary technical challenge in a distributed system is centralized enforcement. Without a tool like Unity Catalog, you would have to manually apply masking logic in every single Spark job or DLT (Delta Live Tables) pipeline. This leads to human error where one pipeline might forget to mask a column, or different teams use different masking logic.
+
+Unity Catalog provides a centralized layer where you can define a Column Mask. 
+Once defined, the masking is applied automatically whenever any user or service principal queries that table, regardless of the compute cluster being used.
+______________________
+Scenario: A data engineering team is collaborating on a Databricks project where each team member
+needs to develop and test code independently before merging changes into the main branch. 
+They want to avoid accidental overwrites or branch switching issues while ensuring that all work is version-controlled and can be integrated into their CI/CD pipeline.
+
+Question: How should the data engineer achieve collaboration?
+
+A. Each team member creates their own Databricks Git folder, mapped to the same remote Git repository, and works in their own development branch within their personal folder.
+B. Team members use the Databricks CLI to clone the Git repository and perform Git operations from a cluster's web terminal.
+C. All team members work in the same Databricks Git folder and perform Git operations (pull, push, commit, branch switching) directly in the shared folder.
+D. Team members edit notebooks directly in the workspace's shared folder and periodically copy changes into a Git folder for version control.
+
+The correct choice is A.
+
+Why A is the Correct Answer
+In a collaborative Databricks environment using Git, the best practice is for each developer to have their own Git folder (formerly known as Repos) within their personal workspace. This setup allows for:
+Isolation: Developers can work on their own branches without interfering with others' work-in-progress.
+Version Control: You get the full Git lifecycle (pull, commit, push) directly within the UI, mapped to a remote repository.
+Safety: It avoids the "accidental overwrite" problem that happens when multiple people edit the same notebook in a shared workspace folder.
+___________________________
+A company has a task management system that tracks the most recent status of tasks. 
+The system takes task events as input and processes events in near real-time using Lakeflow Spark Declarative Pipelines. 
+A new task event is ingested into the system when a task is created or the task status is changed. 
+Lakeflow Spark Declarative Pipelines provides a streaming table (table name: tasks_status) for the BI user to query.
+The table represents the latest status of all tasks and includes 5 columns: task_id (unique for each task), task_name, 
+task_owner, task_status, task_event_time. The table enables 3 properties: deletion vectors, row tracking, and change data feed.
+
+A data engineer is asked to create a new Lakeflow Spark Declarative Pipeline to enrich the tasks_status table in near real-time 
+by adding one additional column representing task_owner's department, which can be looked up from a static dimension table (table name: employee
+
+The correct answer is B.
+
+Why B is the correct choice:
+The scenario describes a streaming table (tasks_status) that enables properties like deletion vectors, row tracking, and change data feed. To properly enrich this stream while capturing updates and changes from the source:
+readStream() with skipChangeCommits: Option C is incorrect because skipChangeCommits would ignore the very changes (like updates or deletes) you need to track.
+readStream() with readChangeFeed: Option B correctly identifies that you should read the CDF. This allows the pipeline to process only the incremental changes (inserts, updates, deletes) rather than re-scanning the entire table.
+apply_changes(): This is the DLT (Delta Live Tables) function specifically designed to handle Change Data Capture (CDC) into a target table, ensuring that the "department" enrichment is applied correctly to the changing records.
+
+_______________
+"A data architect is implementing Delta Sharing as part of their data governance strategy to enable secure
+data collaboration with external partners and internal business units. The architect must establish a permission 
+framework that allows designated data stewards to create shares for their respective domains while maintaining security boundaries and audit compliance.
+
+A. Only workspace admins can create and manage shares.
+
+B. Users need the MANAGE SHARES permission on the workspace.
+
+C. Any user with USE_CATALOG privilege can create shares.
+
+D. Users need to be metastore admins or have CREATE SHARE privilege for the metastore.
+
+Regarding the question on the screen about Delta Sharing permissions, your selection (Option D) is correct. Here is a quick breakdown of why that's the right choice and how the governance model works in this context.
+
+Analysis of the Question
+The core of the question asks what permissions are required to create, configure, and manage Delta Shares while maintaining security governance.
+The Correct Answer (D): To create a share, a user must be a metastore admin or have the CREATE SHARE privilege on the metastore. This is a root-level permission because Delta Sharing operates at the account/metastore level to facilitate cross-workspace and external sharing.
+Why others fall short:
+Option B (MANAGE SHARES): While this sounds plausible, "MANAGE SHARES" is typically a privilege granted on a specific share once it exists, rather than the global right to create them.
+Option C (USE_CATALOG): This allows you to see metadata and use objects within a catalog, but it doesn't provide the administrative authority required to initiate an external sharing protocol like Delta
+________________
+Question Context
+A data engineer manages a production Lakeflow Spark Declarative Pipeline that processes customer transaction data. The pipeline includes several data quality expectations, such as transaction_amount > 0 and customer_id IS NOT NULL.
+
+These expectations are defined using the EXPECT clause in SQL. The engineer aims to monitor the pipeline's data quality by analyzing the number of records that passed or failed each expectation during the latest pipeline update. The Lakeflow Spark Declarative Pipelines event logs are stored in a Delta table named event_log_table.
+
+The Question
+For the most recent pipeline update, determine a programmatically appropriate approach to extract information like the name of each expectation, associated dataset, count of records that passed the expectation, and count of records that failed the expectation.
+
+Which method retrieves the desired data quality metrics from the Lakeflow Spark Declarative Pipelines event log?
+
+The Options
+A) Access the event_log_table, filter for events where event_type = 'flow_progress', and parse the details.flow_progress.data_quality.expectations field to extract the required metrics.
+
+B) Use the Lakeflow Spark Declarative Pipelines UI to navigate to the specific pipeline, select the dataset, and view the Data Quality tab to manually retrieve the expectation metrics.
+
+C) Query the event_log_table for events with event_type = 'data_quality' and directly select the passed_records and failed_records fields.
+
+D) Access the event_log_table, filter for events where event_type = 'expectation_result', and extract the expectation
+*******
+(
+Why Option A is correctIn Databricks Delta Live Tables (DLT) — 
+which uses the Lakeflow Spark Declarative Pipeline framework — 
+data quality metrics are not stored as simple top-level columns. 
+Instead, they are nested within the JSON structure of the event log.flow_progress: This event type specifically tracks the progress 
+and outcome of a pipeline update, including data quality statistics.The Hierarchy: The information you need (passed/failed record counts and expectation names) 
+)
+__________________________
+
+Question: A data engineer is working on a Databricks notebook that requires several third-party Python libraries.
+Some of these are available on PyPI, while others are custom-developed and stored as local wheel (.whl) and source (.tar.gz) files in an S3 bucket. 
+The goal is to ensure all dependencies are installed and correctly available across multiple jobs running on any automated cluster in a Unity Catalog-enabled workspace. 
+The engineer needs to install the required dependencies in a way that ensures a consistent environment setup across interactive notebooks 
+and jobs and complies with workspace security policies (no internet access).
+
+Which approach should the engineer use to install and manage these dependencies while also ensuring reproducibility and compliance?
+
+Options:
+A. Create a Python wheel file for the entire project, upload it to the Databricks Workspace Files or Volumes, and install it using a Cluster Library, or pip install in a requirements.txt declared within a Databricks Asset Bundle.
+B. Install all dependencies manually in the driver node of an interactive cluster, then export the environment and reimport on job clusters using %conda.
+C. Use an init script on the cluster to install all dependencies using pip, referencing the local file system.
+D. Use %pip install in every notebook and job to install packages directly from PyPI and custom S3 paths.
+_____________________
