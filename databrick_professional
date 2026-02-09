@@ -337,3 +337,14 @@ B. Install all dependencies manually in the driver node of an interactive cluste
 C. Use an init script on the cluster to install all dependencies using pip, referencing the local file system.
 D. Use %pip install in every notebook and job to install packages directly from PyPI and custom S3 paths.
 _____________________
+Why Option A is the Best Approach
+In a production-grade Unity Catalog environment with no internet access, managing dependencies requires a strategy that balances security, automation, and reproducibility.
+
+Unity Catalog & Volumes: Uploading custom wheels and source files to Databricks Volumes (or Workspace Files) is the modern standard. Volumes allow you to treat cloud storage like a local file system, making it easy to reference .whl and .tar.gz files.
+
+Cluster Libraries: By installing the libraries at the cluster level, you ensure that every worker node in the automated cluster has the same environment. This is far more robust than notebook-scoped installs for production jobs.
+
+Reproducibility: Using a Databricks Asset Bundle (DAB) or a requirements.txt file within the bundle allows you to automate the deployment process. 
+It treats your infrastructure and environment as code, which is a key requirement for the "Professional" certification level
+____________
+_____________________________________________________________________
