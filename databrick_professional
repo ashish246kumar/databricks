@@ -348,3 +348,18 @@ Reproducibility: Using a Databricks Asset Bundle (DAB) or a requirements.txt fil
 It treats your infrastructure and environment as code, which is a key requirement for the "Professional" certification level
 ____________
 _____________________________________________________________________
+Scenario: A data engineer is building a customer data pipeline in Lakeflow Spark Declarative Pipelines. The source is a cloud-based event stream with limited retention containing inserts, updates, and deletes for customer records. These changes are being applied using the APPLY CHANGES INTO (AUTO CDC INTO) syntax to maintain an SCD Type 1 table as the target table, customer_dim.
+
+Question: How should the data engineer build a downstream job that streams from the customer_dim table to only act on updates and delete events, processing data incrementally?
+
+Options
+A. Read change data feed from customer_dim table and apply filters to incrementally act on the change events.
+B. Use ignoreChanges flag while streaming from customer_dim to avoid breaking the pipeline during updates and deletes.
+C. Streaming from customer_dim table would only be possible in the case of SCD 2 retention.
+D. When stored as SCD 1, the target of AUTO CDC INTO includes updates and deletes. Streaming from customer_dim can fail due to these operations. 
+Instead, build another stream from the original source.
+
+As mentioned, A is the correct choice. In a professional production environment, 
+using Change Data Feed (CDF) is the standard way to capture the "pre-image" and "post-image" of data changes, 
+allowing downstream consumers to distinguish between an INSERT, UPDATE, or DELETE.
+_________________
