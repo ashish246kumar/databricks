@@ -363,3 +363,161 @@ As mentioned, A is the correct choice. In a professional production environment,
 using Change Data Feed (CDF) is the standard way to capture the "pre-image" and "post-image" of data changes, 
 allowing downstream consumers to distinguish between an INSERT, UPDATE, or DELETE.
 _________________
+A data engineer and a platform engineer are working together to automate their system tasks. A script needs to be executed outside of Databricks only if a particular daily Databricks job finishes successfully for the day. Databricks CLI command was used to check the last execution of the job.
+
+What are the required command options for that task?"
+The options listed are:
+A) databricks jobs list-runs --job-id JOB_ID --start-time-from TODAY_MIDNIGHT_EPOCH_MS --active-only
+B) databricks jobs list-runs --job-id JOB_ID --start-time-from TODAY_MIDNIGHT_EPOCH_MS --completed-only
+C) databricks jobs list-runs --job-id JOB_ID --start-time-to TODAY_MIDNIGHT_EPOCH_MS --active-only
+D) databricks jobs list-runs --job-id JOB_ID --start-time-to TODAY_MIDNIGHT_EPOCH_MS --completed-only
+
+B is the winner and how to break down these commands.
+
+The requirement is to check if a job finished successfully today before running an external script.
+
+The Breakdown
+To solve this, you need to filter the job runs based on three criteria:
+Which Job: --job-id JOB_ID (Found in all options).
+The Timeframe: You need runs that started after the beginning of today. This requires the --start-time-from flag.
+The Outcome: Since the script only runs if the job "finishes successfully," you need to filter for finished jobs. The --completed-only flag is essential here.
+Option,Flag 1: Time Filter,Flag 2: Status Filter,Why it's Right/Wrong
+A,--start-time-from,--active-only,"Wrong. This would show you jobs currently running, not those that finished successfully."
+B,--start-time-from,--completed-only,Correct. Filters for jobs that started today and have already finished.
+C,--start-time-to,--active-only,Wrong. to would look for jobs before today; active is still the wrong status.
+D,--start-time-to,--completed-only,Wrong. This would return every successful run from the beginning of time up until today.
+____________________________________________________
+Question: A data engineering team is implementing an append-only data pipeline using Delta Lake, and wants to ensure that data is never deleted once written. 
+Which Delta Lake feature should the data engineer enable to prevent modifications to existing data?
+
+Options:
+A. Delta APPEND_ONLY
+B. Delta OPTIMIZE
+C. Delta VACUUM
+D. Delta Time Travel
+Correct Answer: A. Delta APPEND_ONLY
+In Delta Lake, you can set table properties to enforce specific write behaviors. By setting delta.appendOnly = true, 
+the table will only allow new data to be added. Any attempt to perform an UPDATE, DELETE,
+or MERGE operation that modifies or removes existing records will result in an error.
+ALTER TABLE table_name SET TBLPROPERTIES ('delta.appendOnly' = 'true');
+__________________________________________
+In a Databricks Asset Bundle project, in the file resources/app.yml, the data engineer would like to deploy a Databricks 
+Apps databricks_app_deployed and Volume volume_deployed
+and grant the Service Principal behind Databricks Apps permissions to READ and WRITE to the Volume.
+
+The Correct Configuration (Option D)
+The correct YAML structure requires nesting the grants directly under the volume resource and using the specific Unity Catalog privilege names for volumes.
+
+YAML
+resources:
+  apps:
+    databricks_app_deployed:
+      name: "name-databricks_app"
+      description: 'Databricks App'
+      source_code_path: ../src/databricks_app_code
+
+  volumes:
+    volume_deployed:
+      name: name_volume
+      catalog_name: name_catalog
+      schema_name: name_schema
+      grants:
+        - principal: ${resources.apps.databricks_app_deployed.service_principal_id}
+          privileges:
+            - READ_VOLUME
+            - WRITE_VOLUME
+Why this is the right answer:
+The Principal Reference: It uses a dynamic reference ${resources.apps.databricks_app_deployed.service_principal_id}. This is crucial because the Service Principal is created by the bundle deployment itself, so you cannot hardcode an ID.
+
+Correct Privileges: In Unity Catalog, volumes specifically use READ_VOLUME and WRITE_VOLUME. Simple READ or WRITE (seen in Option A) would result in a deployment error.
+
+Resource Mapping: The grants block must be defined under the resource being protected (the Volume), not the App.
+______________________________________
+Scenario: When a new Databricks project starts, the central IT team provisions the required infrastructure using Terraform and a Service Principal. 
+This includes creating a Databricks workspace, a Unity Catalog linked to an External Location, and a Databricks group containing all project members. 
+Project teams must store all assets—e.g., tables and volumes—as Managed assets in Unity Catalog. This model hides infrastructure complexity while giving 
+teams autonomy within their catalog. They can create and manage schemas, tables, volumes, and related objects, but cannot rename, delete, 
+or change catalog permissions; those remain under IT's control.
+
+Question: Which rights should the project group be granted to enable this model?
+
+Options:
+A) The group needs to have ALL PRIVILEGES on the catalog.
+B) The group should be made OWNER of the catalog.
+C) The group needs to have ALL PRIVILEGES and the MANAGE on the catalog.
+D) The group needs to have USE CATALOG and USE SCHEMA on the catalog.
+
+In Unity Catalog, the OWNER of an object (in this case, the Catalog) has the highest level of permissions for that specific object. Here is how it fits your specific scenario:
+Autonomy: Being the OWNER allows the project group to create, rename, and delete schemas, tables, and volumes within that catalog without needing IT's intervention for every small change.
+Managed Assets: It perfectly supports the requirement to store all assets as "Managed assets," as owners have the implicit right to create these in their designated location.
+IT Control: While the group owns the Catalog object, the "External Location" (the physical storage in S3/ADLS) is still governed by the IT-provisioned Unity Catalog storage credential. Furthermore, IT (as Account Admins or Metastore Admins) can still manage the top-level permissions and ensure the group doesn't overstep.
+Why the others fall short:
+ALL PRIVILEGES: This grants almost everything, but it is technically a set of permissions, not an ownership role. In many Databricks configurations, certain administrative actions or full autonomy over child objects are more cleanly handled via the OWNER status.
+USE CATALOG and USE SCHEMA: These are the bare minimum. They allow a user to see and read data, but they don't grant the power to create new schemas or manage the lifecycle of tables as required by your "autonomy" constraint.
+MANAGE on the catalog: This is not a standard Unity Catalog privilege. Privileges are typically things like CREATE, SELECT, MODIFY, etc.
+____________________________________________
+Question: A data engineer is bringing an existing production Databricks job under asset bundle management and wants to ensure that:
+The job's current configuration is captured as YAML, and all referenced files are included in their bundle project.
+Future changes to the bundle's YAML will update the existing job in-place (not create a new job).
+How should the data engineer successfully move the production job under asset bundle management?
+
+Options:
+
+A. Run databricks bundle generate job --existing-job-id to generate the YAML and download referenced files. Then, run databricks bundle deploy to deploy the bundle, which will always update the existing job automatically.
+B. Export the job definition as JSON, convert it to YAML, and place it in your bundle. Then, run databricks bundle deploy to update the job.
+C. Manually create the YAML configuration for the job in your bundle project, ensuring all settings match the existing job. Then, run databricks bundle deploy to deploy the bundle, which will update the existing job in your workspace.
+D. Run databricks bundle generate job --existing-job-id to generate the YAML and download referenced files. Then, run databricks bundle deployment bind to link the bundle's job resource to the existing job in Databricks.
+
+✅ Why Option D is correct
+To successfully bring an existing production Databricks job under Asset Bundle management while meeting both requirements:
+Capture the current job configuration as YAML and include referenced files
+Ensure future YAML changes update the same existing job (not create a new one)
+the correct and supported approach is:
+Generate → Bind → Deploy
+🔍 Breakdown of Option D
+Step 1: Generate the bundle YAML from the existing job
+databricks bundle generate job --existing-job-id <job-id>
+
+
+✔ This:
+Extracts the exact current job configuration
+Converts it into bundle-compatible YAML
+Downloads all referenced notebooks/files into the bundle project
+Step 2: Bind the bundle resource to the existing job
+databricks bundle deployment bind
+✔ This:
+Links the bundle’s job resource to the existing production job
+Stores the job ID in the deployment state
+Ensures future deployments update the same job in-place
+______________________________________________________________
+job runs four independent tasks (X, Y, Z, W) in parallel to process regional sales data. 
+The Data Engineering team recently updated a cluster policy to ban cost-prohibitive instance types. Task Y now fails due to the newly enforced 
+cluster policy restricting the use of a specific instance type. A data engineer needs to resolve the failure quickly without disrupting the other tasks.
+
+How should the data engineer resolve the failure of tasks?
+
+Options
+A. Edit the global cluster policy to allow the restricted instance type, then re-run the entire job.
+B. Delete the failed run, disable the cluster policy, and re-execute all tasks.
+C. Use "Repair run", override the cluster configuration for Task Y to use a permitted instance type, and let Databricks re-run only Task Y.
+D. Manually create a new cluster for Task Y, update the job configuration, and trigger a full re-run.
+
+Why Option C is correct
+Use Repair run and override the cluster configuration for Task Y
+✔ Databricks Repair run allows you to:
+Re-run only the failed task(s)
+Override the cluster configuration at task level
+Keep successful tasks untouched
+Stay compliant with the new cluster policy
+✔ Overriding Task Y’s cluster to use a permitted instance type fixes the policy violation without impacting the rest of the job
+
+tasks:
+  - task_key: task_y
+    notebook_task:
+      notebook_path: /Sales/RegionY
+    new_cluster:
+      node_type_id: m5.xlarge
+      num_workers: 2
+
+______________________
+
