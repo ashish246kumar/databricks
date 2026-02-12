@@ -616,3 +616,123 @@ ranked_df = agg_df.withColumn("rank", F.dense_rank().over(window_spec))
 
 ---
 __________________________________________________________
+
+Question: A platform team lead is responsible for automating the individual teams attribution towards SQL Warehouse usage. The requirement is to identify the SQL warehouse usage at the individual user's level and generate a daily report to be shared with an executive team that includes leaders from all business units.
+
+How should the platform lead generate an automated report that can be shared daily?
+
+Options:
+
+A. Use the system tables to capture the audit and billing usage data and share the queries with the executive team. This enables the executive to execute the query and see the latest results any time.
+
+B. Use the system tables to capture the audit and billing usage data and create a dashboard with daily refresh schedules and shared with the executive team.
+
+C. Restrict users from running any SQL query unless they provide all the query details so that the attribution can be calculated and shared with the executive team.
+
+D. Let the users run the SQL query and then directly report the usage to the executives. The ownership of the SQL warehouse usage will be with the individual teams.
+
+🧠 Why Option B is correct
+The requirements are to:
+Attribute SQL Warehouse usage at an individual user level
+Automate the process
+Generate a daily report
+Share it with executive leadership (read-only, no manual execution)
+Using Databricks system tables (audit + billing usage) and publishing the results as a dashboard with a scheduled daily refresh best satisfies all of these needs.
+
+-----------------------------
+A data engineer is designing a system leveraging Lakeflow Declarative Pipeline technology to process real-time truck telemetry data ingested from JSON files in S3 using Auto Loader. The data includes truck_id, timestamp, location, speed, and fuel_level. The system must support two use cases:
+
+Near-real-time monitoring of the latest location, speed, and fuel_level per truck_id for the operations team.
+
+Daily aggregated reports of total distance traveled and average fuel efficiency per truck_id for the management team.
+
+Which approach should the data engineer use for streaming tables and materialized views in the Lakeflow Declarative Pipeline to meet these requirements?
+
+A. Define a streaming table to ingest and store the raw telemetry data, and create a materialized view to compute the latest location, speed, and fuel_level per truck_id for real-time monitoring. Create another materialized view to compute the daily aggregated distance and fuel efficiency per truck_id for reporting.
+
+B. Define a materialized view to ingest and store the raw telemetry data, and create a streaming table to compute the latest location, speed, and fuel_level per truck_id for real-time monitoring. Create another materialized view to compute the daily aggregated distance and fuel efficiency per truck_id for reporting.
+
+C. Define a streaming table to ingest and store the raw telemetry data, and create a streaming table to incrementally compute the latest location, speed, and fuel_level per truck_id for real-time monitoring. Create a materialized view to compute the daily aggregated distance and fuel efficiency per truck_id for reporting.
+
+D. Define a streaming table to ingest and store the raw telemetry data, and create a streaming table to compute the daily aggregated distance and fuel efficiency per truck_id for reporting. Create a materialized view to compute the latest location, speed, and fuel_level per truck_id for real-time monitoring.
+
+Correct Answer: A
+
+🧠 Reasoning
+This use case clearly separates real-time streaming needs from analytical reporting needs, which maps perfectly to how Lakeflow Declarative Pipelines (Delta Live Tables) are designed:
+Streaming tables → for continuously ingested, append-only, real-time data
+Materialized views → for derived, query-optimized, up-to-date results
+🔍 Why Option A is the best choice
+1️⃣ Streaming table for raw telemetry ingestion
+Auto Loader ingests JSON files from S3 continuously
+Telemetry data is real-time and append-only
+A streaming table is the correct abstraction for raw ingestion
+Raw telemetry → Streaming Table
+
+2️⃣ Materialized view for near-real-time monitoring
+Operations team needs:
+Latest location
+Latest speed
+Latest fuel_level
+Per truck_id
+A materialized view is ideal because:
+It stays automatically updated
+It supports fast, low-latency queries
+It can compute “latest per key” efficiently
+
+Streaming Table → Materialized View (latest per truck)
+3️⃣ Materialized view for daily aggregated reporting
+Management team needs:
+Daily aggregates
+Total distance traveled
+Average fuel efficiency
+Per truck_id
+
+These are:
+Analytical queries
+Not latency-critical
+Best served by materialized views
+
+_________________________________________________________
+A data engineer is optimizing a MERGE operation on an 800GB UC-managed table that experiences frequent updates and deletions.
+
+Which two actions should the engineer prioritize to improve MERGE performance?
+
+Choose 2 answers:
+
+A. Apply liquid clustering using the merge join keys.
+
+B. Overwrite the table instead of Merge
+
+C. Use ZORDER on high-cardinality columns.
+
+D. Partition the table by date.
+
+E. Enable deletion vectors on the table if not already enabled.
+
+Apply liquid clustering using the merge join keys
+✔ Why this is important
+
+Liquid clustering continuously reorganizes data based on access patterns
+
+Clustering on MERGE join keys:
+
+Reduces the number of files scanned
+
+Improves data skipping
+
+Minimizes shuffle during MERGE
+
+🔑 Key point
+
+Liquid clustering is the modern replacement for manual partitioning and ZORDER in Databricks.
+
+✅ E. Enable deletion vectors on the table
+✔ Why this is critical
+
+Deletion vectors allow Delta Lake to track deletes logically
+Avoids rewriting large Parquet files during DELETE or MERGE
+
+Especially beneficial for frequent updates deletes on large tables
+For large UC-managed tables with heavy churn, deletion vectors can dramatically reduce I/O and improve MERGE speed.
+____________________________________________________________--
