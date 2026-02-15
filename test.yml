@@ -1,0 +1,59 @@
+resources:
+  jobs:
+    <workflow_name>:
+
+      name: <workflow_name>
+
+      queue:
+        enabled: <true_or_false>
+
+      schedule:
+        pause_status: <pause_status>
+        quartz_cron_expression: <cron_expression>
+        timezone_id: <timezone>
+
+      parameters:
+        - name: <param_1>
+          default: <value>
+        - name: <param_2>
+          default: <value>
+
+      tasks:
+
+        # ---------- Notebook Task ----------
+        - task_key: <task_name>
+          notebook_task:
+            notebook_path: <notebook_path>
+          libraries:
+            - whl: <wheel_path>
+          existing_cluster_id: <cluster_id>
+
+        # ---------- Child Job Task ----------
+        - task_key: <task_name>
+          run_job_task:
+            job_id: <job_id>
+          depends_on:
+            - task_key: <dependency_task>
+
+        # ---------- Notebook Task with Dependency ----------
+        - task_key: <task_name>
+          run_if: <run_condition>
+          notebook_task:
+            notebook_path: <notebook_path>
+          existing_cluster_id: <cluster_id>
+          libraries:
+            - whl: <wheel_path>
+          depends_on:
+            - task_key: <dependency_task_1>
+            - task_key: <dependency_task_2>
+
+        # ---------- Post Processing ----------
+        - task_key: <task_name>
+          run_if: <run_condition>
+          notebook_task:
+            notebook_path: <notebook_path>
+          existing_cluster_id: <cluster_id>
+          libraries:
+            - whl: <wheel_path>
+          depends_on:
+            - task_key: <dependency_task>
