@@ -1,3 +1,316 @@
+If Watermark is 10 Minutes, Does Spark Wait Exactly 10 Minutes?
+Question
+
+You configure:
+withWatermark("eventTime", "10 minutes")
+Does Spark wait exactly 10 minutes before closing a window?
+Answer
+❌ No
+spark does not wait exactly 10 minutes in wall-clock time.
+Watermark works based on:
+Max Event Time Seen - Watermark Delay
+Example:
+Event Time	Arrival
+10:01	10:01
+10:03	10:03
+10:08	10:04
+Max event time seen = 10:08
+Watermark =
+10:08 - 10 min = 09:58
+Any event before 09:58 is dropped.
+Key Interview Insight
+Watermark progresses based on event time progression, not processing time.
+2️⃣ Can a Window Close Even if Late Data Is Still Coming?
+Question
+Suppose:
+window = 5 minutes
+watermark = 10 minutes
+An event belongs to window:
+10:00–10:05
+But another event for that window arrives after watermark.
+What happens?
+
+Answer
+The event will be discarded.
+Spark considers the window finalized once:
+Watermark > window end time
+Example:
+Window: 10:00–10:05
+Watermark: 10:06
+Now Spark assumes no more valid events will arrive.
+Late events are dropped.
+
+3️⃣ Why Does Watermark Work Only With Event Time?
+Question
+Why can't we use watermark with processing time windows?
+Answer
+Watermarks rely on event timestamps.
+Processing time windows depend on arrival time, not event time.
+Example:
+Event generated at:
+12:04
+Arrives at:
+1:10
+Processing time window:
+1–2
+But event actually belongs to:
+12–1
+Watermark needs event timestamps to decide lateness.
+Therefore:
+Watermark works only with Event Time
+4️⃣ What Happens If You Don’t Use Watermark in Stateful Aggregation?
+Question
+Suppose you run:
+groupBy(window(eventTime, "1 hour"))
+.avg("temperature")
+but do not define a watermark.
+What will happen over time?
+Answer
+State will grow indefinitely.
+why?
+Spark must keep state for every window forever, because late events may still arrive.
+Example:
+Window 1 → 12–1
+Window 2 → 1–2
+Window 3 → 2–3
+...
+Without watermark:
+Spark never knows when it is safe to drop state.
+
+Result:
+memory usage grows
+state store increases
+job may crash
+Watermark tells Spark:
+It is safe to discard old state
+5️⃣ Why Can Very Large Watermarks Be Dangerous?
+Question
+Suppose you configure:
+withWatermark("eventTime", "24 hours")
+Why can this be a problem?
+Answer
+Spark must keep state for 24 hours of windows.
+Problems:
+1️⃣ Huge memory usage
+Large state store.
+2️⃣ Slow checkpoint recovery
+More data in state store.
+3️⃣ Slow aggregations
+Spark must scan large state.
+4️⃣ Disk pressure
+State store stored in checkpoint directory.
+Example:
+If system processes:
+1 million events/minute
+State for 24 hours becomes enormous.
+Better approach:
+Choose watermark based on expected event delay.
+Example:
+network delay ≈ 10 minutes
+watermark ≈ 15 minutes
+---------------------------------------------------------------------------------------------------
+Global IoT Temperature Monitoring System
+Scenario
+
+A company collects temperature data from IoT devices across the world (Delhi, Sydney, London).
+
+Events contain:
+
+deviceId
+
+temperature
+
+eventTime
+
+You must calculate average temperature per hour.
+
+Due to network delays, some events arrive up to 1 hour late.
+
+Questions
+
+Should you use Processing Time or Event Time? Why?
+
+What problem occurs if you use Processing Time?
+
+How will you handle late arriving events?
+
+What watermark duration would you choose?
+
+Expected discussion:
+
+Event Time windowing
+
+Late data handling
+
+Watermarks
+
+Stateful aggregation
+
+2️⃣ Kafka Order Processing Pipeline
+Scenario
+
+Orders are streamed from Kafka and processed using Spark Structured Streaming.
+
+You need to calculate number of orders per 5-minute window.
+
+But events sometimes arrive out of order.
+
+Example arrival:
+
+Event Time	Arrival Time
+10:01	10:01
+10:03	10:03
+10:02	10:05
+Questions
+
+How will Spark handle out-of-order events?
+
+Why is event time windowing important here?
+
+What happens if a 10:02 event arrives at 10:15?
+
+How would watermarks help here?
+
+Concepts tested:
+
+Out-of-order events
+
+Window aggregation
+
+Watermark logic
+
+3️⃣ Late Data and Memory Management
+Scenario
+
+A Spark job calculates hourly metrics from IoT sensors.
+
+Some events arrive 6 hours late.
+
+The job keeps state for window aggregations.
+
+Questions
+
+Why does Spark need stateful processing in this case?
+
+What happens if Spark keeps state forever?
+
+How do watermarks prevent memory issues?
+
+What happens to events arriving after the watermark threshold?
+
+Concepts tested:
+
+Stateful processing
+
+State store growth
+
+Memory management
+
+Watermark eviction
+
+4️⃣ Designing a Real-Time Analytics Dashboard
+Scenario
+
+You are building a real-time website analytics dashboard showing:
+
+Page views per minute
+
+Unique users per minute
+
+Logs may arrive 2–3 minutes late.
+
+Questions
+
+What window size would you use?
+
+What watermark duration would you configure?
+
+What happens if logs arrive after watermark expiry?
+
+How would you balance accuracy vs memory usage?
+
+Concepts tested:
+
+Window design
+
+Watermark tuning
+
+Late data trade-offs
+
+5️⃣ Spark Stateful Streaming Failure Scenario
+Scenario
+
+Your Spark Structured Streaming job is failing with OutOfMemory errors.
+
+The job performs:
+
+window aggregations
+
+groupBy userId
+
+session tracking
+
+You notice state store size keeps growing.
+
+Questions
+
+What could be the possible reasons for state growth?
+
+How do watermarks help reduce state size?
+
+What other strategies can reduce state explosion?
+
+Concepts tested:
+
+State store
+
+Watermark cleanup
+
+High-cardinality keys
+
+Window design
+
+6️⃣ Fraud Detection Streaming System (System Design)
+Scenario
+
+A bank wants to detect credit card fraud in real time.
+
+Transactions are streamed through Kafka → Spark Streaming.
+
+Fraud rules check:
+
+transactions per user per minute
+
+unusual location changes
+
+high-value transactions
+
+However, some transactions arrive 5–10 minutes late.
+
+Questions
+
+How would you design the Spark streaming pipeline?
+
+Should fraud rules use processing time or event time?
+
+How would you configure watermarks?
+
+What happens if a fraudulent event arrives after watermark expiry?
+
+Concepts tested:
+
+Streaming architecture
+
+Event time processing
+
+Watermarks
+
+Real-time decision trade-offs
+
+
+
+
+------------------------------------------------------------------------------------------
 Feature,Z-Order,Liquid Clustering
 Stability,"Static. If you add data, you must re-run OPTIMIZE to Z-Order the new data.", Dynamic. It is incremental and clusters new data much more efficiently.
 Maintenance,High. You have to manage file sizes and decide when to re-optimize.,Low.                 It handles data skew and changing data patterns automatically.
