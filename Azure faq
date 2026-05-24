@@ -1,0 +1,82 @@
+How would you design a disaster recovery strategy for Azure Event Hubs?
+To design disaster recovery for Azure Event Hubs, I would use the Geo-Disaster Recovery feature.
+
+This involves creating a primary Event Hubs namespace in one Azure region and a secondary namespace in another region. Geo-DR replicates metadata such as Event Hub configurations, consumer groups, and access policies between the two namespaces.
+
+A DNS alias is used so applications connect through the alias instead of directly to the namespace. During failover, the secondary namespace becomes the new primary and the alias automatically points to it.
+
+One important limitation is that Geo-DR does not replicate actual event data, so producers should implement retry logic to resend any in-flight events that may be lost during failover.
+
+For durable event backup, I would enable Event Hubs Capture to store all events in Azure Blob Storage or Azure Data Lake.
+
+I would also regularly test failover scenarios in non-production environments to verify reconnection, DNS propagation, and recovery procedures.
+----------
+Can you explain how to implement partitioning in Azure Event Hubs and its impact on performance?
+
+Partitioning in Azure Event Hubs is used to scale event ingestion and processing.
+An Event Hub is divided into multiple partitions, and each partition acts as an independent ordered log of events.
+When producers send events, they can specify a partition key such as a device ID or customer ID. Events with the same partition key are always routed to the same partition, which preserves ordering.
+Partitions enable parallel processing because different consumers within a consumer group can process different partitions simultaneously.
+Increasing the number of partitions improves throughput and scalability, but it also requires more consumer instances to fully utilize the parallelism.
+If no partition key is provided, Event Hubs distributes events across partitions using round-robin balancing.
+One important design consideration is that partition count cannot be changed later in the Standard tier, so it should be selected based on expected future scale and downstream processing requirements.
+--------------------------------------
+How would you implement a solution to monitor and alert on the performance of an Azure Event Hubs instance?
+To monitor Azure Event Hubs performance, I would use Azure Monitor, which automatically collects platform metrics and logs.
+I would track important metrics such as Incoming Messages, Outgoing Messages, Throttled Requests, Server Errors, and Capture Lag.
+For alerting, I would create Azure Monitor alert rules. For example, if throttled requests become greater than zero or incoming traffic suddenly drops below the normal baseline, an alert can be sent through email, Teams, or SMS.
+I would also enable Diagnostic Settings to send logs to a Log Analytics workspace. This allows advanced querying and troubleshooting using Kusto Query Language (KQL).
+For visualization, I would create Azure Dashboards or Grafana dashboards so the operations team can monitor all Event Hubs namespaces from a single place.
+--------------------------
+“How can you secure data in transit when using Azure Event Hubs?”
+To secure data in transit with Azure Event Hubs, I would first rely on TLS 1.2 encryption, which is enabled by default for all communication between clients and Event Hubs.
+For access control, I would use Azure Active Directory RBAC roles such as Azure Event Hubs Data Sender and Data Receiver because identity-based authentication is more secure than shared keys.
+If SAS tokens are used, I would configure them with limited permissions and expiration times to follow the principle of least privilege.
+To improve network security, I would use Private Link or Virtual Network integration so traffic stays within Azure private networks instead of the public internet.
+In highly secure environments, I would disable public endpoints completely and allow access only through private networking.
+----------
+Design Real-Time Pipeline Using Event Hubs and Power BI
+A real-time analytics pipeline can be designed using Azure Event Hubs, Azure Stream Analytics, and Power BI.
+First, Azure Event Hubs ingests streaming data from applications, IoT devices, or microservices.
+Then Azure Stream Analytics processes the stream in real time by applying filtering, transformations, and window-based aggregations such as tumbling or hopping windows.
+The processed output is sent to Power BI as a streaming dataset.
+Power BI dashboards can then display live metrics such as active users, sales per minute, or sensor readings.
+I would configure Event Hub partitions based on expected throughput and enable checkpointing in Stream Analytics to ensure reliable processing and recovery.
+----------
+Difference Between Event Hubs, Service Bus, and Event Grid
+Azure Event Hubs, Service Bus, and Event Grid serve different purposes.
+
+Azure Event Hubs is used for high-throughput streaming data such as telemetry, clickstreams, and IoT events. It is designed for big data ingestion.
+
+Azure Service Bus is an enterprise messaging service used for reliable communication between applications. It supports queues, topics, transactions, sessions, and dead-letter queues.
+
+Azure Event Grid is a lightweight event-routing service used for reactive architectures. It is commonly used for events like blob uploads, resource creation, or application notifications.
+
+In short, Event Hubs is for streaming, Service Bus is for reliable messaging, and Event Grid is for event notifications.
+------------
+2. How would you handle duplicate events in Azure Event Hubs?
+Azure Event Hubs provides at-least-once delivery, so duplicate events are possible.
+
+To handle this, I would design the consumer to be idempotent, meaning processing the same event multiple times should produce the same result.
+
+Each event should contain a unique event ID generated by the producer.
+
+The consumer can maintain a processed-event store using Redis or a database table to track already processed IDs.
+
+If the same event arrives again, the consumer skips processing.
+
+I would also use checkpointing so consumers resume from the last processed offset after failures.
+
+For downstream systems, I would prefer upsert operations instead of plain inserts to avoid duplicate records.
+-------------------------
+Describe a scenario where you would use Azure Data Factory with Azure Event Hubs
+Azure Data Factory and Azure Event Hubs are commonly used together when we need both batch and real-time processing.
+
+For example, ADF can run scheduled pipelines to load reference data like customer or product information from SQL Server into Azure Storage.
+
+At the same time, Azure Event Hubs can ingest real-time events such as website clicks or IoT sensor data.
+
+Then services like Stream Analytics can combine the streaming events with the batch reference data to generate enriched real-time analytics.
+
+ADF can also trigger downstream pipelines automatically when new files arrive from Event Hub consumers.
+
