@@ -1,0 +1,11 @@
+Why Delta Lake for SCD Type 2?
+Interview Answer
+"Delta Lake provides ACID transactions. Since SCD Type 2 requires updating an old row and inserting a new row together, Delta Lake ensures both operations succeed atomically."
+Follow-up
+What if the job fails during update?
+Without Delta:
+Old row updated
+New row not inserted
+Data becomes inconsistent.
+Delta prevents this.
+
