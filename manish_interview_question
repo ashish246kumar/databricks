@@ -9,3 +9,292 @@ New row not inserted
 Data becomes inconsistent.
 Delta prevents this.
 
+-------------------------------------------------------
+Why is Shuffle Expensive?
+Interview Answer
+
+"Shuffle involves network transfer, disk I/O, and sorting. Since data moves between executors, it is one of the most expensive Spark operations
+-------------------
+6. What is AQE?
+"AQE allows Spark to optimize execution during runtime. It can merge small partitions, handle skewed data, and choose better join strategies automatically."
+------------
+7. What is Data Skew?
+Example
+Imagine:
+Customer A = 10 million rows
+Customer B = 10 rows
+Customer C = 20 rows
+One executor gets most data.
+Other executors stay idle.
+This is Data Skew.
+Interview Answer
+"Data skew occurs when some partitions contain significantly more data than others, causing certain executors to take much longer."
+-------------------------------------------------------
+How Would You Handle Data Skew?
+Answer
+Enable AQE
+Salting
+Repartitioning
+Broadcast joins
+Simple Interview Answer
+
+"I would first identify skewed keys and then use AQE or salting techniques to distribute data more evenly."
+-----------------------
+What is Structured Streaming?
+Simple Explanation
+Instead of reading a file once:
+spark.read()
+
+spark continuously reads incoming data:
+
+spark.readStream()
+Interview Answer
+
+"Structured Streaming is Spark's stream processing engine that allows processing of real-time data using the same DataFrame API used for batch processing."
+-----------------
+Why Watermark Is Important
+Without watermark:
+Spark keeps every window forever
+Problems:
+Huge memory consumption
+Slow processing
+Stateful operations become expensive
+Watermark tells Spark:
+"After this time, forget this window."
+This allows Spark to clean up state from memory.
+--------------------------------------------------------------------------------
+Why do we need Watermarking?
+Answer:
+"Watermarking helps Spark handle late-arriving data while preventing unlimited state growth. 
+It defines how long Spark should wait for delayed events before closing a window and cleaning up state
+----------------------------------------------
+18. What is Z-Ordering?
+Interview Answer
+"Z-Ordering reorganizes data files based on frequently filtered columns so that Spark scans fewer files."
+Example
+OPTIMIZE customer
+ZORDER BY (customer_id)
+--------------------
+What is Auto Loader?
+Interview Answer
+
+"Auto Loader incrementally processes new files arriving in cloud storage without scanning the entire directory
+--------------
+"Partitioning divides data into smaller chunks that can be processed in parallel."
+------------------------
+For interviews, don't try to explain these answers exactly as written. Instead, explain them in a simple flow:
+
+**1. What is the problem?**
+**2. Why does it happen?**
+**3. How would I solve it?**
+**4. Which Databricks/Spark feature helps?**
+
+---
+
+# Q1. Explain SCD Type 2 in Azure Databricks
+
+### Interview-Friendly Answer
+
+"SCD Type 2 is used when we want to maintain the complete history of changes in a dimension table.
+
+For example, if a customer's city changes from Ranchi to Bangalore, we don't overwrite the old value. Instead, we keep the old record and create a new record.
+
+In Databricks, I would use Delta Lake and MERGE statements.
+
+The dimension table contains:
+
+* Customer ID
+* Customer Name
+* Start Date
+* End Date
+* Current Flag
+
+When a change arrives:
+
+1. Mark the old record as inactive.
+2. Set its end date.
+3. Insert a new record with updated values.
+4. Mark the new record as current.
+
+This allows us to see both current and historical data while Delta Lake ensures ACID transactions."
+
+### Simple Example
+
+| CustomerId | City      | StartDate  | EndDate    | Current |
+| ---------- | --------- | ---------- | ---------- | ------- |
+| 101        | Ranchi    | 2024-01-01 | 2025-01-15 | False   |
+| 101        | Bangalore | 2025-01-16 | NULL       | True    |
+
+### One-Line Summary
+
+"SCD Type 2 preserves history by expiring old records and inserting new versions."
+
+---
+
+# Q2. Spark Job Has Long Shuffle Times. How Would You Optimize It?
+
+### What is Shuffle?
+
+Imagine data is spread across 10 machines.
+
+Now Spark needs to group or join data.
+
+Data must move between machines.
+
+This movement is called **shuffle** and is expensive.
+
+---
+
+### Interview-Friendly Answer
+
+"If a Spark job is experiencing long shuffle times, I would first identify operations causing shuffle such as joins, group by, distinct, and order by.
+
+To optimize:
+
+1. Filter data early to reduce rows.
+2. Select only required columns.
+3. Use broadcast joins for small lookup tables.
+4. Tune spark.sql.shuffle.partitions.
+5. Enable Adaptive Query Execution (AQE) to automatically optimize partitions and handle skewed data.
+
+These techniques reduce network transfer and improve job performance."
+
+### Real Example
+
+Bad:
+
+```python
+df1.join(df2)
+.filter(col("status")=="ACTIVE")
+```
+
+Good:
+
+```python
+df1.filter(col("status")=="ACTIVE") \
+   .join(df2)
+```
+
+Less data moves across the network.
+
+### One-Line Summary
+
+"Reduce data movement between executors and let AQE optimize shuffle operations."
+
+---
+
+# Q3. Real-Time Streaming with Complex Aggregations
+
+### Scenario
+
+Suppose a banking application receives transactions continuously.
+
+Management wants:
+
+* Total transactions every 5 minutes
+* Average transaction amount
+* Fraud detection metrics
+
+in real time.
+
+---
+
+### Interview-Friendly Answer
+
+"I would use Structured Streaming in Azure Databricks.
+
+1. Read data from Event Hub or Kafka.
+2. Use event timestamps.
+3. Apply window-based aggregations.
+4. Configure watermarking to handle late-arriving data.
+5. Store results in Delta Lake.
+6. Expose results through Databricks SQL dashboards for monitoring."
+
+### Flow
+
+```text
+Event Hub/Kafka
+       ↓
+Structured Streaming
+       ↓
+Window Aggregation
+       ↓
+Delta Lake
+       ↓
+Dashboard
+```
+
+### Watermark Example
+
+If I set:
+
+```python
+withWatermark("timestamp","10 minutes")
+```
+
+Spark will wait 10 minutes for late events.
+
+### One-Line Summary
+
+"Use Structured Streaming, window aggregations, watermarking, and Delta Lake."
+
+---
+
+# Q4. Dataset Doesn't Fit Into Memory
+
+### First Thing to Understand
+
+Interviewers often ask this because they want to know:
+
+**Do you understand that Spark is distributed?**
+
+The correct answer is not:
+
+> "I'll buy more RAM."
+
+---
+
+### Interview-Friendly Answer
+
+"If the dataset does not fit into memory, I would rely on Spark's distributed processing model.
+
+Spark processes data partition by partition rather than loading the entire dataset into memory.
+
+To improve performance:
+
+1. Increase cluster size using autoscaling.
+2. Repartition data appropriately.
+3. Use Delta Lake partition pruning.
+4. Read only required columns.
+5. Persist large intermediate data using MEMORY_AND_DISK or DISK_ONLY.
+6. Process incrementally using Auto Loader or Change Data Feed instead of full loads."
+
+### Simple Analogy
+
+Instead of reading a 1000-page book at once,
+
+you read:
+
+```text
+Page 1-100
+Page 101-200
+Page 201-300
+...
+```
+
+Spark does the same with partitions.
+
+### One-Line Summary
+
+"Spark handles large datasets by processing partitions independently and spilling to disk when necessary."
+
+---
+------------------------------------------------
+How would you handle a scenario where your streaming application in Azure Databricks needs to process data from multiple sources with varying data arrival patterns?
+
+"When I have multiple streaming sources in Azure Databricks, not all sources send data at the same speed. For example, Kafka events may arrive immediately, while files from ADLS may arrive 10–15 minutes late.
+To handle this, I configure a separate watermark for each source based on how late its data can arrive. This helps Spark know how long it should wait for late records.
+When I join or combine these streams, Spark uses the watermarks to manage state and clean up old data.
+By default, Spark waits for the slowest stream to ensure no valid data is missed. If the business wants faster processing and can tolerate losing some very late records, I can change the watermark policy to process data sooner.
+I also monitor the lag of each stream so that if one source starts falling behind, I can identify and fix the issue quickly."
+-----------------------------------------------------------------
