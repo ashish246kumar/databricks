@@ -298,3 +298,63 @@ When I join or combine these streams, Spark uses the watermarks to manage state 
 By default, Spark waits for the slowest stream to ensure no valid data is missed. If the business wants faster processing and can tolerate losing some very late records, I can change the watermark policy to process data sooner.
 I also monitor the lag of each stream so that if one source starts falling behind, I can identify and fix the issue quickly."
 -----------------------------------------------------------------
+In a streaming application, how would you implement exactly-once processing semantics in Azure Databricks?
+
+In Azure Databricks Structured Streaming, exactly-once processing is achieved through 
+a combination of source offset tracking, checkpointing, and transactional sinks like Delta Lake.
+First, the streaming source such as Kafka or Event Hubs maintains offsets for each event. 
+Spark reads data in micro-batches and records the offsets it has processed.
+Second, checkpointing stores the streaming query's metadata, progress information, 
+and source offsets in durable storage. If the application crashes, Spark restarts from the last successfully committed offset instead of reprocessing all data.
+Third, I write the output to Delta Lake, which provides ACID transactions. A micro-batch is committed atomically. If a failure occurs before the commit, the batch is retried. If the commit succeeds, Delta Lake ensures the same batch is not written again, preventing duplicates.
+Finally, I design transformations and merge logic to be idempotent. For example, when upserting records into Delta tables,
+I use a unique business key with MERGE operations so that reprocessing the same data produces 
+the same result and does not create duplicate records.
+--------------------------------------
+In a scenario where you need to join two streaming datasets with different lateness characteristics, how would you configure watermarks to ensure accurate results?
+"When joining two streaming datasets with different lateness characteristics, I configure separate watermarks for each stream based on how late data is expected to arrive.
+
+For example, suppose order events can arrive up to 10 minutes late, while payment events can arrive up to 30 minutes late. I would configure:
+orders = orders.withWatermark("event_time", "10 minutes")
+payments = payments.withWatermark("event_time", "30 minutes")
+Then I add a time-bounded join condition:
+joined = orders.join(
+    payments,
+    expr("""
+        orders.order_id = payments.order_id AND
+        payments.event_time BETWEEN
+            orders.event_time AND
+            orders.event_time + interval 1 hour
+    """)
+)
+The watermark tells Spark how long to keep state for each stream. 
+Since streaming joins require Spark to hold unmatched records in memory,
+without watermarks the state would grow indefinitely.
+Spark computes a global watermark from both streams. 
+By default, it uses the minimum watermark to avoid dropping potentially matching records from the slower stream. 
+Once records are older than the watermark and can no longer participate in a valid join, 
+Spark removes them from state storage, preventing memory issues while still producing accurate results."
+------------------------------------
+How would you implement a data pipeline in Azure Databricks to process and analyze streaming data from IoT devices, ensuring scalability and fault tolerance?
+
+To process and analyze streaming IoT data in Azure Databricks, I would build a scalable pipeline using Azure IoT Hub/Event Hubs, Structured Streaming, and Delta Lake.
+First, IoT devices send telemetry data such as temperature, pressure, and device status to Azure IoT Hub or Event Hubs. 
+Databricks consumes these events in real time using Structured Streaming and a dedicated consumer group to isolate the workload.
+The incoming data is validated, filtered, and enriched with reference data such as device metadata, location information, or device type. I would then perform real-time aggregations, such as calculating average temperature per device or detecting anomalies using window-based operations.
+To handle varying event volumes, I would enable autoscaling on Databricks clusters so that additional workers are added automatically when throughput increases.
+For fault tolerance, I would configure checkpointing. Checkpoints store offsets and streaming progress so that if a node or cluster fails, the stream resumes from the last successfully processed offset without data loss
+Finally, I would store the processed data in Delta Lake. Delta Lake provides ACID transactions, schema enforcement, time travel, and exactly-once write guarantees, making it suitable for both real-time dashboards and downstream analytics workloads."
+-------------------------------
+Describe the process of integrating Azure Databricks with Azure Data Lake Storage Gen2 for a data lake solution.
+
+To integrate Azure Databricks with Azure Data Lake Storage Gen2 (ADLS Gen2),
+I first configure secure authentication using either a Service Principal or Managed Identity
+. I then grant the required permissions on the storage account through Azure RBAC, 
+typically using the Storage Blob Data Contributor role.
+Once authentication is configured, Databricks can access the storage either 
+through mounted paths or directly using ABFSS URLs. In modern implementations, 
+direct ABFSS access is preferred because it provides better security, governance, and Unity Catalog integration.
+After connectivity is established, I use Delta Lake tables on top of ADLS Gen2 to store data. 
+Delta Lake provides ACID transactions, schema enforcement, time travel, and optimized metadata management.
+This combination of Databricks and ADLS Gen2 forms the foundation of a scalable lakehouse architecture
+---------------------------------------
