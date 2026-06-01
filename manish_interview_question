@@ -1,3 +1,8 @@
+ci/cd
+
+the part where we integrate the dev changes to the repository is called as continuous integration. 
+And the part where we are deploying all the latest code from dev - to prod is called as continuous deployment
+----------------------
 Why Delta Lake for SCD Type 2?
 Interview Answer
 "Delta Lake provides ACID transactions. Since SCD Type 2 requires updating an old row and inserting a new row together, Delta Lake ensures both operations succeed atomically."
