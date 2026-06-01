@@ -401,3 +401,57 @@ Record counts
 Data quality metrics
 Failed records
 -----------------------------------------------------------------------------
+Connect → Secure → Access → Store
+1. Connect ADLS Gen2 with Databricks
+Connect ADLS Gen2 using Service Principal or OAuth authentication.
+2. Secure Access
+Use Azure Active Directory (AAD) for authentication.
+Assign appropriate RBAC roles such as:
+Storage Blob Data Contributor
+Storage Blob Data Reader
+This ensures only authorized users and applications can access the data.
+Access Data Efficiently
+Use the ABFS driver (abfss://) to read and write data directly from ADLS Gen2.
+Provides optimized and scalable access to storage.
+4. Store Data in Delta Format
+Store data as Delta Lake tables on ADLS Gen2.
+Benefits:
+ACID Transactions
+Schema Enforcement
+Time Travel
+Better Performance
+----------------------------------
+5 What are the considerations for implementing role-based access control (RBAC) in Azure Databricks?
+A
+Implement RBAC in Azure Databricks at multiple levels:
+Workspace roles: Assign Admin, User, or Viewer roles to control who can create clusters, jobs, and notebooks
+Cluster policies: Define policies restricting VM types, max nodes, and auto-termination to enforce cost control per team
+Data access via Unity Catalog: Centralize permissions on catalogs, schemas, and tables with GRANT / REVOKE statements
+AAD integration: Map Azure Active Directory groups to Databricks groups for consistent, centralized identity management
+------------
+
+Code → Test → Deploy → Promote
+1. Code (Version Control)
+Store Databricks notebooks, scripts, and libraries in Git.
+Use Databricks Repos to sync with Git repositories.
+Developers work on feature branches and create pull requests.
+2. Test (CI)
+When code is pushed, the CI pipeline runs automatically.
+Perform:
+Unit testing using pytest
+Code quality checks
+Notebook validation
+3. Deploy (CD)
+After successful testing, deploy notebooks and workflows to Databricks.
+Use:
+Databricks CLI
+Databricks REST API
+Databricks Asset Bundles (modern approach)
+
+The pipeline automatically:
+
+Uploads notebooks
+Updates jobs/workflows
+Deploys libraries
+Environment promotion: Maintain separate workspaces for dev, staging, and production with identical configurations managed via Terraform or ARM templates
+-------------------
