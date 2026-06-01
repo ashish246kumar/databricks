@@ -2,6 +2,8 @@ ci/cd
 
 the part where we integrate the dev changes to the repository is called as continuous integration. 
 And the part where we are deploying all the latest code from dev - to prod is called as continuous deployment
+- It is a set of practices used to automate and streamline the process of building, testing, 
+and deploying code changes to different Environments
 ----------------------
 Why Delta Lake for SCD Type 2?
 Interview Answer
@@ -363,3 +365,39 @@ After connectivity is established, I use Delta Lake tables on top of ADLS Gen2 t
 Delta Lake provides ACID transactions, schema enforcement, time travel, and optimized metadata management.
 This combination of Databricks and ADLS Gen2 forms the foundation of a scalable lakehouse architecture
 ---------------------------------------
+Can you explain the concept of Databricks Delta Live Tables and how they simplify ETL processes?
+
+Delta Live Tables (DLT) is a managed ETL framework in Databricks.
+We only define data transformations in SQL or Python.
+Databricks automatically manages the entire ETL pipeline.
+Key Features
+1. Declarative ETL
+Focus on what transformation is needed, not how to execute it.
+Define tables and transformations using SQL or Python.
+2. Automatic Pipeline Orchestration
+Automatically identifies dependencies between tables.
+Executes tasks in the correct order.
+No need to manually manage workflow scheduling.
+3. Automated Infrastructure Management
+Automatically provisions and manages clusters.
+Handles retries on failures.
+Supports auto-scaling based on workload.
+4. Built-in Data Quality Checks
+Use Expectations to validate data.
+Can:
+Drop invalid records
+Fail the pipeline
+Log invalid records for analysis
+Example:
+CONSTRAINT valid_amount
+EXPECT (amount > 0)
+ON VIOLATION DROP ROW
+5. Monitoring and Data Lineage
+Provides a visual UI for monitoring pipelines.
+Shows:
+Data lineage
+Pipeline status
+Record counts
+Data quality metrics
+Failed records
+-----------------------------------------------------------------------------
