@@ -1,3 +1,10 @@
+how to create spark session 
+how to read table jdbc table
+how much memory you have used how much executor and how much core
+how much data you have processed incrementally 
+
+
+----------------------------------------------------------------------------
 ci/cd
 
 the part where we integrate the dev changes to the repository is called as continuous integration. 
