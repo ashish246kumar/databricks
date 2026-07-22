@@ -1,0 +1,143 @@
+
+What are the columns in your datasets you have seen?
+
+In my last project, I worked on a **Customer Data Management (CDM)** platform that integrated data from multiple source systems to create a single golden record for our customers and related entities. We used **Databricks** for our data pipelines and **Reltio** as our Master Data Management (MDM) hub.
+
+The main datasets I worked with were **Customer, Vehicle, Organization, and Location**.
+
+The **Customer** dataset was our core entity. Beyond standard fields like **FirstName** and **LastName**, it had a rich structure. For example, contact information like **Email** and **Phone** was stored as nested objects, where each entry had its own type (such as **Home** or **Work**) and a **ValidationStatus**. We also tracked customer privacy choices in a **PrivacyPreferences** object with flags like **DoNotMarket**, which was critical for compliance.
+
+The **Vehicle** dataset was keyed by the **VIN**. It contained descriptive attributes like **Model** and **Year**, financial data such as **MSRPAmount**, and various status flags like **PreownedIndicator**.
+
+We also had an **Organization** dataset for our business customers, which included **LegalName**, **DUNSNumber** for identification, and industry classification codes.
+
+Finally, to ensure consistency, all physical addresses were standardized into a central **Location** dataset. This was more than just **AddressLine1** and **City**; it also stored **VerificationStatus** from our address validation service and **GeoLocation** coordinates.
+
+This structured approach ensured our data was clean, standardized, and ready for use by downstream analytics and operational systems.
+----------------------------------------------------------------------------------------------------------------------------------------------
+What are the different transformations have you worked on?
+
+From a project-specific standpoint, a lot of my work involved the following transformations:
+
+Schema Mapping and Evolution: A major task was transforming data from our Reltio MDM system to fit the ODS schema. This involved:
+
+Flattening Nested Structures: The MDM data often came as complex, nested JSON. I would flatten these structures into a tabular format, creating new columns from nested attributes (e.g., address.street, address.city).
+Column Renaming and Selection: We would select only the necessary attributes from the source and rename them to align with the ODS's naming conventions for consistency.
+Data Type Casting: Ensuring all data was correctly typed, like converting string-based dates into proper timestamp formats (YYYY-MM-DDTHH:MM:SSZ to timestamp) or ensuring numeric fields were stored as integers or floats, not strings.
+Data Cleansing and Quality: With Delta Live Tables, we enforced data quality rules directly in the pipeline. For example:
+
+Handling Nulls: We'd define rules to either drop records with null primary keys (DROP IF id IS NULL) or replace nulls in non-critical fields with default values (e.g., COALESCE(status, 'Unknown')).
+Deduplication: We implemented logic to identify and remove duplicate records based on a composite key (like a customer ID and a source system timestamp) to ensure we only kept the most recent or relevant record.
+Data Enrichment:
+
+Joining Datasets: I often wrote transformations to join different data streams. For instance, joining the core customer entity with related entities like 'Vehicle Relationship' or 'Financial Accounts' to create a richer, more unified customer profile in the ODS.
+Creating Derived Attributes: We would create new, valuable fields from existing data. A simple example is concatenating first_name and last_name to create a full_name. A more complex one might involve calculating a customer's tenure based on their first interaction date.
+Beyond this specific project, I also have experience with more general transformation patterns:
+
+Aggregation: Such as calculating total sales per customer or monthly active users, using window functions and GROUP BY operations in Spark SQL.
+Pivoting/Unpivoting: Restructuring data from a wide format to a long format (or vice-versa) to make it suitable for specific types of analysis or for loading into certain BI tools.
+Filtering: Applying business logic to filter out records that are not relevant for the downstream system, like filtering out inactive or test accounts.
+My experience on the CDM project has given me deep, practical skills in implementing these transformations in a modern, scalable environment with tools like Spark and Delta Live Tables, ensuring our data is not only moved but also refined, reliable, and valuable."
+
+---------------------------------------------------------------------------------------
+Have you created a job pipleine in your databricks and what are the steps to create ?
+
+Yes. In an interview, you don't want to explain every YAML property unless the interviewer asks. A concise 1–2 minute answer is much better.
+
+**Interview Answer:**
+
+> **Yes, I have created and maintained Databricks job pipelines in my current project.** We use **Databricks Asset Bundles (DAB)**, so instead of creating jobs manually in the UI, we define them in **YAML files** and store them in Git.
+>
+> The process is:
+>
+> 1. First, we define the job or pipeline in a YAML file.
+> 2. Then we add one or more tasks, such as running a notebook, Python script, SQL query, or a Delta Live Tables (DLT) pipeline.
+> 3. Next, we configure the compute cluster, including the node type and autoscaling.
+> 4. We configure scheduling if the pipeline needs to run automatically, for example daily or hourly.
+> 5. We also set up notifications so the team receives alerts if the pipeline fails.
+> 6. Finally, we deploy the pipeline to the required environment (Dev, QA, or Prod) using Databricks Asset Bundles.
+>
+[
+
+Define the Pipeline: We define our pipelines using YAML. In our project, you can see this in the databricks.yml file, which is a Databricks Asset Bundle configuration. This file includes other YAML files from the resources/ directory, such as cdmcloud_pipeline.yml, which defines a large multi-task workflow.
+
+Define Tasks: A pipeline consists of one or more tasks. Each task is a specific action, like running a notebook, a Python script, a SQL query, or a Delta Live Tables (DLT) pipeline. For example, in our databricks.yml file, you can see several DLT pipelines defined, such as swt_streaming.
+Configure the Cluster: You need to specify the compute resources for the job. This includes the node type, number of workers, and auto-scaling settings. In our databricks.yml, you can see the cluster configuration for the swt_streaming pipeline:
+  clusters:
+    - label: default
+      node_type_id: "Standard_F4"
+      driver_node_type_id: "Standard_F4"
+      autoscale:
+        min_workers: 1
+        max_workers: 3
+        mode: "ENHANCED"
+]
+
+--------------------------------------------------------------------------------------------------
+Differnt clusters you have worked on?
+
+In my project, I mainly worked with two types of Databricks clusters: Job Clusters and All-Purpose Clusters.
+
+Job Clusters were used for our production ETL pipelines. These clusters are created when a job starts and automatically terminate after the job completes, which helps reduce costs and provides an isolated execution environment.
+
+All-Purpose Clusters were used during development for writing notebooks, debugging, testing transformations, and ad-hoc data analysis. We enabled auto-termination so that idle clusters didn't incur unnecessary costs.
+
+From a hardware perspective, we selected different VM sizes based on the workload. For regular ETL jobs, we used general-purpose clusters. For larger datasets or memory-intensive operations, we used memory-optimized nodes. If a workload was CPU-intensive, we could choose compute-optimized nodes.
+
+I also worked with cluster configurations such as autoscaling, which automatically adjusts the number of worker nodes based on workload, Photon acceleration to improve Spark SQL and DataFrame performance, and selecting the appropriate Databricks Runtime version for compatibility and performance."
+
+------------------------------------------------
+What is Bundle Deployment Binding (DABs)?
+
+Databricks Asset Bundles (DABs) are Databricks' **Infrastructure as Code (IaC)** solution for managing the complete lifecycle of a Databricks project. Instead of creating jobs, clusters, and pipelines manually in the Databricks workspace, everything is defined as code and stored in a Git repository. This includes notebooks, Python code, Delta Live Tables (DLT) pipelines, workflows, jobs, clusters, and other project configurations. The bundle ensures consistent deployments across Development, QA, and Production environments and integrates seamlessly with CI/CD pipelines.
+
+In my project, the **`databricks.yml`** file was the main entry point of the Asset Bundle. It defined the bundle and referenced configuration files inside the **`resources/`** directory. These YAML files contained definitions for Databricks jobs, workflows, DLT pipelines, and cluster configurations. Our actual ETL and business logic was maintained in the **`src/`** directory, which included PySpark code, data transformation logic, and Delta Live Table notebooks.
+
+Whenever developers pushed code to GitHub, our **GitHub Actions CI/CD pipeline** automatically executed Databricks CLI commands such as **`databricks bundle validate`**, **`databricks bundle deploy`**, and **`databricks bundle run`**. During deployment, the Asset Bundle packaged all the source code and YAML configurations together and deployed them as a single unit to the target Databricks workspace.
+
+The main advantages of using Databricks Asset Bundles were:
+
+* **Consistency:** The same configuration was deployed across all environments, eliminating manual configuration differences.
+* **Automation:** Deployment, validation, and execution were fully automated through CI/CD pipelines.
+* **Version Control:** All infrastructure and application code were maintained in Git, making collaboration, auditing, and rollback straightforward.
+* **Reusability and Maintainability:** YAML-based configurations made it easy to reuse resources and manage changes efficiently.
+
+In my CDM project, we used DABs to deploy our customer data pipelines, including PySpark ETL code, DLT pipelines, Databricks workflows, and cluster configurations. This ensured reliable, repeatable, and automated deployments from development to production while reducing manual effort and deployment errors.
+
+------------------------------
+
+Is the the statement correct? shuffling depensds on stages? 10.What is unity catalog?
+Do Databricks has there own storage?
+
+Shuffle & Stages: "A shuffle redistributes data across partitions, and every shuffle creates a new Spark stage. In other words, shuffle boundaries determine stage boundaries."
+
+A shuffle is the process of redistributing data across partitions and is triggered by wide transformations like join, groupBy, and repartition. A stage is a set of tasks that can execute without a shuffle.
+Spark's DAG Scheduler groups all narrow transformations (such as map, filter, and select) into the same stage because they don't require data movement.
+Shuffle boundaries determine stage boundaries, meaning whenever a shuffle occurs, Spark ends the current stage and starts a new one.
+The relationship is that shuffle boundaries determine stage boundaries. Whenever Spark encounters a shuffle operation, it completes the current stage and creates a new stage for the operations after the shuffle.
+
+---------------------------------------------------------
+
+Unity Catalog is Databricks' centralized data governance solution that manages access, security, lineage, and discovery of all data and AI assets across the Databricks Lakehouse.
+
+Its main features include:
+
+Centralized Governance: Manage permissions using SQL GRANT and REVOKE commands for catalogs, schemas, tables, views, columns, and even row-level security.
+Built-in Data Lineage: Automatically tracks where data comes from and where it is used, helping with debugging, impact analysis, and compliance.
+Data Discovery: Provides a searchable catalog of tables, views, models, functions, and other assets so teams can easily discover and share data.
+
+Three-Level Namespace: Uses the hierarchy Catalog → Schema → Table, for example:
+
+Project Example: Our Databricks jobs and DLT pipelines read from and wrote to Unity Catalog-managed Delta tables, ensuring secure access, governance, and lineage.
+------
+3. Does Databricks Have Its Own Storage? (Summary)
+
+No. Databricks separates compute and storage. It manages Spark clusters (compute), while data is stored in the customer's cloud storage, such as Azure Data Lake Storage Gen2 (ADLS Gen2), Amazon S3, or Google Cloud Storage.
+
+Databricks follows a decoupled architecture, where compute and storage are separate.
+
+Compute: Databricks manages Spark clusters that execute your workloads.
+Storage: Your data remains in your own cloud storage account.
+------------------------------------------------
+
+
