@@ -1,0 +1,184 @@
+i was working for mercedenz
+the data was bascially customer and vehicle and dealer releated transactioal data
+they were usin for promotional purpose
+this was bascially migration project where we are moving form ibm data stage to db2
+ 
+
+the  arhcitecture we followed medallian arhcitecture  (Bornze ,gold and silver)
+how we are consuming the file it was through dlt pipeline our archicture is not something fully dlt pipeline 
+raw data consumption is through delta live table after that we are using delta table
+how incremntally we are digesting  data we are bascially using dt level partition 
+on a daily basis we are consuming 60 to 70k data processing
+
+some data were pull 
+
+
+cluster configration->
+Databricks Runtime 14.3 with Photon enabled
+auto-termination after 30 minutes
+Cluster logs were stored in DBFS
+Cluster Name
+Node Type
+Both Driver and Worker use the same VM type. 
+Standard_D8ds_v5
+User Isolation
+data_security_mode: USER_ISOLATION
+Cluster starts with
+2 Workers
+If workload increases
+Automatically scales
+Up to
+12 Workers 
+the data was dump into adls and from adls we pick and process it incremntally through spark strctured streaming
+
+how we decide cluster configration 
+1. Data Volume
+2. Complexity of Processing
+7. SLA (Time Requirement)
+-----------------------------------
+inside cluster also we have 2-3 vartion waht are they  compte intensive memory intensive
+Yes. Inside Databricks (Azure Databricks), when selecting a VM (node) type for your cluster, you can choose different VM families based on the workload. This is a very common interview topic.
+Main Types of VM Families
+1. Compute Optimized (CPU Intensive)
+Purpose: More CPU cores relative to memory.
+2. Memory Optimized (Memory Intensive)
+Purpose: More RAM per CPU core.
+3. General Purpose (Balanced)
+Purpose: Balanced CPU and memory.
+----------------
+
+Common Reasons for Job Slowdown
+1. Data Volume Increased
+How to identify
+Input data size increased
+Longer stage execution
+Solution
+Autoscaling
+Better partitioning
+
+2)Data Skew
+One partition contains far more data than the others
+spark UI
+One task runs much longer than the rest.
+Solution
+Salting
+Better partition key
+Adaptive Query Execution (AQE)
+Too Many Small Files 
+Example
+500,000 files
+Each file
+2 MB
+Spark spends a lot of time opening files instead of processing data.
+Solution
+OPTIMIZE table_name;
+or write larger files by tuning partition
+11. Cache Misuse
+Caching helps only if the DataFrame is reused.
+3. Small File Problem
+Instead of:
+100 files
+You now have:
+100,000 files
+Spark spends a lot of time opening files.
+Solution
+OPTIMIZE customer;
+Or write larger files by tuning partitioning.
+
+Concurrent Update
+
+A Concurrent Update Error occurs when two Spark jobs try to update the same Delta table (or the same data) at the same time.
+
+Delta Lake uses Optimistic Concurrency Control (OCC):
+
+Both jobs read the same table version.
+The first job commits successfully.
+The second job checks the table before committing.
+Since the table has already changed, Delta detects the conflict and rejects the second job with a concurrent update error.
+Example
+Job A: MERGE INTO customer
+Job B: DELETE FROM customer
+Both modify the same customer records simultaneously
+How to resolve it
+Schedule jobs so they don't overlap
+
+---------------
+Z-Ordering is a Delta Lake optimization that physically rearranges data in files based on one or more frequently filtered columns, so related values are stored close together.
+
+This improves data skipping, meaning Spark reads fewer files, resulting in faster query performance.
+We typically apply it after OPTIMIZE on columns commonly used in filters or joins, such as customer_id or date."
+Create a Single Output File
+
+If you want only one output file (for example, a CSV report):
+
+df.coalesce(1).write.mode("overwrite").csv("/output")
+---------------
+
+An Out of Memory (OOM) error occurs when Spark executors or the driver do not have enough memory to process the data.
+
+Common Reasons
+1. Large Join (Most Common)
+
+Joining two very large DataFrames.
+4. Caching Large DataFrames
+df.cache()
+Caching Large DataFrames
+df.cache()
+7. Broadcasting a Large Table
+from pyspark.sql.functions import broadcast
+
+df1.join(broadcast(df2), "id")
+Increase executor memory or use memory-optimised VMs.
+Increase the number of partitions.
+Avoid collect() and toPandas() on large datasets.
+Broadcast only small tables.
+Handle data skew (salting, better partitioning).
+Cache only DataFrames that are reused.
+Filter data before joins to reduce data size.
+--------------------
+
+worked on building job that will delete 20 year old data from all the system based on differet type of date field each source have 
+before delete need to take backup of data and store in adls 
+the challenges were we were doing hard delete so before deleteing we should be 100 percent sure that no right data get older
+challenge was suppose from one source it is older than 20 year but from other source it is not older so we not need to delete the data 
+date format we need make it proper 
+challenge was how to delete from reltio because it take 100 id at a time so need to send in a chunk of 100
+and reltio was completely new to me 
+--------
+all the error which were in datastage so that data i need to migrate from mulittple source system for each source system 
+and dump into our table
+the challenge was that in old system there was single table that hold data but in our new system we need to distribute the data into multiple table
+each for source system
+what was error logic like we have 3 differnt phase of error phase0,phase1 and phase2
+when should phase0 error come WHEN should phase1  name format not valid ,profanity ,vin
+and when should phase2 error come
+
+-----------
+error reprocessing logic implmented
+when ever the phase1 error have come data steward going to reprocess it after ui for recorrction we have build stremlit app
+through ui data stewaard is going to correct error
+when ever error is correct it is going into fixed table that is present intermediate layer.
+from this table which ever data have come  it is going to pick those record incrementally and will be reprocessed
+-----------
+build data lineagge 
+to track transction of customer from source till golden layer
+we were using source releated table and golden data releated table
+optimised our pyspark job
+___
+test cases 
+----
+bug fixing
+------
+schema enhansement addition of col and how  it going to be populated
+added created date logic 
+
+
+-----------
+ 
+
+
+
+
+
+
+
