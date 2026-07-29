@@ -1,3 +1,14 @@
+Mask Sensitive Column in Unity Catalog table using Column Masking
+[https://www.youtube.com/watch?v=LCG7LX5nIfg&t=2s]
+In Unity Catalog, I implement dynamic column masking by 
+creating SQL scalar functions that determine whether a user belongs to an authorised group using functions such as 
+is_account_group_member(). The function returns either the original value or a masked version. 
+I then attach the function to the sensitive column using ALTER TABLE ... ALTER COLUMN ... SET MASK. After that, 
+all queries against the table automatically enforce masking based on the querying user's permissions. 
+This provides centralized, policy-driven protection for sensitive columns without requiring changes to downstream 
+applications or PySpark job
+
+----------------------------------------------------------------------------------
 What is Partition Pruning in Spark?
 
 Answer:
