@@ -8,6 +8,14 @@ all queries against the table automatically enforce masking based on the queryin
 This provides centralized, policy-driven protection for sensitive columns without requiring changes to downstream 
 applications or PySpark job
 
+CREATE OR REPLACE FUNCTION my_catalog.security.mask_ssn(ssn STRING)
+RETURNS STRING
+RETURN
+CASE
+    WHEN is_account_group_member('PII_READERS')
+        THEN ssn
+    ELSE 'XXX-XX-' || RIGHT(ssn,4)
+END;
 ----------------------------------------------------------------------------------
 What is Partition Pruning in Spark?
 
