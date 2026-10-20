@@ -12,3 +12,13 @@ In Databricks, Delta Lake supports schema evolution for compatible changes.
 .option("mergeSchema", "true")
 
 ---------------------------------------------------------------------------------------------------------
+Source Has 1 Million Rows, Target Has 999,500
+
+1. Transformation filters: Check filter() or where() conditions in PySpark to identify whether 500 rows were removed due to business rules or incorrect filter conditions.
+
+2. Duplicate handling: Check whether dropDuplicates() or distinct() removed duplicate records from the source data.
+
+3. Null keys: Check whether key columns contain NULL values and whether records were excluded using filter(), dropna(), or join conditions.
+6. Incremental logic: Check watermark values, timestamps, and CDC conditions to ensure no records were skipped because of incorrect last-processed timestamps or incremental filters
+.
+------------------------------------------------------------------------------------
