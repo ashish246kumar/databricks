@@ -22,3 +22,16 @@ Source Has 1 Million Rows, Target Has 999,500
 6. Incremental logic: Check watermark values, timestamps, and CDC conditions to ensure no records were skipped because of incorrect last-processed timestamps or incremental filters
 
 ------------------------------------------------------------------------------------
+ 1: Your Pipeline Ran Successfully, But No Data Was Loaded
+ 1\. Source record count: Check whether the source contains records using `df.count()` to confirm that data is available for processing.
+
+2\. Incremental/watermark condition: Validate the watermark value and timestamp filter to ensure new or updated records are not accidentally excluded.
+
+3\. Transformation filters: Review PySpark `filter()` and `where()` conditions to identify whether all records were removed during transformation.
+
+4\. Target write: Verify the write mode, target table or path, permissions, and transaction results to confirm that data was actually written.
+
+5\. Pipeline logs: Review job logs and task metrics to identify skipped records, warnings, incorrect configurations, or issues that did not cause the pipeline to fail.
+  Pipeline success does not always mean data success
+  This is why record-count validation is important.
+--------------------------------------------------------------------------------------------
