@@ -1,14 +1,14 @@
 What would you do if the source schema suddenly changes?
 
-Compare the incoming schema with the expected schema. 
-Identify whether a column was added, removed, renamed, or had its data type changed.
+i would not blindly accept every schema change
+but if a critical column disappear or its data type change i may want te pipeline to fail or quartine the data.
 
-Check whether the change is backward-compatible. Adding an optional column is generally easier to handle 
-than changing customer_id from an integer to a string.
+
 
 Step 3: Apply schema evolution if approved
 If the new column is expected and approved, update the transformation logic and target schema.
 In Databricks, Delta Lake supports schema evolution for compatible changes.
 
 .option("mergeSchema", "true")
+
 ---------------------------------------------------------------------------------------------------------
