@@ -35,3 +35,30 @@ Source Has 1 Million Rows, Target Has 999,500
   Pipeline success does not always mean data success
   This is why record-count validation is important.
 --------------------------------------------------------------------------------------------
+Your Source Sends the Same File Twice
+If the source sends the same file twice, I will maintain a metadata table to track file processing details, such as the file name, processing timestamp, processing status, and other important information.
+
+Before processing a file, I will check the metadata table to see whether that file has already been successfully processed. 
+If the file is already processed, I
+will skip it to avoid duplicate data. Otherwise, I will process the file and update its status
+to SUCCESS after successful completion.
+
+Example metadata table:
+File Name	Processed Timestamp	Status
+customers_01.csv	2026-10-20 10:00	SUCCESS
+orders_01.csv	2026-10-20 10:15	SUCCESS
+customers_02.csv	2026-10-20 10:30	FAILED
+Important interview point: If a file fails, I can retry it instead of skipping it. Also, 
+if the source sends a modified file with the same name, I can use a file checksum or unique file ID to distinguish it from the previously processed version.
+
+----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
