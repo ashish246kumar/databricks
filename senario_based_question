@@ -20,5 +20,5 @@ Source Has 1 Million Rows, Target Has 999,500
 
 3. Null keys: Check whether key columns contain NULL values and whether records were excluded using filter(), dropna(), or join conditions.
 6. Incremental logic: Check watermark values, timestamps, and CDC conditions to ensure no records were skipped because of incorrect last-processed timestamps or incremental filters
-.
+
 ------------------------------------------------------------------------------------
