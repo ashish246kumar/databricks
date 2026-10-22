@@ -4,7 +4,11 @@
 **Interview answer:**
 
 > “Z-Ordering is a data layout optimization technique in Databricks. It colocates related data based on one or more columns, so when I query using those columns, Databricks can skip unnecessary files and scan less data.”
-
+- OPTIMIZE compacts and rewrites Delta data files.
+- ZORDER BY improves data locality for the specified columns.
+- Z-Ordering is most useful when queries repeatedly filter on those columns.
+- It has a cost: rewriting files consumes compute resources.
+- Z-Ordering does not guarantee that every query becomes faster, and it is not the same as a traditional index.
 ### Simple example
 
 Suppose we have a customer table:
