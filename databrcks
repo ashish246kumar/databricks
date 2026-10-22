@@ -66,23 +66,7 @@ ____________________
 
 
 _________________________________________________________
-A data lake is raw file storage without ACID guarantees. Delta Lake is a layer built on top of a data lake that adds ACID transactions, schema enforcement, time travel, and reliability.
 
-A data lake is a storage system that stores all kinds of data (structured, semi-structured, unstructured) in its raw format.
-Examples: Azure Data Lake, AWS S3, Google Cloud Storage
-Key Characteristics:
-Stores raw data (CSV, JSON, Parquet, images, logs, etc.)
-Cheap and scalable
-
-Delta Lake is a storage layer built on top of a data lake, adding reliability and database-like features.
-It works on top of S3, ADLS, GCS, etc. also it add unity catlog
-we can use 
-Key Features:
-ACID Transactions
-Schema enforcement & schema evolution
-Time Travel (restore older versions)
-Audit history
-Deletion + updates using MERGE (upsert)
 
 Data Lake
 What it is	A storage concept/architecture for holding raw data
