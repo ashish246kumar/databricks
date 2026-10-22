@@ -1,4 +1,12 @@
 
+Feature	Partitioning	Bucketing
+Cardinality	Best suited to low or moderate cardinality	Can be useful with high-cardinality columns
+How data is organized	Separate folders for each distinct partition value	Fixed number of hash-based buckets
+Example	country=India/, country=USA/	256 buckets based on customer_id
+Main benefit	Faster filtering through partition pruning	Can improve compatible joins and reduce shuffling
+Main risk	High cardinality creates too many folders and small files	Too few or too many buckets can limit performance benefits
+Typical use case	Filter by date, country, or region	Join large tables using customer IDs or other join keys
+---------------------------------------------------------------
 ### 1. Z-Ordering — Simple Explanation
 
 **Interview answer:**
