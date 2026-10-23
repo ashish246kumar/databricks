@@ -814,14 +814,17 @@ Spark creates a DAG, breaks it into stages, converts them into tasks, and sends 
 The driver coordinates the whole process.
 
 2️⃣ Driver vs Executors — what’s the difference?
-	•	Driver: creates the DAG, schedules stages, tracks metadata.
-	•	Executors: actually run the tasks and store data in memory/disk.
+	•	Driver: creates the DAG, Coordinates jobs and tasks, - Tracks task execution and results.,tracks metadata.
+	•	Executors: actually run the tasks and store data in memory/disk, Can process multiple tasks concurrently.
 
 3️⃣ What is a DAG?
 A Directed Acyclic Graph of transformations.
 It shows how your data flows from one step to the next, without cycles.
 Spark uses it to optimize your job before execution.
 
+Job
+A unit of execution triggered by an action.
+Examples: count(), collect(), show() (which can trigger Spark execution).
 
 4️⃣ What are Narrow vs Wide transformations?
 	•	Narrow: each partition depends on a single parent partition (e.g., map, filter). → No shuffle
@@ -832,8 +835,8 @@ This one is critical — most performance issues come from wide transformations.
 
 5️⃣ What is a Stage?
 A group of tasks that can run without a shuffle.
-A shuffle boundary creates a new stage.
-
+a shuffle is the main reason Spark creates a new stage
+Creates a new stage?-->filter(),select()->no , groupBy(),distinct()->yes
 
 6️⃣ What triggers a Shuffle?
 Wide transformations like:
