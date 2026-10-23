@@ -597,6 +597,7 @@ view
 A view in a database is a virtual table that is based on the result-set of an SQL query. 
 Views are used to simplify complex queries, 
 enhance security, and present data in a specific format
+Performance	May be slower for complex queries
 ___________________________________________
 A stored procedure is a reusable set of SQL statements stored in the database. Instead of writing queries again and again,
 we put them in a procedure and call it with parameters. Since it’s precompiled, it improves performance 
@@ -621,7 +622,7 @@ It is used to improve performance for complex queries.
 Fast performance for repeated heavy queries
 Reduces load on source tables
 Excellent for BI dashboards, reporting, analytics
-
+Performance	May be slower for complex queries
 CREATE MATERIALIZED VIEW sales_summary AS
 SELECT region, SUM(amount) AS total_sales
 FROM sales
