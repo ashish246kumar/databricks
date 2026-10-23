@@ -17,3 +17,16 @@ Unity Catalog-centralized governance solution , provides built-in end-to-end dat
 data lake vs delta lake
 Delta Live Tables
 how delta table support versioning
+--------------------------------------------------------------------
+[interviewquestion]
+Stage
+task
+cluster manager,driver,executor,dag,job
+spark master slave architecture
+data lake vs data warehouse
+Partition Pruning,Predicate Pushdown
+Star Schema vs snowflake
+view,materalized view, stored procedure,trigger
+why Databricks Jobs Are Slow
+full outer join,inner join , left join,left anti join , semi join
+-----------------------------------------------------
