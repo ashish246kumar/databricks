@@ -1649,4 +1649,13 @@ Merge, update, delete support
 Streaming + batch unification
 ______________________________________________________________________________________________________
 
+Join type	What it returns	Result rows
+INNER JOIN	Matching rows from both tables	9
+LEFT JOIN	All A rows + matching B rows	10
+FULL OUTER JOIN	All matching and non-matching rows	11
+LEFT ANTI JOIN	A rows with no match in B	1
+LEFT SEMI JOIN	A rows with at least one match in B	6
 
+primary key--->cannot contain duplicate or NULL values | 
+foreign key-  Establishes a relationship between tables
+-------------------------------------------------------------------------------------
