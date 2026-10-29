@@ -1668,5 +1668,10 @@ How is Liquid Clustering different from Z-Ordering?
 Think of both as ways to improve the physical organization of data in a Delta table.
 - Z-Ordering: You explicitly run OPTIMIZE ... ZORDER BY (customer_id) to reorganize data for better locality.
 - Liquid Clustering: You define clustering keys with CLUSTER BY (customer_id), and supported OPTIMIZE operations organize the table around those keys. Databricks also supports automatic clustering features in eligible configurations
------------------------------------------------------
+
+When to use:
+- Existing Delta tables with frequent filters on particular columns.
+- Columns such as customer_id, product_id, or region_id.
+- Tables where file skipping can reduce the amount of data scanned.
+---------------------------------------------------------------------------------------
 
