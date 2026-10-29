@@ -1,0 +1,4 @@
+AWS Step Functions is a serverless workflow orchestration service 
+that coordinates multiple AWS services and tasks in a defined sequence.
+In simple words, it controls which task should run first, which task should run next, 
+and what should happen if a task succeeds or fails.
