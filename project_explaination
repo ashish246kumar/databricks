@@ -1,0 +1,21 @@
+cdm
+first i have extracted data from datastage ->for data extraction we have written datastage job which is just doing
+select * from {table_name} and table_name we have passed through parameter
+After the DataStage job completed, the data was loaded into a shared network folder accessible through a UNC path.
+i have wriiten python script that will use azcopy 
+this file which is in shared network folder is then loaded into adls.
+
+---
+Connects to the configured migration storage. (gets the storage account and container names from configuration, 
+retrieves the storage key from Databricks secrets, and sets the Spark storage-account credential. It returns a URI in this form
+(wasbs://<migration-container>@<storage-account>.blob.core.windows.net
+This code uses the Azure Blob wasbs:// URI scheme
+)
+
+
+Saves a raw copy to the historical Delta table.(writes the untransformed DataFrame as Delta into the table named historical_cust_mbfs in the configured catalog/schema)
+Transforms and filters the data, then saves the result to the staging Delta table. (removes rows where transaction_id is null)
+
+df = spark.read.format("csv").schema(df_schema).option("header", False).option("nullValue", "NULL").option(
+            "delimiter", "\x01").load(source_path)
+------------------------------------
