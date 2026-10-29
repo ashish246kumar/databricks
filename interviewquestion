@@ -1659,6 +1659,7 @@ LEFT SEMI JOIN	A rows with at least one match in B	6
 primary key--->cannot contain duplicate or NULL values | 
 foreign key-  Establishes a relationship between tables
 -------------------------------------------------------------------------------------
+Liquid Clustering  z ordering
 Liquid Clustering is a modern Databricks / Delta Lake technique that organizes table data around 
 selected clustering columns. It is designed to make data layout easier to maintain as data grows and query patterns change
 
