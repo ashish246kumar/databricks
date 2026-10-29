@@ -18,4 +18,84 @@ Transforms and filters the data, then saves the result to the staging Delta tabl
 
 df = spark.read.format("csv").schema(df_schema).option("header", False).option("nullValue", "NULL").option(
             "delimiter", "\x01").load(source_path)
-------------------------------------
+------------------------------------------------------------------------------------------------------------------
+**Oversight (Vanguard)** is a multi-tenant spend / T&E risk-analytics platform. As a data engineer, you’d describe it as the pipelines and orchestration that take customer expense, card, and ERP data in, run analytics that flag policy and fraud risk, and push results into app databases and workflows.
+
+## One-line interview answer
+
+> “Oversight ingests travel & expense and procurement data for enterprise customers, transforms it on Databricks into analytics-ready models, detects risk insights (duplicates, out-of-policy spend, fraud patterns), and syncs results to Postgres for the investigation UI and downstream workflows.”
+
+## Business problem it solves
+
+Customers (enterprises) drop or connect data from systems like:
+
+- Expense systems (e.g. **Concur**)
+- Card feeds (**Amex, Mastercard CDF, Citibank, VCF**)
+- Travel / P-card / fleet sources
+- OCR’d receipts and files over SFTP/S3
+
+Oversight turns that into **insights** such as duplicate submissions, keyword risks, manager/attendee issues, P-card outliers, out-of-policy spend—so auditors can investigate, not just report.
+
+Domains you see in the repo: **CTE** (Corporate Travel & Expense) and **PTP** (Procure-to-Pay), driven by **knowledge** configs (extractors, mappings, insight profiles).
+
+## Data-engineer view of the platform
+
+Think of a classic lakehouse + serving pattern:
+
+```text
+Sources (SFTP / APIs / card files / OCR)
+        ↓
+Ingest / preprocess (Lambdas, direct feeds, connectors)
+        ↓
+Bronze / SRC → Extractor (PySpark on Databricks)
+        ↓
+Staging / mapped Delta tables (Mapper)
+        ↓
+Analytics / insights (ICA, knowledge rules, ML-ish detection)
+        ↓
+Postgres sync (app / workbench) + SFTP/report export + escalator workflows
+```
+
+| Area | What it does (interview language) |
+|------|-----------------------------------|
+| **Extractor** | Config-driven ingest: source files/APIs → staging (CREATE/UPDATE modes), schema/knowledge JSON driven |
+| **Mapper** | Transforms lake data; merges into **Postgres** (JDBC, temp tables, SCD-style sync) |
+| **Direct feeds** | Card/bank file pipelines: split files, sequence validation, bronze polling, EMC integration |
+| **Universal connector** | Pull expense reports / entities from customer systems (often SFTP/API + SQS) |
+| **OCR / Lambdas** | Event-driven ingest and preprocessing on AWS |
+| **ICA / insights** | Risk detection / assignment / limits on processed spend data |
+| **Poster / Escalator** | Push or route findings into workflows / case handling |
+| **Tenant config / validator** | Per-tenant YAML/config; multi-tenant isolation and validation |
+| **Orchestration** | Databricks notebooks/jobs wiring extractor, mapper, cleanup, EMC, etc. |
+
+## Stack you’d name in interviews
+
+- **Compute / lakehouse:** Databricks, **PySpark**, Delta tables  
+- **Serving DB:** **Postgres** (app/workbench, watermarks, merges)  
+- **Cloud:** **AWS** (S3, Lambdas, SQS, SFTP/CompleteFTP-style drops)  
+- **Config as code:** tenant YAML, knowledge JSON/XML (sources, mappings, insight profiles)  
+- **Quality / delivery:** pytest (~95% coverage target), pylint, Sonar, Snyk, Bitbucket PRs into `develop`
+
+## How to talk about *your* role on it
+
+Strong DE talking points from this codebase:
+
+1. **Multi-tenant ETL** — same pipelines, tenant-specific config and catalogs  
+2. **Incremental loads** — CREATE vs UPDATE, watermarks, merge/upsert into Postgres  
+3. **File-based + API ingest** — card file splitting, sequence checks, empty-file handling, retries  
+4. **Lake → serving sync** — Delta as system of record for analytics; Postgres for interactive app  
+5. **Event-driven + batch** — Lambdas for arrival/preprocess; Databricks jobs for heavy transforms  
+6. **Data quality / ops** — validators, cleanup, monitoring, DLQ/OCR reprocess tooling  
+
+## Sample interview soundbites
+
+**“What does Oversight do?”**  
+Spend-risk analytics SaaS: ingest customer T&E/P2P data, enrich and model it, surface exceptions, support investigation workflows.
+
+**“What’s the data architecture?”**  
+Medallion-style flow on Databricks (source → staging → mapped/analytics), synced to Postgres for the product, with AWS for ingest and orchestration around multi-tenant configs.
+
+**“Hardest DE problems?”**  
+Idempotent incremental sync, card-file sequencing, tenant isolation, schema evolution via knowledge configs, and keeping lake and Postgres consistent under retries.
+
+I can also turn this into a 2-minute interview script, or map modules you’ve touched (e.g. `tenant_config_validator`, `rpt_sftp_export`) to “STAR” stories.
