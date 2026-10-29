@@ -29,4 +29,11 @@ Star Schema vs snowflake
 view,materalized view, stored procedure,trigger
 why Databricks Jobs Are Slow
 full outer join,inner join , left join,left anti join , semi join
+Parquet
+Window functions,Indexes
+fact vs dimension
+scd, List Comprehension
+Transformations vs action
+how do we migrate from postgress (old ->onpermises system) to (oracle database)
+
 -----------------------------------------------------
