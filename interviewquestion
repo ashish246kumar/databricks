@@ -1659,3 +1659,14 @@ LEFT SEMI JOIN	A rows with at least one match in B	6
 primary key--->cannot contain duplicate or NULL values | 
 foreign key-  Establishes a relationship between tables
 -------------------------------------------------------------------------------------
+Liquid Clustering is a modern Databricks / Delta Lake technique that organizes table data around 
+selected clustering columns. It is designed to make data layout easier to maintain as data grows and query patterns change
+
+Meaning: Z-Ordering colocates related data values in Delta Lake data files so that queries can skip more files when filtering on selected columns.
+
+How is Liquid Clustering different from Z-Ordering?
+Think of both as ways to improve the physical organization of data in a Delta table.
+- Z-Ordering: You explicitly run OPTIMIZE ... ZORDER BY (customer_id) to reorganize data for better locality.
+- Liquid Clustering: You define clustering keys with CLUSTER BY (customer_id), and supported OPTIMIZE operations organize the table around those keys. Databricks also supports automatic clustering features in eligible configurations
+-----------------------------------------------------
+
