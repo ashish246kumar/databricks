@@ -1,3 +1,16 @@
+# Read JSON (add multiLine=True if each file is one pretty-printed JSON document)
+df = spark.read.option("multiLine", True).json("/path/to/data/*.json")
+
+# Write to a Delta table
+df.write.format("delta").mode("append").saveAsTable("my_schema.my_table")
+
+# Or write to a Delta path
+df.write.format("delta").mode("overwrite").save("/path/to/delta/table")
+
+# Read it back
+spark.read.table("my_schema.my_table").show()
+------------------------------------------------
+
 Calculate cumulative sums using Window Functions
 
 SELECT
