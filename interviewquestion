@@ -17,6 +17,9 @@ CASE
     ELSE 'XXX-XX-' || RIGHT(ssn,4)
 END;
 ----------------------------------------------------------------------------------
+explode() drops rows with null or empty arrays, whereas explode_outer() preserves the parent row and produces a null value for the exploded column
+
+--------------------------
 What is Partition Pruning in Spark?
 
 Answer:
