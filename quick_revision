@@ -35,8 +35,15 @@ fact vs dimension
 scd, List Comprehension
 Transformations vs action
 how do we migrate from postgress (old ->onpermises system) to (oracle database)
-
+explode() VS explode_outer()
 -----------------------------------------------------
+
+------------
 On-Premises System
 datastage
 step function
+MULTILINE JSON
+----------
+sql
+cumulative sums using Window Functions
+
