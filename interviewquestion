@@ -18,7 +18,42 @@ CASE
 END;
 ----------------------------------------------------------------------------------
 explode() drops rows with null or empty arrays, whereas explode_outer() preserves the parent row and produces a null value for the exploded column
+from pyspark.sql.functions import explode_outer, col
 
+df_outer = df.select(
+    col("emp_id"),
+    col("emp_name"),
+    explode_outer(col("skills")).alias("skill")
+)
+
+df_outer.show()
+-------------------------------
+1. Difference between Single-Line JSON and Multi-Line JSON
+{"emp_id": 101, "name": "Ashish", "salary": 50000}
+{"emp_id": 102, "name": "Rahul", "salary": 60000}
+{"emp_id": 103, "name": "Amit", "salary": 70000}
+df = spark.read.json("/path/employee.json")
+df.show()
+Multi-line JSON
+[
+  {
+    "emp_id": 101,
+    "name": "Ashish",
+    "salary": 50000
+  },
+  {
+    "emp_id": 102,
+    "name": "Rahul",
+    "salary": 60000
+  }
+]
+df = spark.read \
+    .option("multiLine", "true") \
+    .json("/path/employee.json")
+
+df.show()
+multiLine=true tells Spark to read the entire JSON document 
+as one record/document instead of treating each line as a separate JSON record
 --------------------------
 What is Partition Pruning in Spark?
 
