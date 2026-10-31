@@ -1,3 +1,52 @@
+read data from kafka which is json convert the json in to table bascially write into delta table json can be nested
+
+from pyspark.sql import functions as F
+from pyspark.sql.types import *
+
+df = spark.readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "<broker1:9092,broker2:9092>") \
+    .option("subscribe", "<topic_name>") \
+    .option("startingOffsets", "latest") \
+    .load()
+
+df_str = df.selectExpr("CAST(key AS STRING) as key", "CAST(value AS STRING) as json_str")
+schema = StructType([
+    StructField("id", IntegerType()),
+    StructField("name", StringType()),
+    StructField("address", StructType([
+        StructField("city", StringType()),
+        StructField("zip", StringType())
+    ])),
+    StructField("orders", ArrayType(StructType([
+        StructField("item", StringType()),
+        StructField("price", DoubleType())
+    ])))
+])
+
+df_parsed = df_str.withColumn("data", F.from_json(F.col("json_str"), schema))
+df_flat = df_parsed.select(
+    "data.id",
+    "data.name",
+    F.col("data.address.city").alias("city"),
+    F.col("data.address.zip").alias("zip"),
+    F.explode_outer("data.orders").alias("order")   # explode array of structs
+).select(
+    "id", "name", "city", "zip",
+    F.col("order.item").alias("item"),
+    F.col("order.price").alias("price")
+)
+query = df_flat.writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "/mnt/delta/checkpoints/my_table") \
+    .option("path", "/mnt/delta/tables/my_table") \
+    .trigger(processingTime="30 seconds") \
+    .start()
+
+query.awaitTermination()
+
+--------------------------------
 # Read JSON (add multiLine=True if each file is one pretty-printed JSON document)
 df = spark.read.option("multiLine", True).json("/path/to/data/*.json")
 
