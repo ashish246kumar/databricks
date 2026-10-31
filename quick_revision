@@ -47,4 +47,7 @@ MULTILINE JSON
 sql
 cumulative sums using Window Functions
 json read
+read data from kafka which is json convert the json in to table bascially write into delta table json can be nested
+MERGE INTO
+--------------------------------
 
