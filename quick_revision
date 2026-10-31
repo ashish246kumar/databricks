@@ -46,4 +46,5 @@ MULTILINE JSON
 ----------
 sql
 cumulative sums using Window Functions
+json read
 
