@@ -16,7 +16,7 @@ cache vs persistence
 Unity Catalog-centralized governance solution , provides built-in end-to-end data lineage, manage metadata,enforce fine-grained access
 data lake vs delta lake
 Delta Live Tables
-how delta table support versioning
+how delta table support versioning (IQ)
 --------------------------------------------------------------------
 [interviewquestion]
 Stage
