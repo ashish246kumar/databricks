@@ -258,11 +258,12 @@ DROPMALFORMED: Drops the corrupt records.
 FAILFAST: Stops immediately on the first bad record.
 spark.read.option("mode", "DROPMALFORMED").csv("/mnt/input")
 
-Schema validation
-I define an explicit schema instead of letting Spark infer it — this helps detect mismatches and ensures consistent data types
-
-Logging and alerting:
-
+(explict schema instead of infer schema)
+"When we use inferSchema, Spark generally scans the data twice. First, 
+1) to identify the data types of columns, and second, 2) to read the actual data. 
+If we define an explicit schema, Spark already knows the data types, so it avoids the additional 
+schema inference scan. 
+That's why explicit schema is preferred in production ETL pipelines."
 
 ____________________________________________________________________
 map() → applies a function to each element individually.
