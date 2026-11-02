@@ -1,5 +1,5 @@
 different read mode
-z order,liquid clustring,partioning,bucketing
+z order,liquid clustring|(iq)|,partioning,bucketing
 explict schema instead of infer schema,badRecordsPath
 For more parallelism, I can either increase the number of worker nodes or choose larger instances (like Standard_D4s_v3 or i3.xlarge) with more cores.
 I can tune Spark settings like spark.default.parallelism or spark.sql.shuffle.partitions to control how Spark uses these cores efficiently.
