@@ -11,7 +11,9 @@ Bucketing means 1) distributing records into a fixed number of buckets 2) based 
 3) Why do we use bucketing?  -----> improving join performance (
 When joining on emp_id, Spark may be able to reduce shuffle overhead by using the compatible bucket layouts.)
 4) Bucketing Best for	join
-5) Bucketing is often considered for high-cardinality join columns
+5) Bucketing is often considered for high-cardinality join columns (
+because it distributes data into a fixed number of buckets instead of creating a separate directory for every distinct value
+)
 6) Can help reduce shuffle during joins
 5) df.write \
     .bucketBy(4, "emp_id") \
