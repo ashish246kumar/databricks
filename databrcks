@@ -221,6 +221,7 @@ Additionally, I can tune Spark settings like spark.default.parallelism or spark.
 
 
 ________________________________________________________
+READ MODE
 How do you handle bad records in Databricks during ingestion?
 
 bad records — for example, corrupted rows, missing fields, or data type mismatche
@@ -228,7 +229,7 @@ Using badRecordsPath:
 spark.read.option("badRecordsPath", "/mnt/errorRecords").csv("/mnt/input")
 
 Using the mode option:
-PERMISSIVE (default): Keeps good records and puts null for bad ones.
+PERMISSIVE (default): 1) Keeps good records and 2)puts null for bad ones.
 DROPMALFORMED: Drops the corrupt records.
 FAILFAST: Stops immediately on the first bad record.
 spark.read.option("mode", "DROPMALFORMED").csv("/mnt/input")
