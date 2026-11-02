@@ -1222,9 +1222,24 @@ The reordered files make data skipping more effective.
 
 
 --------------------------------------------------------------------------------------------------------------
+how delta table support versioning (T — Time Travel (Data Versioning))
+
+1) whenever you modify a Delta table using operations like INSERT, UPDATE, DELETE, or MERGE, Delta Lake creates a new version of the table
+2) Delta Lake supports versioning using a 2)  Transaction Log (_delta_log) 3) stored inside the Delta table directory.
+4) Whenever you create a Delta table, Delta Lake creates a folder structure like this:
+customers/
+│
+├── part-0001.parquet
+├── part-0002.parquet
+│
+└── _delta_log/
+    ├── 00000000000000000000.json
+    ├── 00000000000000000001.json
+    └── 00000000000000000002.json
+5) Each JSON file represents one committed version.
+6) Delta log tracks which data files are added and removed
+
 T — Time Travel (Data Versioning)
-Delta automatically versions your table after every transaction (in _delta_log).
-You can query older versions of your data using a timestamp or version number.
 spark.read.format("delta").option("versionAsOf", 5).load("/delta/sales")
 This feature allows rollback to previous versions
 
