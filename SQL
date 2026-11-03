@@ -1,3 +1,6 @@
+AND e.access_date <= u.join_date + INTERVAL 30 DAY
+
+--------------------------------------------------
 MERGE INTO target_table AS t
 USING source_table AS s
 ON t.id = s.id
