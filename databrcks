@@ -1,3 +1,11 @@
+spark store data in memory and caching also store date in memory then how it is improving the performance
+
+Spark does not automatically keep DataFrames in memory after executing a job. By default, 1)after an action completes, 
+intermediate results are discarded.2) If the same DataFrame is used again, Spark recomputes it from the original source. 
+3) cache() stores the computed DataFrame in executor memory, so subsequent actions reuse the cached data instead of 
+recomputing the entire lineage. 
+4) This significantly improves performance when the same DataFrame is accessed multiple times.
+----------------------------
 Partitioning
 Partitioning means dividing 1) a large table into smaller physical directories based on the values of a particular column.
 2) avoid Partitioning on High-cardinality column such as customer_id, transaction_id (Too many small files | More metadata management overhead.)
