@@ -161,6 +161,14 @@ Purpose	Reuse computed data	                Reuse computed data
 Storage level	Uses the default level	       Lets you choose a level
 Example	df.cache()	                         df.persist(StorageLevel.MEMORY_AND_DISK)
 Best suited for	General reuse	                When you need control over storage
+
+cache (Cache persists the computed partitions of a DataFrame in executor memory)
+The same DataFrame is reused multiple times.
+The transformations are expensive (joins, aggregations, complex filters).
+Avoid caching when:
+The DataFrame is used only once.
+The dataset is too large to fit comfortably in memory
+
 ____________________________________________________
 “Shuffle in Spark means redistributing data across partitions or nodes when an operation needs data from multiple partitions.
 Shuffling is expensive because it involves disk I/O, data serialization, and network transfer, which can slow down jobs and even cause memory issues if not handled properly
