@@ -37,6 +37,11 @@ Transformations vs action
 how do we migrate from postgress (old ->onpermises system) to (oracle database)
 explode() VS explode_outer()
 -----------------------------------------------------
+sa6_merged_merged_merged
+spark store data in memory and caching also store date in memory then how it is improving the performance (databricks | PG 5 PDF SA6_MERGED)
+
+Why Doesn't Spark Keep Everything in Memory Automatically? (7)
+eplode,pivot,unpivot (13)
 
 ------------
 On-Premises System
