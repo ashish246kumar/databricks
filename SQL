@@ -1,3 +1,16 @@
+
+
+--------------------------
+1. What is an Instance?
+An instance is a single virtual machine (VM) running in the cloud.
+It provides computing resources such as:
+- CPU
+- RAM
+- Storage
+- Operating system
+2. What is a Cluster?
+A cluster is a group of instances working together to perform distributed processing
+----------------------------------------------
 AND e.access_date <= u.join_date + INTERVAL 30 DAY
 
 --------------------------------------------------
