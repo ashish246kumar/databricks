@@ -10,6 +10,7 @@ It provides computing resources such as:
 - Operating system
 2. What is a Cluster?
 A cluster is a group of instances working together to perform distributed processing
+
 ----------------------------------------------
 AND e.access_date <= u.join_date + INTERVAL 30 DAY
 
