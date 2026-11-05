@@ -56,6 +56,6 @@ read data from kafka which is json convert the json in to table bascially write 
 MERGE INTO
 Write a query to delete the duplicate records from the table
 Write a SQL query to display all the name which contains only single "a" in the name.
-
+Cluster, Instance
 --------------------------------
 
