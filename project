@@ -1,4 +1,28 @@
+Migation
 
+My experience includes analyzing legacy systems, designing ETL pipelines, implementing mapping rules, 
+validating data, and resolving inconsistencies.
+I've worked with tools like SQL Server Integration Services (SSIS), Informatica, Talend
+and cloud services such as AWS DMS and Azure Data Factory.
+I prioritize data accuracy, quality checks, and documentation to ensure smooth and error-free migrations.
+
+How do you approach planning a data migration project?
+
+I begin by assessing the source and target systems, identifying data structures, and under structures, and understanding business ements
+ELECTRONICS INTERVIEW
+Then I create a detailed migration strategy that includes timelines, dependencies, tools, transformation rules, and potential risks.
+
+How do you ensure data quality during migration?
+I ensure data quality by performing comprehensive data profiling before migration.
+I identify duplicates, missing fields, incorrect formats, and inconsistencies.
+During the migration, I use validation rules, transformation logic, and automated checks to maintain accuracy.
+After migration, I conduct reconciliation, record counts, checksum comparisons, and user acceptance testing.
+-----
+Data migration challenges include incomplete
+or corrupted legacy data, mismatched data structures, performance issues, and
+To handle these challenges, I rely on thorough planning, data profiling, risk assessment, and regular communication.
+----------------------------------------------------
+I also use SQL scripts, Python automation, and APIs for data extraction and transformation.
 _________________________________
 CREATE OR REFRESH STREAMING LIVE TABLE bronze_customers_ingestion_cleaned
 (
