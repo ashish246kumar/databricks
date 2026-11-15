@@ -1732,4 +1732,143 @@ When to use:
 - Columns such as customer_id, product_id, or region_id.
 - Tables where file skipping can reduce the amount of data scanned.
 ---------------------------------------------------------------------------------------
+How do you migrate a SQL Server database to PostgreSQL?
+
+1. Understand the source database (SQL Server)
+First, I analyze the existing SQL Server database to understand its structure and dependencies.
+
+I identify:
+- Number of databases and schemas.
+- Number of tables and columns.
+- Data types of columns.
+- Primary keys and foreign keys.
+- Indexes and constraints.
+- Views, stored procedures, functions and triggers.
+- Approximate data volume in each table.
+
+Why? Before migration, we need to understand what we are migrating and identify SQL Server-specific features that PostgreSQL might not support directly.
+
+
+2. Schema extraction
+Next, I extract the database schema from SQL Server.
+
+I can use SQL Server Management Studio (SSMS) to generate scripts for:
+- Tables
+- Columns and data types
+- Primary keys and foreign keys
+- Indexes
+- Views
+- Constraints
+At this stage, I focus on understanding the source-to-target schema mapping
+
+3
+3. Schema and data type mapping
+SQL Server and PostgreSQL support different data types, so I prepare a mapping between them.
+
+For example:
+SQL Server	PostgreSQL
+INT	INTEGER
+BIGINT	BIGINT
+VARCHAR(n)	VARCHAR(n)
+NVARCHAR(n)	VARCHAR(n)
+DATETIME	TIMESTAMP
+DATETIME2	TIMESTAMP
+BIT	BOOLEAN
+DECIMAL(p,s)	NUMERIC(p,s)
+UNIQUEIDENTIFIER	UUID
+IDENTITY	GENERATED AS IDENTITY
+I also check:
+- Identity columns and sequences.
+- Default constraints.
+- NULL and NOT NULL constraints.
+- Collation and case sensitivity.
+- SQL Server-specific functions and syntax.
+Example: SQL Server's GETDATE() needs to be replaced with an appropriate PostgreSQL expression such as CURRENT_TIMESTAMP.
+
+
+4. Schema conversion
+Once the mapping is finalized, I convert the SQL Server schema into PostgreSQL-compatible SQL scripts.
+
+I can use:
+- Manual SQL script conversion.
+- SSMS-generated scripts with modifications.
+- Migration tools such as pgloader or dedicated schema conversion tools.
+
+
+5. Data migration
+After creating the target schema, I migrate the actual data from SQL Server to PostgreSQL.
+
+Depending on the project requirements, I can use:
+- pgloader
+- ETL pipelines using Python
+- Database migration tools
+- Bulk export/import processes
+
+6. Data validation and reconciliation
+After migration, I compare the source and target databases to ensure data has been migrated correctly.
+
+I perform the following checks:
+
+A. Table count validation
+
+Check whether all expected tables exist in PostgreSQL.
+
+B. Row count validation
+
+Compare the number of records in each source and target table.
+
+SQL Server:
+SELECT COUNT(*) FROM Customers;
+
+
+PostgreSQL:
+SELECT COUNT(*) FROM customers;
+
+
+C. Schema validation
+
+Compare:
+- Column names.
+- Data types.
+- Column lengths and precision.
+- Primary keys and foreign keys.
+- NULL and NOT NULL constraints.
+- Indexes and defaults.
+D. Data-level validation
+
+Check:
+- NULL values.
+- Duplicate records.
+- Missing records.
+- Data truncation.
+- Incorrect date or numeric conversions.
+- Referential integrity.
+
+7. Performance testing and application testing
+Once data validation is complete, I test the PostgreSQL database.
+
+I check:
+- Whether important queries execute correctly.
+- Whether indexes are created properly.
+- Whether joins return expected results.
+- Whether application connections work.
+- Whether query performance is acceptable.
+I also review and optimize queries because SQL Server and PostgreSQL may have different query execution plans.
+
+If there are stored procedures, functions or triggers, I test their rewritten PostgreSQL equivalents.
+
+
+8. Production cutover and monitoring
+Finally, I plan the production migration.
+
+The steps include:
+1. Take a backup of the source database.
+2. Perform the final incremental data migration, if applicable.
+3. Stop or pause source writes during the final synchronization.
+4. Perform final validation.
+5. Update the application connection string to PostgreSQL.
+6. Start the application and monitor database operations.
+7. Keep a rollback plan in case something goes wrong.
+For minimal downtime, I would prefer an initial bulk load followed by incremental synchronization and a short final cutover window.
+-----------------------------------------------------------------------------------------------
 
