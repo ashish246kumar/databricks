@@ -18,6 +18,12 @@ Transforms and filters the data, then saves the result to the staging Delta tabl
 
 df = spark.read.format("csv").schema(df_schema).option("header", False).option("nullValue", "NULL").option(
             "delimiter", "\x01").load(source_path)
+--------------------------------
+“In our legacy environment, ETL processing was built using IBM DataStage, with DB2 in the legacy data landscape. 
+We modernized the relevant pipelines by mapping the existing DataStage jobs, stages, dependencies, and output formats
+to Spark-based processing and Databricks Workflows on Azure.
+
+
 ------------------------------------------------------------------------------------------------------------------
 **Oversight (Vanguard)** is a multi-tenant spend / T&E risk-analytics platform. As a data engineer, you’d describe it as the pipelines and orchestration that take customer expense, card, and ERP data in, run analytics that flag policy and fraud risk, and push results into app databases and workflows.
 
