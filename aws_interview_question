@@ -2,3 +2,244 @@ AWS Step Functions is a serverless workflow orchestration service
 that coordinates multiple AWS services and tasks in a defined sequence.
 In simple words, it controls which task should run first, which task should run next, 
 and what should happen if a task succeeds or fails.
+---------------------------------------------------------------------------------------------
+Classes Amazon S3 offers a range of storage classes that you can choose from based on the performance, data access, resiliency, and cost requirements of your workloads.
+S3 is designed to exceed 99.999999999% (11 nines) data durability and 99.99%
+availability.
+Additionally, S3 stores data redundantly across a minimum of 3 Availability Zones by default.
+Amazon S3 also offers capabilities to manage your data throughout its lifecycle. Once an S3 Lifecycle policy is set, your data will automatically transfer to a different storage class without any changes to your application.
+
+-----------------------
+Durability
+It refers to how likely it is that your data will not be lost over time.
+Availability
+Availability refers to the percentage of time your data is accessible when you try to access it.
+Activate Wind
+
+S3 Standard
+Use for frequently accessed, mission-critical data.
+S3 Intelligent-Tiering
+Use when access patterns are unpredictable to optimize costs.
+S3 Standard-IA
+Use for data that is accessed less frequently but requires quick access when needed.
+S3 One Zone-IA
+Activate Windows
+Use for infrequently accessed data that does not require multi-AZ resilience.
+
+Amazon S3 Glacier instant retrieval
+It use for long-term archive with occasional access and flexible retrieval times. It provide access to milliseconds.
+Amazon S3 Glacier flexibal retrieval
+It use for the lowest-cost long-term storage where retrieval times are not critical.it retrieval few minutes to hours.
+Amazon S3 Glacier Deep Archive
+It designed for data that need to retained for long periods.
+It retrieve from (12 Hours) and Bulk (48 Hours).
+Lowest storage cost among all S3 classes, but highest retrieval time and retrieval cost.
+Activate Windows Go to Settings to adivate
+
+----------------------------------------------------
+S3 Standard
+storage Cost is $0.023 per GB for the first 50 TB/month and No additional charges for data retrieval.
+S3 Standard-Infrequent Access (IA)
+Storage Cost is lower than S3 Standard and Retrieval Cost is higher than S3 Standard.
+S3 One Zone-Infrequent Access (IA)
+Storage Cost is lower than S3 Standard-IA and Retrieval Cost is Higher than S3 Standard-IA.
+--------
+Comparison of Durability and Availability Across S3 Storage Classes
+Storage Class
+Durability
+Availability
+Explanation
+S3 Standard
+99.999999999% (11 nines)
+99.99%
+Best for frequently accessed data with high redundancy.
+S3 Intelligent-Tiering
+99.999999999% (11 nines)
+99.99%
+Matches Standard; intelligently moves data between access tiers.
+S3 Standard-IA
+99.999999999% (11 nines)
+99.9%
+Lower availability than Standard, suitable for infrequent access.
+S3 One Zone-IA
+99.999999999% (11 nines)
+99.5%
+Durability is high, but data is stored in a single AZ, reducing availability.
+S3 Glacier Instant Retrieval
+99.999999999% (11 nines)
+99.99%
+Comparable to Standard for durability, but designed for infrequent access.
+S3 Glacier Flexible Retrieval
+99.999999999% (11 nines)
+N/A
+Focuses on archival data; availability depends on retrieval speed selected.
+S3 Glacier Deep Archive
+99.999999999% (11 nines)
+N/A
+Durability is maintained, but availability is not guaranteed for immediate access.
+Activate Go to Setting
+------------
+ses
+AWS S3 Lifecycle policies
+Use Case: Streaming Service Data Management
+Day 1 - 30: Store new data in S3 Standard for frequent access.
+>>This allows analysts, ML pipelines, and reporting tools to access fresh data quickly.
+Day 31 - 90: Transition to S3 Standard-IA (Infrequent Access).
+>>Data accessed occasionally for analytics or audits is stored at a lower cost.
+After 90 Days: Move to S3 Glacier Flexible Retrieval for archival purposes.
+>>Retain data for compliance or long-term analysis, with occasional access.
+After 2 Years: Move to S3 Glacier Deep Archive.
+>>This is for data that must be kept for regulatory purposes but is rarely accessed.
+After 7 Years: Delete the data.
+>>In compliance with data retention policies, objects no longer needed are removed to save costs
+----------
+AWS S3 Version
+Enabling Versioning: When you enable versioning on a bucket, every new object uploaded will have a unique version ID.
+Overwriting Objects: If an object is overwritten, a new version is created, and the previous version remains in the bucket.
+Deleting Objects: When an object is deleted, S3 doesn't remove the object data. Instead, it inserts a delete marker3. The delete marker becomes the current version of the object.
+Restoring Objects: If you delete the delete marker, the object is restored to its previous version.
+---------------
+
+Step-by-Step Guide to Restore Previous Version
+1) Identify the Previous Version ID
+List Object Versions
+aws s3api list-object-versions --bucket bucketforversion-13)--prefix
+mydata/example1.txt
+2)Use AWS CLI to Restore the Previous Version
+>>aws s3api get-object --bucket bucketforversion-13 --key mydata/example1.txt --version <previous-version-id> example1_previous.txt
+3) Copy the Previous Version as the Latest Version:
+------------------------------------------
+AWS DMS
+AWS Database Migration Service (DMS) is a managed service that helps migrate databases to AWS with minimal downtime.
+It enables safe database migration to the cloud from on-premise DB instances, databases, or databases running on AWS EC2 instances.
+It supports full load migrations and continuous replication (Change Data Capture, or CDC) for various source and target databases or data stores.
+A primary key is not mandatory for a full load migration from source to target using DMS. However, it is required for CDC (ongoing replication) to ensure data consistency and track changes effectively.
+DMS replication instances cannot be stopped. It is also not advisable to destroy and create it on daily basic.
+AWS DMS (Database Migration Service) offers both serverless and server-based options for database migrations.
+----------
+How to Use AWS DMS
+Step 1: Create a Replication Instance
+Step 2: Configure Source and Target Endpoints
+Step 3: Create a Replication Task
+Step 4: Start and Monitor
+-----------
+Types of Migrations
+Homogeneous Migration (same DB engines)
+MySQL → MySQL
+PostgreSQL → PostgreSQL
+Heterogeneous Migration (different DB engines)
+Oracle → Amazon Aurora PostgreSQL
+PostgreSQL → Amazon Redshift
+This usually requires AWS Schema Conversion Tool (SCT) to convert schema objects
+------
+DMS Components
+Replication Instance - Main compute engine doing data movement
+Source Endpoint - Connection to source DB.
+Target Endpoint - Connection to target DB.
+Migration Tasks – The actual jobs (full load, CDC, etc.).
+------
+Instance Sizing – DMS instance types
+Use Case
+Suggested Instance Type
+Small data (< 100 GB, light CDC)
+dms.t3.medium or dms.r5.large
+Medium data (1-5 TB)
+dms.r5.xlarge or r5.2xlarge
+Large data (10+ TB or heavy CDC)
+dms.r5.4xlarge or higher
+-----------------------
+Price Estimate
+For 10 TB full load and 2 TB of CDC:
+Resource
+Estimation (Approx)
+Replication Instance (r5.4xlarge)
+~$1.20/hour
+Time for Full Load (say, 2 days)
+-
+$1.20 * 48 = $57.6
+CDC Replication (30 days) _
+$1.20 * 24 * 30 = $864
+Total Compute
+~$900-$1000/month
+Add storage, logging (~$20-$100)
+Depends on volume
+-------
+Optimization strategy for AWS DMS.
+Save cost by stopping the DMS instance when not in use.
+Use large instance during heavy load (e.g., full load of 10TB).
+Use smaller instance during light load (e.g., CDC of 2TB over 30 days).
+Automate the stop/start and swap using AWS tools like Lambda, EventBridge.
+------------
+BatchApplyEnabled
+DMS collects the changes in batch from the source DB transaction logs.
+DMS creates a table called the net changes table, with all changes from the batch.
+This table resides in the memory of the replication DB instance, and is passed on to the target DB instance.
+DMS applies a net changes algorithm that nets out all changes from the net changes table to actual target table.
+if you run a DMS task with BatchApplyEnabled, and you have a new row insert, ten updates to that row, and a delete for that row in a single batch, then DMS nets out all these transactions and doesn't carry them over. It does this because the row is eventually deleted
+------
+DMS premigration assessment report
+This report details the results of premigration checks to identify potential issues in the source database, target, or DMS task configuration before starting the migration.
+Source database parameters.
+LOB handling settings (e.g., limited LOB mode, LobMaxSize).
+Presence of primary keys or unique indexes for CDC and validation.
+Long-running transactions or replication slot availability.
+---------
+parameter group
+If your RDS is using the default parameter group, you must create a new custom parameter group to make any changes
+if migrate from postgres to redshift-serverless enable logical replication in PostgreSQL parameter group:
+DMS migration
+SHOW max_slot_wal_keep_size;
+-- Should be -1
+SHOW rds.logical_replication;
+Should be 1
+SHOW rds.force_ssl;
+Should be 0 (PoC) or 1 (production)
+
+-----------
+benefits of Amazon Athena
+Serverless. There is no need to manage any underlying compute infrastructure to use the tool.
+Athena also enables cross-account access to S3 buckets owned by another user. In addition.
+Amazon Athena can process unstructured, semistructured and structured data sets. This is useful for research and log analysis
+--------
+Limitations of Athena include:
+Optimization is limited to queries. For example, data already stored in S3 cannot be optimized.
+No indexing options. Indexing options commonly appear in traditional databases
+When querying a table with thousands of partitions, Athena can time out. Athena's partition limit is 20,000 per table
+---------
+Partitioning naming convention - #1
+★ Partition column name followed by '=' symbol.
+★
+Example s3://bucket/data/year=2019/month=12/day=31/
+s3://yourBucket/pathToTable/<PARTITION_COLUMN_NAME>=<VALUE>/<PARTITION_COLUMN_ NAME>=<VALUE>/
+// Load the partitions
+MSCK REPAIR TABLE table_name;
+-------------
+Partitioning naming convention - #2
+If the S3 path doesn't have '=' symbol
+Example - s3://bucket/data/2019/12/31/
+s3://yourBucket/pathToTable/YYYY/MM/DD/
+// Load the partitions
+Alter Table <tablename> add Partition (PARTITION_COLUMN_NAME = <VALUE>, PARTITION_COLUMN2_NAME = <VALUE>) LOCATION
+'s3://yourBucket/pathToTable/YYYY/MM/DD/';
+--
+What is Amazon Athena and Amazon Redshift?
+Athena is a serverless service and does not need any infrastructure to create, manage, or scale data sets.
+It works directly on top of Amazon S3 data sets.
+It creates external tables and therefore does not manipulate S3 data sources.
+Athena uses Presto and ANSI SQL to query on the data sets. It also uses HiveQL for DDL statements.
+----
+Redshift
+Redshift is a petabyte-scale data warehouse used together with business intelligence tools for modern analytical solutions.
+Redshift requires a cluster. It is scalable enough that even if new nodes are added to the cluster.
+it contains a number of replicas, even if any node is down, it interacts with other nodes and rebuilds the drive.
+------
+Creating Athena tables
+There are three main ways to create a new table for Athena:
+using AWS Glue Crawler
+defining the schema manually
+through SQL DDL queries
+-------
+
+
+
+
