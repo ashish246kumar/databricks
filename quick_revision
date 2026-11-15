@@ -57,5 +57,99 @@ MERGE INTO
 Write a query to delete the duplicate records from the table
 Write a SQL query to display all the name which contains only single "a" in the name.
 Cluster, Instance
---------------------------------
+---------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+Below are the few sample questions I remember from my interview.Hope it give idea what type of questions to expect for someone giving interview for similar role.
+
+1)Given a large table with millions of records, how would you optimize a query that uses multiple joins and filters?
+
+2)How to perform SCD Type 2 using SQL or stored procedures?
+
+3)What are common SQL performance tuning techniques you have used?
+
+4)Difference between INNER JOIN vs EXISTS when would you prefer one over the other?
+
+5)Explain your data pipeline architecture in your project.
+
+6)How do you implement incremental data loads in your pipelines?
+
+7)What’s the difference between batch vs streaming pipelines? Where have you used both?
+
+8)How do you ensure data quality and data validation in pipelines?
+
+9)Explain CDC and how you have implemented it.
+
+10)What are your strategies to handle schema evolution in data pipelines?
+
+11)Explain windowing functions using partitioning, and how they differ from group aggregations in performance and result.
+
+12)How do you implement audit logging for a data pipeline using SQL procedures and triggers?
+
+13)How do you handle downstream schema changes?
+
+14)Describe a situation where a pipeline failed in production. How did you troubleshoot it?
+1) You have a huge text file, how would you replicate a given row "n" number of times, write a code for this?
+2) Which storage level in persist is optimized for storage ?
+3) Steps you would take to tune a slow running spark application ?
+4) How do you implement SCD type 2 in Pyspark?
+5) Limitation of for-each activity in ADF ?
+6) How is deployment done in your project ? Explain about development/testing etc. ?
+7) SQL : Question about year-on-year growth in salary
+8) Python : Reversal of string, removing delimiter and capitalizing
+9) SQL : Anti and semi Join and their use-cases
+10) SQL : Total sales for each product in last 12 months
+
+---------------
+Write a SQL code to filter customer transactions greater than $10,000, transform customer names to have the first letter capitalized and the rest in lowercase and compute the average transaction amount for each product category
+
+
+select * from customer where transactions >=10000
+
+upper(LEFT(customer_name,1))+substring(lower(customer_name),2,len(customer_name))
+
+Get all employees with their department names, including those without a department
+
+select department_name from employee
+
+2.How do you find and remove duplicate records from a table?
+Show only departments that have more than 10 employees
+
+
+What is incremental load and how do you implement it in SQL?
+ 📌 Scenario: Load only updated records from a source file into your target table.
+
+select * from t1 left anti join t2
+on t1.id=t2.id 
+
+
+merge into table t1 
+using table t2
+on t1.id=t2.id
+when matched
+and (t1.city<>t2.city 
+then update
+set t1=
+t2=
+when not matched
+then insert (id,nam)
+values()
+-----------
+10.How do you compare two tables and find mismatches in data and row count?
+
+Convert monthly sales data from rows to columns for each region.
 
