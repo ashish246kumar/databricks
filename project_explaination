@@ -23,7 +23,20 @@ df = spark.read.format("csv").schema(df_schema).option("header", False).option("
 We modernized the relevant pipelines by mapping the existing DataStage jobs, stages, dependencies, and output formats
 to Spark-based processing and Databricks Workflows on Azure.
 
+Extract and land the source data
+DataStage-produced files were made available in the Azure migration storage container. Databricks notebooks read those files from source-specific folders
 
+Define and apply schemas
+The notebooks load schema definitions from SQL DDL files, then use those schemas when Spark reads the files
+
+Transform legacy records
+Source-specific PySpark functions map and normalize the data for the target model
+
+Write to Azure Databricks Delta tables
+The migration notebooks retain historical data in Delta tables and create migration staging tables for transformed records
+
+Validate and operate
+The code uses explicit target DDLs and checks whether migration tables already exist before creating them, which helps avoid repeating completed loads. In an interview, describe reconciliation—such as row counts, rejected records, key checks, and schema comparisons
 ------------------------------------------------------------------------------------------------------------------
 **Oversight (Vanguard)** is a multi-tenant spend / T&E risk-analytics platform. As a data engineer, you’d describe it as the pipelines and orchestration that take customer expense, card, and ERP data in, run analytics that flag policy and fraud risk, and push results into app databases and workflows.
 
