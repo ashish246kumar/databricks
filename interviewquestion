@@ -1861,6 +1861,7 @@ If there are stored procedures, functions or triggers, I test their rewritten Po
 8. Production cutover and monitoring
 Finally, I plan the production migration.
 
+
 The steps include:
 1. Take a backup of the source database.
 2. Perform the final incremental data migration, if applicable.
@@ -1870,5 +1871,13 @@ The steps include:
 6. Start the application and monitor database operations.
 7. Keep a rollback plan in case something goes wrong.
 For minimal downtime, I would prefer an initial bulk load followed by incremental synchronization and a short final cutover window.
+
+Tools I can use
+Tool	Purpose
+SSMS	Extract SQL Server schema
+pgloader	Automate common schema and data migration tasks
+Python	Build custom ETL and validation scripts
+PostgreSQL psql	Execute SQL scripts and validate target
+DBeaver	Connect to and inspect both databases
 -----------------------------------------------------------------------------------------------
 
