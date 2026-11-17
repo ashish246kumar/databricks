@@ -1,4 +1,29 @@
+find consecutive login date
+WITH cte1 AS (
+    SELECT
+        user_id,
+        login_date,
+        ROW_NUMBER() OVER (
+            PARTITION BY user_id
+            ORDER BY login_date
+        ) AS rn
+    FROM user_logins
+),
 
+cte2 AS (
+    SELECT *,
+        DATE_SUB(login_date, CAST(rn AS INT)) AS group_date
+    FROM cte1
+)
+
+SELECT
+    user_id,
+    MIN(login_date) AS start_date,
+    MAX(login_date) AS end_date,
+    COUNT(*) AS streak_days
+FROM cte2
+GROUP BY user_id, group_date
+ORDER BY user_id, start_date;
 --------------------------------------------------------------
 WITH cte AS (
     SELECT
