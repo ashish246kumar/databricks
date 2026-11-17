@@ -13,7 +13,9 @@ A cluster is a group of instances working together to perform distributed proces
 
 ----------------------------------------------
 AND e.access_date <= u.join_date + INTERVAL 30 DAY
-
+datepart(year, order_date
+as year_order,
+datepart (month, order_date)
 --------------------------------------------------
 MERGE INTO target_table AS t
 USING source_table AS s
