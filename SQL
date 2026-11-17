@@ -16,6 +16,10 @@ AND e.access_date <= u.join_date + INTERVAL 30 DAY
 datepart(year, order_date
 as year_order,
 datepart (month, order_date)
+--------------
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING
+ROWS 2 PRECEDING
 --------------------------------------------------
 MERGE INTO target_table AS t
 USING source_table AS s
