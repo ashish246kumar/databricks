@@ -1,3 +1,12 @@
+Find consecutive login dates	Continuous login streaks
+Find consecutive task dates	Continuous task periods
+Find consecutive days with same status	Status ranges
+Find employees working continuously	Consecutive employment periods
+Find consecutive numbers in a table	Number sequences
+Find customers with consecutive purchases	Purchase streaks
+Find machine downtime periods	Continuous failure periods
+Find consecutive months of sales	Monthly sales streaks
+--------------------------------------------------------------
 find consecutive login date
 WITH cte1 AS (
     SELECT
