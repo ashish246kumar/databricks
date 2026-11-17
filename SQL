@@ -1,4 +1,43 @@
+WITH cte AS (
+    SELECT
+        user_id,
+        status,
+        stime,
+        LAG(status) OVER (
+            PARTITION BY user_id
+            ORDER BY stime
+        ) AS prev_status
+    FROM user_orders
+),
 
+cte1 AS (
+    SELECT *
+    FROM cte
+    WHERE status <> prev_status
+       OR prev_status IS NULL
+),
+
+final_cte AS (
+    SELECT
+        user_id,
+        status,
+        stime,
+        COALESCE(
+            LEAD(stime) OVER (
+                PARTITION BY user_id
+                ORDER BY stime
+            ),
+            CURRENT_TIMESTAMP
+        ) AS next_stime
+    FROM cte1
+)
+
+SELECT
+    user_id,
+    status,
+    stime,
+    next_stime
+FROM final_cte;
 
 --------------------------
 1. What is an Instance?
