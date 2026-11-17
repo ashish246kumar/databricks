@@ -1,5 +1,24 @@
 WITH cte AS (
     SELECT
+        name,
+        gender,
+        salary,
+        ROW_NUMBER() OVER (
+            PARTITION BY gender
+            ORDER BY salary DESC
+        ) AS rnk
+    FROM salaries
+)
+
+SELECT
+    name,
+    gender,
+    salary
+FROM cte
+ORDER BY rnk, gender;
+--------------------------------------------------------------
+WITH cte AS (
+    SELECT
         user_id,
         status,
         stime,
