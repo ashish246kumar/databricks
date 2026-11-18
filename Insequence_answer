@@ -1,0 +1,1847 @@
+# **Databricks and PySpark interview preparation**
+
+Below are interview-ready notes for each topic, with **5–6 important points**, simple explanations, and examples. The answers are framed for a Data Engineer with around 3 years of experience.
+
+## **1. Different read modes in Spark**
+
+Read modes define how Spark handles records when it encounters malformed or corrupt data while reading files.
+
+| Mode            | Meaning                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `PERMISSIVE`    | Reads valid records and handles corrupt records by putting them in a corrupt-record column or setting affected fields to NULL. |
+| `DROPMALFORMED` | Skips malformed records.                                                                                                       |
+| `FAILFAST`      | Stops the job immediately when malformed data is encountered.                                                                  |
+
+**Example:**
+
+```
+df = (spark.read    .option("mode", "PERMISSIVE")    .option("columnNameOfCorruptRecord", "_corrupt_record")    .schema(schema)    .json("/path/data.json"))
+```
+
+**Interview points:**
+
+1. `PERMISSIVE` is the default mode for many Spark file readers.
+2. `DROPMALFORMED` is useful when you intentionally want to skip invalid records.
+3. `FAILFAST` is useful when data quality is critical and bad records should stop processing.
+4. In production, I prefer capturing bad records rather than silently losing them.
+5. Read modes are different from write modes such as `append`, `overwrite`, and `ignore`.
+
+## **2. Z-ORDER**
+
+Z-ORDER is a data layout optimization technique in Delta Lake that colocates related column values to improve data skipping.
+
+1. It helps queries that frequently filter on particular columns.
+2. It reorganizes data so related values are stored closer together.
+3. It reduces the amount of data Spark needs to scan.
+4. It is useful for columns such as `customer_id`, `region`, or `product_id`.
+5. It is performed using the `OPTIMIZE` command.
+6. It is not the same as partitioning; Z-ORDER does not create separate directories for each value.
+
+**Example:**
+
+```
+OPTIMIZE sales
+ZORDER BY (customer_id);
+```
+
+If users frequently search sales records by `customer_id`, Z-ORDER can help improve query performance.
+
+## **3. Liquid Clustering**
+
+Liquid Clustering is a modern Delta table layout optimization technique that organizes data based on clustering columns.
+
+1. It improves data skipping for frequently filtered columns.
+2. Unlike traditional partitioning, it does not create separate directories for each partition value.
+3. You can change clustering columns as query patterns evolve.
+4. It avoids the need to choose a fixed partition strategy upfront.
+5. It is useful for large tables with high-cardinality columns.
+6. It works with incremental data layout optimization through `OPTIMIZE` and supported automatic maintenance features.
+
+**Example:**
+
+```
+CREATE TABLE sales (
+    customer_id INT,
+    order_date DATE,
+    amount DOUBLE
+)
+USING DELTA
+CLUSTER BY (customer_id, order_date);
+```
+
+To optimize:
+
+```
+OPTIMIZE sales;
+```
+
+**Z-ORDER vs Liquid Clustering**
+
+| Z-ORDER                                        | Liquid Clustering                            |
+| ---------------------------------------------- | -------------------------------------------- |
+| Uses `ZORDER BY` with `OPTIMIZE`               | Uses `CLUSTER BY`                            |
+| Traditional data layout optimization           | Modern clustering approach                   |
+| Clustering columns are less flexible to change | Clustering keys can be changed               |
+| Requires manual Z-ORDER optimization           | Supports incremental clustering              |
+| Often used in existing Delta tables            | Recommended for many new Delta table designs |
+
+Note: Feature availability and exact behavior depend on your Databricks Runtime and Delta table features.
+
+## **4. Partitioning**
+
+Partitioning divides a large table into smaller physical sections based on one or more columns.
+
+1. It helps Spark read only the required partitions when a query filters on partition columns.
+2. It reduces the amount of data scanned.
+3. Common partition columns are `year`, `month`, `country`, or `region`.
+4. It is useful for large datasets with frequently filtered, relatively low-cardinality columns.
+5. Too many partitions can create small files and increase metadata overhead.
+6. Avoid partitioning by high-cardinality columns such as `customer_id` when there are millions of unique values.
+
+**Example:**
+
+```
+df.write \  .format("delta") \  .partitionBy("year", "month") \  .save("/mnt/sales")
+```
+
+Query:
+
+```
+SELECT *
+FROM sales
+WHERE year = 2026 AND month = 11;
+```
+
+Spark can use partition pruning to skip unrelated partitions.
+
+## **5. Bucketing**
+
+Bucketing distributes records into a fixed number of buckets based on a hash of the bucket column.
+
+1. It divides data into a fixed number of files or buckets.
+2. It uses a hash function to determine which bucket receives a record.
+3. It can help with joins when tables are bucketed compatibly on the join columns.
+4. It can reduce shuffle in certain supported query plans.
+5. It is different from partitioning: partitioning creates groups based on column values, while bucketing hashes values into a fixed number of buckets.
+6. It is less commonly used in modern Databricks Delta Lake designs; liquid clustering is often preferred.
+
+**Example in Spark SQL:**
+
+```
+CREATE TABLE customer_bucketed (
+    customer_id INT,
+    customer_name STRING
+)
+USING PARQUET
+CLUSTERED BY (customer_id)
+INTO 8 BUCKETS;
+```
+
+**Interview tip:** Don't say bucketing always eliminates shuffle. It depends on compatible bucket specifications and whether Spark can use them for the query.
+
+## **6. Explicit schema vs inferSchema**
+
+**Explicit schema:** We define the data types ourselves before reading the data.
+
+**inferSchema:** Spark tries to identify the data types by examining the input data.
+
+| Explicit schema                                   | inferSchema                                 |
+| ------------------------------------------------- | ------------------------------------------- |
+| Schema is defined by the developer                | Spark determines the schema                 |
+| More control over data types                      | Data types are inferred from data           |
+| Consistent across daily loads                     | Inferred schema may vary with input data    |
+| Avoids schema inference overhead                  | Can require additional data scanning        |
+| Better suited to predictable production pipelines | Useful for exploration and initial analysis |
+
+**Explicit schema example:**
+
+```
+from pyspark.sql.types import *schema = StructType([    StructField("customer_id", IntegerType(), True),    StructField("customer_name", StringType(), True),    StructField("amount", DoubleType(), True)])df = (spark.read    .format("csv")    .option("header", "true")    .schema(schema)    .load("/mnt/input/customers.csv"))
+```
+
+**Interview answer:**
+
+"In production, I prefer an explicit schema because I already know the expected structure of the source data. It gives me control over data types, maintains consistency across daily loads, and avoids the overhead of schema inference."
+
+## **7. badRecordsPath**
+
+`badRecordsPath` is used to store malformed records separately while reading supported file formats such as CSV and JSON.
+
+1. It helps separate bad records from valid records.
+2. It is useful for debugging data-quality issues.
+3. It helps prevent malformed input from going unnoticed.
+4. It can be configured while reading supported file formats.
+5. It is different from `DROPMALFORMED`, which skips malformed records.
+6. You should monitor and process the bad-record location separately; configuring it alone does not fix invalid source data.
+
+**Example:**
+
+```
+df = (spark.read    .format("json")    .schema(schema)    .option("mode", "PERMISSIVE")    .option("badRecordsPath", "/mnt/bad_records/")    .load("/mnt/input/"))
+```
+
+**Interview answer:**
+
+"When reading source files, I can configure `badRecordsPath` to capture malformed records separately. This helps us investigate invalid data without losing visibility into the data-quality problems."
+
+Note: The exact behavior depends on the file format and Spark version. For production pipelines, test how corrupt records are captured and consider using `columnNameOfCorruptRecord` as well.
+
+## **8. Increasing Spark parallelism**
+
+Parallelism means how many tasks Spark can execute concurrently to process data.
+
+1. **Increase worker nodes:** More workers provide more CPU cores and memory to execute tasks.
+2. **Choose larger instances:** Instances with more cores can run more tasks concurrently on each worker.
+3. **Tune&#x20;**`spark.sql.shuffle.partitions`**:** Controls the number of partitions created for many SQL shuffle operations.
+4. **Tune&#x20;**`spark.default.parallelism`**:** Provides the default number of partitions for certain RDD operations.
+5. **Check data partitioning:** Too few partitions can underutilize the cluster; too many small partitions can create scheduling overhead.
+6. **Monitor Spark UI:** Check task duration, data skew, shuffle read/write, CPU utilization, and idle resources before tuning.
+
+**Example:**
+
+```
+spark.conf.set("spark.sql.shuffle.partitions", "200")
+```
+
+```
+spark.conf.set("spark.default.parallelism", "200")
+```
+
+**Interview answer:**
+
+"If I want to increase parallelism, I can scale out by adding worker nodes or scale up by selecting instances with more CPU cores. I can also tune Spark partition settings based on the workload. I validate the changes using the Spark UI to check whether tasks are distributed efficiently."
+
+**Important distinction:**
+
+- More workers = more cluster resources.
+- More partitions = more potential tasks.
+- More partitions do not automatically mean faster execution. The cluster must have enough resources to execute them.
+
+Your examples `Standard_D4s_v3` and `i3.xlarge` are cloud-specific instance types. The right choice depends on the cloud provider, workload, memory requirement, and availability.
+
+## **9. Managed table vs External table**
+
+The main difference is who manages the underlying data files and what happens to those files when the table is dropped.
+
+| Managed table                                       | External table                                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Databricks manages table data and metadata          | Databricks manages table metadata, but data is stored at an externally specified location |
+| Data is stored in the managed storage location      | Data is stored at the specified external location                                         |
+| Dropping the table generally deletes its data files | Dropping the table removes metadata but keeps the underlying data                         |
+| Easier for Databricks-managed datasets              | Useful when multiple systems need access to the same data                                 |
+| Storage lifecycle is managed with the table         | Data lifecycle is managed separately                                                      |
+
+**Managed table example:**
+
+```
+CREATE TABLE sales (
+    id INT,
+    amount DOUBLE
+)
+USING DELTA;
+```
+
+**External table example:**
+
+```
+CREATE TABLE sales_external (
+    id INT,
+    amount DOUBLE
+)
+USING DELTA
+LOCATION 'abfss://container@account.dfs.core.windows.net/sales/';
+```
+
+**Interview answer:**
+
+"In a managed table, Databricks manages both the metadata and the data lifecycle. In an external table, Databricks manages the metadata, but the underlying data is stored at an external location. If I drop an external table, its data files remain in storage."
+
+## **10.&#x20;**`spark.read.table()`**&#x20;vs&#x20;**`spark.read.format().load()`
+
+Both approaches read data into a Spark DataFrame, but they identify the source differently.
+
+**A. Reading using a table name**
+
+```
+df = spark.read.table("sales.customers")
+```
+
+1. Reads a registered table from the catalog.
+2. Uses the table name rather than a storage path.
+3. The catalog provides metadata such as schema and storage location.
+4. Useful when working with Unity Catalog tables.
+5. Access is controlled through catalog permissions.
+
+**B. Reading using a storage path**
+
+```
+df = (spark.read    .format("delta")    .load("abfss://container@account.dfs.core.windows.net/orders/"))
+```
+
+1. Reads data directly from a storage location.
+2. The format specifies how Spark should interpret the files.
+3. Useful when the data is not registered as a catalog table.
+4. You need appropriate storage permissions.
+5. You can read Delta data directly without creating a table first.
+
+**Interview answer:**
+
+"I use `spark.read.table()` when the data is registered in Unity Catalog or another Spark catalog. I use `spark.read.format('delta').load(path)` when I want to access Delta data directly from ADLS using its storage path."
+
+## **11. Job cluster vs Interactive cluster**
+
+| Job cluster                                                     | Interactive cluster                                         |
+| --------------------------------------------------------------- | ----------------------------------------------------------- |
+| Designed for running scheduled or automated jobs                | Designed for interactive development                        |
+| Created for a job run and terminated according to its lifecycle | Can remain running for repeated development activities      |
+| Resources are generally dedicated to the job run                | Can be shared by multiple users, depending on configuration |
+| Helps isolate production workloads                              | Useful for notebooks, debugging, and experimentation        |
+| Can reduce cost by terminating after the job finishes           | Can cost more if left running when not needed               |
+| Supports automated job execution                                | Supports interactive execution and testing                  |
+
+**Job cluster example:**
+
+Suppose you have a daily ETL pipeline:
+
+1. Read customer data from ADLS.
+2. Apply transformations using PySpark.
+3. Write the output into Delta tables.
+4. Run the pipeline through a Databricks Workflow.
+5. The job uses its configured compute and terminates when finished.
+
+**Interactive cluster example:**
+
+1. A developer opens a Databricks notebook.
+2. Connects it to an interactive cluster.
+3. Runs SQL and PySpark commands.
+4. Tests transformations and fixes errors.
+5. Uses the same running cluster for further development.
+
+**Interview answer:**
+
+"I use an interactive cluster during development and debugging because I need to execute notebooks repeatedly. For production pipelines, I prefer job compute because it is designed for automated execution, workload isolation, and terminating compute after the job finishes."
+
+Note: Databricks now offers different compute options, including classic job compute and serverless compute. The exact lifecycle and sharing behavior depend on the compute type and workspace configuration.
+
+## **Quick interview revision sheet**
+
+| Topic               | One-line explanation                                            |
+| ------------------- | --------------------------------------------------------------- |
+| Read modes          | Control how malformed records are handled                       |
+| Z-ORDER             | Colocates related data to improve data skipping                 |
+| Liquid Clustering   | Flexible clustering for improving data layout and data skipping |
+| Partitioning        | Divides data into physical partitions based on column values    |
+| Bucketing           | Distributes data into a fixed number of hash buckets            |
+| Explicit schema     | Developer defines the expected data structure                   |
+| badRecordsPath      | Stores malformed records separately                             |
+| Parallelism         | Executes multiple Spark tasks concurrently                      |
+| Managed table       | Databricks manages the table's data lifecycle                   |
+| External table      | Data remains at an externally specified location                |
+| `read.table()`      | Reads a registered catalog table                                |
+| `format().load()`   | Reads data directly from a storage path                         |
+| Job cluster         | Used for automated job execution                                |
+| Interactive cluster | Used for development and testing                                |
+
+## **Test your interview preparation**
+
+Try answering these three questions without looking at the explanations:
+
+**Q1. You have a 500 GB Delta table. Users frequently filter by customer_id. Which optimization would you consider?**
+
+Partition by customer_id
+
+Z-ORDER or Liquid Clustering
+
+Use inferSchema
+
+**Q2. You want to read a Delta table registered in Unity Catalog. Which method would you use?**
+
+spark.read.table()
+
+spark.read.format('csv').load()
+
+badRecordsPath
+
+**Q3. You want to run a production ETL workflow automatically. Which compute is generally suitable?**
+
+Interactive cluster only
+
+Job compute
+
+Local Python interpreter
+
+Check answers
+-------------------------------------------------------------------------------------------
+# **Databricks and PySpark interview preparation**
+
+Below are interview-ready notes for each topic, with **5–6 important points**, simple explanations, and examples. The answers are framed for a Data Engineer with around 3 years of experience.
+
+## **1. Different read modes in Spark**
+
+Read modes define how Spark handles records when it encounters malformed or corrupt data while reading files.
+
+| Mode            | Meaning                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `PERMISSIVE`    | Reads valid records and handles corrupt records by putting them in a corrupt-record column or setting affected fields to NULL. |
+| `DROPMALFORMED` | Skips malformed records.                                                                                                       |
+| `FAILFAST`      | Stops the job immediately when malformed data is encountered.                                                                  |
+
+**Example:**
+
+```
+df = (spark.read    .option("mode", "PERMISSIVE")    .option("columnNameOfCorruptRecord", "_corrupt_record")    .schema(schema)    .json("/path/data.json"))
+```
+
+**Interview points:**
+
+1. `PERMISSIVE` is the default mode for many Spark file readers.
+2. `DROPMALFORMED` is useful when you intentionally want to skip invalid records.
+3. `FAILFAST` is useful when data quality is critical and bad records should stop processing.
+4. In production, I prefer capturing bad records rather than silently losing them.
+5. Read modes are different from write modes such as `append`, `overwrite`, and `ignore`.
+
+## **2. Z-ORDER**
+
+Z-ORDER is a data layout optimization technique in Delta Lake that colocates related column values to improve data skipping.
+
+1. It helps queries that frequently filter on particular columns.
+2. It reorganizes data so related values are stored closer together.
+3. It reduces the amount of data Spark needs to scan.
+4. It is useful for columns such as `customer_id`, `region`, or `product_id`.
+5. It is performed using the `OPTIMIZE` command.
+6. It is not the same as partitioning; Z-ORDER does not create separate directories for each value.
+
+**Example:**
+
+```
+OPTIMIZE sales
+ZORDER BY (customer_id);
+```
+
+If users frequently search sales records by `customer_id`, Z-ORDER can help improve query performance.
+
+## **3. Liquid Clustering**
+
+Liquid Clustering is a modern Delta table layout optimization technique that organizes data based on clustering columns.
+
+1. It improves data skipping for frequently filtered columns.
+2. Unlike traditional partitioning, it does not create separate directories for each partition value.
+3. You can change clustering columns as query patterns evolve.
+4. It avoids the need to choose a fixed partition strategy upfront.
+5. It is useful for large tables with high-cardinality columns.
+6. It works with incremental data layout optimization through `OPTIMIZE` and supported automatic maintenance features.
+
+**Example:**
+
+```
+CREATE TABLE sales (
+    customer_id INT,
+    order_date DATE,
+    amount DOUBLE
+)
+USING DELTA
+CLUSTER BY (customer_id, order_date);
+```
+
+To optimize:
+
+```
+OPTIMIZE sales;
+```
+
+**Z-ORDER vs Liquid Clustering**
+
+| Z-ORDER                                        | Liquid Clustering                            |
+| ---------------------------------------------- | -------------------------------------------- |
+| Uses `ZORDER BY` with `OPTIMIZE`               | Uses `CLUSTER BY`                            |
+| Traditional data layout optimization           | Modern clustering approach                   |
+| Clustering columns are less flexible to change | Clustering keys can be changed               |
+| Requires manual Z-ORDER optimization           | Supports incremental clustering              |
+| Often used in existing Delta tables            | Recommended for many new Delta table designs |
+
+Note: Feature availability and exact behavior depend on your Databricks Runtime and Delta table features.
+
+## **4. Partitioning**
+
+Partitioning divides a large table into smaller physical sections based on one or more columns.
+
+1. It helps Spark read only the required partitions when a query filters on partition columns.
+2. It reduces the amount of data scanned.
+3. Common partition columns are `year`, `month`, `country`, or `region`.
+4. It is useful for large datasets with frequently filtered, relatively low-cardinality columns.
+5. Too many partitions can create small files and increase metadata overhead.
+6. Avoid partitioning by high-cardinality columns such as `customer_id` when there are millions of unique values.
+
+**Example:**
+
+```
+df.write \  .format("delta") \  .partitionBy("year", "month") \  .save("/mnt/sales")
+```
+
+Query:
+
+```
+SELECT *
+FROM sales
+WHERE year = 2026 AND month = 11;
+```
+
+Spark can use partition pruning to skip unrelated partitions.
+
+## **5. Bucketing**
+
+Bucketing distributes records into a fixed number of buckets based on a hash of the bucket column.
+
+1. It divides data into a fixed number of files or buckets.
+2. It uses a hash function to determine which bucket receives a record.
+3. It can help with joins when tables are bucketed compatibly on the join columns.
+4. It can reduce shuffle in certain supported query plans.
+5. It is different from partitioning: partitioning creates groups based on column values, while bucketing hashes values into a fixed number of buckets.
+6. It is less commonly used in modern Databricks Delta Lake designs; liquid clustering is often preferred.
+
+**Example in Spark SQL:**
+
+```
+CREATE TABLE customer_bucketed (
+    customer_id INT,
+    customer_name STRING
+)
+USING PARQUET
+CLUSTERED BY (customer_id)
+INTO 8 BUCKETS;
+```
+
+**Interview tip:** Don't say bucketing always eliminates shuffle. It depends on compatible bucket specifications and whether Spark can use them for the query.
+
+## **6. Explicit schema vs inferSchema**
+
+**Explicit schema:** We define the data types ourselves before reading the data.
+
+**inferSchema:** Spark tries to identify the data types by examining the input data.
+
+| Explicit schema                                   | inferSchema                                 |
+| ------------------------------------------------- | ------------------------------------------- |
+| Schema is defined by the developer                | Spark determines the schema                 |
+| More control over data types                      | Data types are inferred from data           |
+| Consistent across daily loads                     | Inferred schema may vary with input data    |
+| Avoids schema inference overhead                  | Can require additional data scanning        |
+| Better suited to predictable production pipelines | Useful for exploration and initial analysis |
+
+**Explicit schema example:**
+
+```
+from pyspark.sql.types import *schema = StructType([    StructField("customer_id", IntegerType(), True),    StructField("customer_name", StringType(), True),    StructField("amount", DoubleType(), True)])df = (spark.read    .format("csv")    .option("header", "true")    .schema(schema)    .load("/mnt/input/customers.csv"))
+```
+
+**Interview answer:**
+
+"In production, I prefer an explicit schema because I already know the expected structure of the source data. It gives me control over data types, maintains consistency across daily loads, and avoids the overhead of schema inference."
+
+## **7. badRecordsPath**
+
+`badRecordsPath` is used to store malformed records separately while reading supported file formats such as CSV and JSON.
+
+1. It helps separate bad records from valid records.
+2. It is useful for debugging data-quality issues.
+3. It helps prevent malformed input from going unnoticed.
+4. It can be configured while reading supported file formats.
+5. It is different from `DROPMALFORMED`, which skips malformed records.
+6. You should monitor and process the bad-record location separately; configuring it alone does not fix invalid source data.
+
+**Example:**
+
+```
+df = (spark.read    .format("json")    .schema(schema)    .option("mode", "PERMISSIVE")    .option("badRecordsPath", "/mnt/bad_records/")    .load("/mnt/input/"))
+```
+
+**Interview answer:**
+
+"When reading source files, I can configure `badRecordsPath` to capture malformed records separately. This helps us investigate invalid data without losing visibility into the data-quality problems."
+
+Note: The exact behavior depends on the file format and Spark version. For production pipelines, test how corrupt records are captured and consider using `columnNameOfCorruptRecord` as well.
+
+## **8. Increasing Spark parallelism**
+
+Parallelism means how many tasks Spark can execute concurrently to process data.
+
+1. **Increase worker nodes:** More workers provide more CPU cores and memory to execute tasks.
+2. **Choose larger instances:** Instances with more cores can run more tasks concurrently on each worker.
+3. **Tune&#x20;**`spark.sql.shuffle.partitions`**:** Controls the number of partitions created for many SQL shuffle operations.
+4. **Tune&#x20;**`spark.default.parallelism`**:** Provides the default number of partitions for certain RDD operations.
+5. **Check data partitioning:** Too few partitions can underutilize the cluster; too many small partitions can create scheduling overhead.
+6. **Monitor Spark UI:** Check task duration, data skew, shuffle read/write, CPU utilization, and idle resources before tuning.
+
+**Example:**
+
+```
+spark.conf.set("spark.sql.shuffle.partitions", "200")
+```
+
+```
+spark.conf.set("spark.default.parallelism", "200")
+```
+
+**Interview answer:**
+
+"If I want to increase parallelism, I can scale out by adding worker nodes or scale up by selecting instances with more CPU cores. I can also tune Spark partition settings based on the workload. I validate the changes using the Spark UI to check whether tasks are distributed efficiently."
+
+**Important distinction:**
+
+- More workers = more cluster resources.
+- More partitions = more potential tasks.
+- More partitions do not automatically mean faster execution. The cluster must have enough resources to execute them.
+
+Your examples `Standard_D4s_v3` and `i3.xlarge` are cloud-specific instance types. The right choice depends on the cloud provider, workload, memory requirement, and availability.
+
+## **9. Managed table vs External table**
+
+The main difference is who manages the underlying data files and what happens to those files when the table is dropped.
+
+| Managed table                                       | External table                                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Databricks manages table data and metadata          | Databricks manages table metadata, but data is stored at an externally specified location |
+| Data is stored in the managed storage location      | Data is stored at the specified external location                                         |
+| Dropping the table generally deletes its data files | Dropping the table removes metadata but keeps the underlying data                         |
+| Easier for Databricks-managed datasets              | Useful when multiple systems need access to the same data                                 |
+| Storage lifecycle is managed with the table         | Data lifecycle is managed separately                                                      |
+
+**Managed table example:**
+
+```
+CREATE TABLE sales (
+    id INT,
+    amount DOUBLE
+)
+USING DELTA;
+```
+
+**External table example:**
+
+```
+CREATE TABLE sales_external (
+    id INT,
+    amount DOUBLE
+)
+USING DELTA
+LOCATION 'abfss://container@account.dfs.core.windows.net/sales/';
+```
+
+**Interview answer:**
+
+"In a managed table, Databricks manages both the metadata and the data lifecycle. In an external table, Databricks manages the metadata, but the underlying data is stored at an external location. If I drop an external table, its data files remain in storage."
+
+## **10.&#x20;**`spark.read.table()`**&#x20;vs&#x20;**`spark.read.format().load()`
+
+Both approaches read data into a Spark DataFrame, but they identify the source differently.
+
+**A. Reading using a table name**
+
+```
+df = spark.read.table("sales.customers")
+```
+
+1. Reads a registered table from the catalog.
+2. Uses the table name rather than a storage path.
+3. The catalog provides metadata such as schema and storage location.
+4. Useful when working with Unity Catalog tables.
+5. Access is controlled through catalog permissions.
+
+**B. Reading using a storage path**
+
+```
+df = (spark.read    .format("delta")    .load("abfss://container@account.dfs.core.windows.net/orders/"))
+```
+
+1. Reads data directly from a storage location.
+2. The format specifies how Spark should interpret the files.
+3. Useful when the data is not registered as a catalog table.
+4. You need appropriate storage permissions.
+5. You can read Delta data directly without creating a table first.
+
+**Interview answer:**
+
+"I use `spark.read.table()` when the data is registered in Unity Catalog or another Spark catalog. I use `spark.read.format('delta').load(path)` when I want to access Delta data directly from ADLS using its storage path."
+
+## **11. Job cluster vs Interactive cluster**
+
+| Job cluster                                                     | Interactive cluster                                         |
+| --------------------------------------------------------------- | ----------------------------------------------------------- |
+| Designed for running scheduled or automated jobs                | Designed for interactive development                        |
+| Created for a job run and terminated according to its lifecycle | Can remain running for repeated development activities      |
+| Resources are generally dedicated to the job run                | Can be shared by multiple users, depending on configuration |
+| Helps isolate production workloads                              | Useful for notebooks, debugging, and experimentation        |
+| Can reduce cost by terminating after the job finishes           | Can cost more if left running when not needed               |
+| Supports automated job execution                                | Supports interactive execution and testing                  |
+
+**Job cluster example:**
+
+Suppose you have a daily ETL pipeline:
+
+1. Read customer data from ADLS.
+2. Apply transformations using PySpark.
+3. Write the output into Delta tables.
+4. Run the pipeline through a Databricks Workflow.
+5. The job uses its configured compute and terminates when finished.
+
+**Interactive cluster example:**
+
+1. A developer opens a Databricks notebook.
+2. Connects it to an interactive cluster.
+3. Runs SQL and PySpark commands.
+4. Tests transformations and fixes errors.
+5. Uses the same running cluster for further development.
+
+**Interview answer:**
+
+"I use an interactive cluster during development and debugging because I need to execute notebooks repeatedly. For production pipelines, I prefer job compute because it is designed for automated execution, workload isolation, and terminating compute after the job finishes."
+
+Note: Databricks now offers different compute options, including classic job compute and serverless compute. The exact lifecycle and sharing behavior depend on the compute type and workspace configuration.
+
+## **Quick interview revision sheet**
+
+| Topic               | One-line explanation                                            |
+| ------------------- | --------------------------------------------------------------- |
+| Read modes          | Control how malformed records are handled                       |
+| Z-ORDER             | Colocates related data to improve data skipping                 |
+| Liquid Clustering   | Flexible clustering for improving data layout and data skipping |
+| Partitioning        | Divides data into physical partitions based on column values    |
+| Bucketing           | Distributes data into a fixed number of hash buckets            |
+| Explicit schema     | Developer defines the expected data structure                   |
+| badRecordsPath      | Stores malformed records separately                             |
+| Parallelism         | Executes multiple Spark tasks concurrently                      |
+| Managed table       | Databricks manages the table's data lifecycle                   |
+| External table      | Data remains at an externally specified location                |
+| `read.table()`      | Reads a registered catalog table                                |
+| `format().load()`   | Reads data directly from a storage path                         |
+| Job cluster         | Used for automated job execution                                |
+| Interactive cluster | Used for development and testing                                |
+
+## **Test your interview preparation**
+
+Try answering these three questions without looking at the explanations:
+
+**Q1. You have a 500 GB Delta table. Users frequently filter by customer_id. Which optimization would you consider?**
+
+Partition by customer_id
+
+Z-ORDER or Liquid Clustering
+
+Use inferSchema
+
+**Q2. You want to read a Delta table registered in Unity Catalog. Which method would you use?**
+
+spark.read.table()
+
+spark.read.format('csv').load()
+
+badRecordsPath
+
+**Q3. You want to run a production ETL workflow automatically. Which compute is generally suitable?**
+
+Interactive cluster only
+
+Job compute
+
+Local Python interpreter
+
+Check answers
+---------------------------
+# **Spark and Databricks interview preparation**
+
+These are important topics for a Data Engineer interview with 3–5 years of experience. I'll cover each with **6 interview points, a simple example, and an interview-ready answer**.
+
+## **1. Lazy Evaluation in Spark**
+
+Lazy evaluation means Spark does not execute transformations immediately. It builds an execution plan and executes it only when an action is called.
+
+**6 important points:**
+
+1. Transformations are not executed immediately.
+2. Spark builds a logical execution plan called a lineage.
+3. Actions trigger actual execution.
+4. It allows Spark to optimize the execution plan before running it.
+5. It avoids unnecessary computation when intermediate results are not required.
+6. It helps Spark combine operations and optimize execution through Catalyst and other optimizations.
+
+**Example:**
+
+```
+df = spark.read.csv("/mnt/customers.csv")df1 = df.filter(df.age > 25)df2 = df1.select("name", "age")df2.show()
+```
+
+What happens?
+
+| Statement          | Execution                                        |
+| ------------------ | ------------------------------------------------ |
+| `spark.read.csv()` | Defines the data source; reading may be deferred |
+| `filter()`         | Transformation; no immediate job execution       |
+| `select()`         | Transformation; no immediate job execution       |
+| `show()`           | Action; triggers execution                       |
+
+**Interview answer:**
+
+"Spark follows lazy evaluation. It does not execute transformations immediately. Instead, it creates an execution plan. When we call an action like `show()`, `count()`, or `collect()`, Spark executes the required operations. This allows Spark to optimize the execution plan before processing the data."
+
+## **2. Narrow vs Wide Transformations**
+
+Transformations in Spark are divided into two types based on how data is distributed across partitions.
+
+### **Narrow transformation**
+
+A narrow transformation means each output partition depends on a limited number of input partitions, typically one. It does not require a shuffle.
+
+Examples:
+
+- `filter()`
+- `map()`
+- `flatMap()`
+- `select()`
+
+### **Wide transformation**
+
+A wide transformation means an output partition may depend on data from multiple input partitions. It generally requires a shuffle.
+
+Examples:
+
+- `groupBy()`
+- `distinct()`
+- `join()` (when a shuffle is required)
+- `orderBy()`
+- `repartition()`
+
+**Difference:**
+
+| Narrow                                        | Wide                           |
+| --------------------------------------------- | ------------------------------ |
+| No shuffle generally required                 | Shuffle generally required     |
+| Data stays within its input partition lineage | Data moves across partitions   |
+| Usually faster                                | Usually more expensive         |
+| Can be pipelined                              | Often creates a stage boundary |
+| Example: filter                               | Example: groupBy               |
+
+**Example:**
+
+```
+# Narrow transformationdf1 = df.filter(df.salary > 50000)# Wide transformationdf2 = df.groupBy("department").count()
+```
+
+**Interview answer:**
+
+"Narrow transformations do not require data movement across partitions, whereas wide transformations generally require shuffling data between partitions. For example, filter is a narrow transformation, while groupBy is a wide transformation. Wide transformations are generally more expensive because they involve network transfer, serialization, and sometimes disk I/O."
+
+## **3. Shuffling and why is it expensive?**
+
+Shuffling is the process of redistributing data across partitions or executors so that records with related keys can be processed together.
+
+**Example:**
+
+Suppose we have employee data distributed across three partitions.
+
+**Before shuffle**
+
+**Partition 1**
+
+IT - 100
+
+HR - 200
+
+**Partition 2**
+
+IT - 300
+
+Finance - 400
+
+**Partition 3**
+
+HR - 500
+
+Finance - 600
+
+**Shuffle by department**
+
+Records with the same department are redistributed
+
+**After shuffle**
+
+**IT**
+
+100, 300
+
+**HR**
+
+200, 500
+
+**Finance**
+
+400, 600
+
+**Why is shuffling expensive?**
+
+1. **Network transfer:** Data moves between executors over the network.
+2. **Serialization:** Data needs to be serialized before transferring and deserialized after receiving.
+3. **Disk I/O:** Shuffle data may be written to and read from local disk.
+4. **Memory usage:** Shuffle operations consume memory for sorting, buffering, and aggregation.
+5. **Stage boundaries:** Shuffle operations generally divide Spark jobs into separate stages.
+6. **Data skew:** If one key has significantly more records, one partition may take much longer than others.
+
+**How can we reduce shuffle?**
+
+- Use broadcast joins when one table is small enough.
+- Avoid unnecessary `repartition()` and `distinct()`.
+- Filter data early.
+- Use appropriate partitioning.
+- Handle skewed join keys.
+- Use AQE (Adaptive Query Execution) where appropriate.
+
+**Interview answer:**
+
+"Shuffle is the redistribution of data across partitions. It is expensive because data moves between executors, requires serialization and deserialization, and may involve disk I/O. It can also cause data skew and increase execution time. I try to reduce unnecessary shuffles and use broadcast joins when suitable."
+
+## **4. Cache vs Persistence**
+
+Both are used to store intermediate DataFrames so that Spark does not need to recompute them repeatedly.
+
+### **Cache**
+
+Cache stores the DataFrame using the default storage level for the API and language.
+
+```
+df.cache()
+```
+
+### **Persistence**
+
+Persistence allows us to specify the storage level.
+
+```
+from pyspark import StorageLeveldf.persist(StorageLevel.MEMORY_AND_DISK)
+```
+
+**Difference:**
+
+| Cache                               | Persistence                                      |
+| ----------------------------------- | ------------------------------------------------ |
+| Uses default storage level          | Allows custom storage levels                     |
+| Convenient for repeated use         | Gives more control                               |
+| Commonly uses memory-based storage  | Can use memory, disk, or both                    |
+| Suitable for frequently reused data | Suitable when memory is limited or data is large |
+
+**6 important points:**
+
+1. Both avoid recomputing the same transformations repeatedly.
+2. They are useful when a DataFrame is reused multiple times.
+3. Caching is lazy; data is materialized when an action runs.
+4. `cache()` uses the default storage level.
+5. `persist()` supports different storage levels.
+6. Use `unpersist()` when the cached data is no longer required.
+
+**Example:**
+
+```
+df = spark.read.parquet("/mnt/sales")df.cache()df.count()  # Materializes the cached datadf.filter(df.amount > 1000).show()df.groupBy("region").count().show()df.unpersist()
+```
+
+**Interview answer:**
+
+"If I use the same DataFrame multiple times, I can cache or persist it to avoid recomputing the transformations. Cache uses the default storage level, whereas persist allows me to specify a storage level such as MEMORY_AND_DISK. Once the data is no longer required, I use unpersist to release resources."
+
+## **5. Unity Catalog**
+
+Unity Catalog is Databricks' centralized governance solution for managing data and AI assets across a workspace or multiple workspaces.
+
+**6 important points:**
+
+1. **Centralized governance:** Provides a centralized way to manage data assets and permissions.
+2. **Three-level namespace:** Organizes objects as `catalog.schema.table`.
+3. **Access control:** Supports fine-grained permissions at catalog, schema, table, view, and column levels, with additional row-level controls.
+4. **Data lineage:** Provides built-in lineage to understand where data comes from and how it is used.
+5. **Metadata management:** Manages metadata for tables, views, volumes, functions, and other supported assets.
+6. **Auditing:** Supports audit logs to track access and activities.
+
+**Three-level namespace:**
+
+**Catalog**
+
+sales_catalog
+
+**Schema**
+
+customer_schema
+
+**Table**
+
+customer
+
+**Example:**
+
+```
+SELECT *
+FROM sales_catalog.customer_schema.customer;
+```
+
+**Interview answer:**
+
+"Unity Catalog is a centralized governance solution in Databricks. It helps manage metadata, control access to data, maintain data lineage, and audit user activities. It provides a three-level namespace: catalog, schema, and table."
+
+## **6. Data Lake vs Delta Lake**
+
+### **Data Lake**
+
+A Data Lake is a centralized storage repository that stores large amounts of raw and processed data in different formats.
+
+### **Delta Lake**
+
+Delta Lake is an open-source storage framework that adds reliability and transactional capabilities to data lakes using a transaction log.
+
+**Difference:**
+
+| Data Lake                                                      | Delta Lake                                                   |
+| -------------------------------------------------------------- | ------------------------------------------------------------ |
+| Stores data in different formats                               | Adds a reliable table layer over data files                  |
+| Can store CSV, JSON, Parquet, etc.                             | Commonly stores data in Parquet with a Delta transaction log |
+| Does not inherently provide ACID transactions                  | Supports ACID transactions                                   |
+| Versioning is not inherently available                         | Supports time travel and table versioning                    |
+| Schema enforcement depends on the format and processing engine | Supports schema enforcement and evolution                    |
+| Concurrent writes can be harder to coordinate                  | Provides transaction-based concurrency control               |
+
+**6 important Delta Lake features:**
+
+1. ACID transactions.
+2. Schema enforcement.
+3. Schema evolution.
+4. Time travel.
+5. `MERGE`, `UPDATE`, and `DELETE`.
+6. Change Data Feed (CDF), when enabled.
+
+**Interview answer:**
+
+"A Data Lake is a storage repository where we store large volumes of structured, semi-structured, and unstructured data. Delta Lake adds features such as ACID transactions, schema enforcement, time travel, and MERGE operations on top of data lake storage. It makes data processing more reliable."
+
+## **7. Delta Live Tables (DLT)**
+
+Delta Live Tables is the former name of Databricks' managed declarative pipeline framework. It is now called **Lakeflow Spark Declarative Pipelines**.
+
+It is used to build reliable batch and streaming data pipelines using declarative definitions.
+
+**6 important points:**
+
+1. **Declarative approach:** Define what data you want to produce rather than manually managing every execution step.
+2. **Pipeline management:** Databricks manages pipeline execution and dependencies.
+3. **Data quality:** Supports expectations to validate incoming records.
+4. **Streaming support:** Supports streaming data processing.
+5. **Monitoring:** Provides pipeline event logs and execution information.
+6. **Incremental processing:** Supports incremental pipeline processing where applicable.
+
+**Example of a declarative pipeline:**
+
+```
+from pyspark import pipelines as dpfrom pyspark.sql.functions import col@dp.tabledef bronze_customers():    return spark.readStream.table("source.customers")@dp.table@dp.expect("valid_customer_id", "customer_id IS NOT NULL")def silver_customers():    return (        spark.readStream.table("bronze_customers")        .filter(col("customer_id").isNotNull())    )
+```
+
+Here:
+
+- Bronze table reads incoming customer data.
+- Silver table applies a data-quality rule.
+- Pipeline manages the execution dependencies.
+
+**Interview answer:**
+
+"Delta Live Tables, now called Lakeflow Spark Declarative Pipelines, is a Databricks framework for building and managing data pipelines declaratively. It supports batch and streaming workloads, data-quality expectations, incremental processing, and pipeline monitoring."
+
+Note: Current syntax and supported features depend on the pipeline edition and runtime. Older DLT code commonly uses `dlt` decorators.
+
+## **8. How does Delta Table support versioning? (Important interview question)**
+
+Delta Lake supports versioning through the **Delta Transaction Log**, stored in the `_delta_log` directory.
+
+Every successful transaction creates a new table version.
+
+**6 important points:**
+
+1. **Transaction log:** Delta Lake maintains a transaction log in the `_delta_log` directory.
+2. **Version numbers:** Every successful transaction creates a new version, starting from version 0.
+3. **Transaction details:** The log records operations such as INSERT, UPDATE, DELETE, MERGE, and metadata changes.
+4. **Time travel:** We can query previous versions of a Delta table.
+5. **Data consistency:** Delta Lake uses the transaction log to identify which data files belong to a particular table version.
+6. **Retention:** Historical data files and transaction logs are subject to retention and cleanup policies. Time travel is not guaranteed indefinitely.
+
+### **Example**
+
+Suppose we have a customer table.
+
+## **Delta table version history**
+
+1. **Version 0 — Initial data**
+
+   Customer 101, Ashish, Salary 50,000
+
+   CREATE
+2. **Version 1 — Salary updated**
+
+   Customer 101, Ashish, Salary 60,000
+
+   UPDATE
+3. **Version 2 — New customer inserted**
+
+   Customer 102, Rahul, Salary 40,000
+
+   INSERT
+
+### **How to check table history?**
+
+```
+DESCRIBE HISTORY customers;
+```
+
+This displays:
+
+- Version number
+- Operation
+- Timestamp
+- User
+- Operation parameters
+
+### **How to read an older version?**
+
+**Using version number:**
+
+```
+df = (spark.read    .format("delta")    .option("versionAsOf", 0)    .load("/mnt/delta/customers"))
+```
+
+**Using timestamp:**
+
+```
+df = (spark.read    .format("delta")    .option("timestampAsOf", "2026-11-17 10:00:00")    .load("/mnt/delta/customers"))
+```
+
+**Using SQL:**
+
+```
+SELECT *
+FROM customers VERSION AS OF 0;
+```
+
+### **Important: Does Delta Lake store a complete copy of the table for every version?**
+
+No.
+
+Delta Lake generally stores changes as new data files and transaction-log entries. The transaction log tracks which files are active for each version.
+
+For example:
+
+- Version 0 may reference file A.
+- Version 1 may remove file A and add file B.
+- Version 2 may add file C.
+
+Old files may remain available for time travel until they are removed by `VACUUM`, subject to retention rules.
+
+**Interview answer (2-minute version):**
+
+"Delta Lake supports versioning through its transaction log, which is stored in the `_delta_log` directory. Whenever we perform a successful operation like INSERT, UPDATE, DELETE, or MERGE, Delta Lake creates a new version of the table. We can check the version history using DESCRIBE HISTORY and retrieve previous data using VERSION AS OF or timestamp-based time travel. It does not store a complete copy of the table for every version. Instead, it tracks data-file changes through the transaction log. We should also understand retention policies and VACUUM because deleted historical files may no longer be available for time travel."
+
+# **Quick revision: Important concepts to remember**
+
+| Topic                 | Keyword to remember                        |
+| --------------------- | ------------------------------------------ |
+| Lazy evaluation       | Execution happens when an action is called |
+| Narrow transformation | No shuffle generally                       |
+| Wide transformation   | Shuffle generally                          |
+| Shuffling             | Network + serialization + disk I/O         |
+| Cache                 | Default storage level                      |
+| Persistence           | Custom storage level                       |
+| Unity Catalog         | Centralized governance                     |
+| Data Lake             | Centralized data storage                   |
+| Delta Lake            | ACID + transaction log                     |
+| DLT / Lakeflow        | Declarative pipeline                       |
+| Delta versioning      | `_delta_log` + time travel                 |
+
+## **Test your interview knowledge**
+
+**1. Which operation triggers Spark execution?**
+
+filter()
+
+select()
+
+show()
+
+withColumn()
+
+
+
+**2. Which transformation generally requires a shuffle?**
+
+filter()
+
+map()
+
+select()
+
+groupBy()
+
+
+
+**3. Where does Delta Lake maintain its transaction history?**
+
+\_metadata
+
+\_delta_log
+
+\_spark_log
+
+\_history
+
+
+
+**4. What is the main difference between cache() and persist()?**
+
+No difference at all
+
+Cache uses a default storage level; persist lets us choose
+
+Persist only works on SQL
+
+Cache always writes to disk
+
+
+
+----------------
+# **Spark, Databricks, SQL and Data Warehouse – Interview Preparation**
+
+These are frequently asked topics for Data Engineer interviews. I'll explain each in simple language with 5–6 interview points, examples, and an interview-ready answer.
+
+# **1. Spark Architecture – Driver, Executor, Cluster Manager, Job, Stage, Task and DAG**
+
+First understand the complete execution flow.
+
+**Spark Application**
+
+Your PySpark code / notebook
+
+**Driver**
+
+Creates execution plan, DAG and schedules tasks
+
+**Cluster Manager**
+
+Allocates resources to the application
+
+**Executor 1**
+
+Task 1, Task 2
+
+**Executor 2**
+
+Task 3, Task 4
+
+Executors process data partitions and send results/status back to the driver.
+
+## **A. Driver**
+
+The Driver is the main controlling process of a Spark application.
+
+**6 important points:**
+
+1. It is responsible for coordinating the Spark application.
+2. It creates the Spark execution plan.
+3. It converts the logical plan into a physical execution plan.
+4. It creates the DAG (Directed Acyclic Graph).
+5. It schedules jobs, stages, and tasks.
+6. It communicates with executors and tracks execution progress.
+
+**Interview answer:**
+
+"The driver is the main control process of a Spark application. It coordinates execution, creates the DAG, divides work into stages and tasks, and schedules those tasks on executors."
+
+## **B. Executor**
+
+Executors are processes that run on worker nodes and execute tasks assigned by the driver.
+
+**6 important points:**
+
+1. Executors perform actual data processing.
+2. They execute tasks assigned by the driver.
+3. They process data partitions in parallel.
+4. They can store cached or persisted data.
+5. They handle shuffle operations.
+6. They send task results and status information back to the driver.
+
+**Interview answer:**
+
+"Executors are responsible for performing the actual computation. They process data partitions in parallel, execute tasks, handle shuffle operations, and can store cached data."
+
+## **C. Cluster Manager**
+
+A Cluster Manager is responsible for allocating resources such as CPU and memory to Spark applications.
+
+**6 important points:**
+
+1. It manages available cluster resources.
+2. It allocates CPU and memory to Spark applications.
+3. It helps launch executors.
+4. It manages resource availability across applications.
+5. It does not perform the actual DataFrame transformations.
+6. Examples include Standalone, YARN, and Kubernetes.
+
+**Interview answer:**
+
+"The cluster manager manages resources across the cluster. When a Spark application starts, it helps allocate resources and launch executors so that the application can execute its tasks."
+
+## **D. DAG (Directed Acyclic Graph)**
+
+DAG represents the sequence and dependency of operations that Spark needs to execute.
+
+**6 important points:**
+
+1. DAG stands for Directed Acyclic Graph.
+2. It represents dependencies between transformations.
+3. Spark creates an execution plan from the transformations.
+4. The DAG Scheduler divides the work into stages.
+5. Shuffle boundaries generally create stage boundaries.
+6. It helps Spark organize and optimize execution.
+
+**Example:**
+
+```
+df = spark.read.csv("/mnt/employee.csv")df1 = df.filter(df.salary > 50000)df2 = df1.groupBy("department").count()df2.show()
+```
+
+Conceptually:
+
+Read CSV
+
+Filter salary (Narrow)
+
+GroupBy department (Shuffle)
+
+Show results
+
+## **E. Job**
+
+A Job is created when an action is called on a DataFrame or RDD.
+
+**6 important points:**
+
+1. An action triggers a Spark job.
+2. Examples of actions include `show()`, `count()`, and `collect()`.
+3. A job is divided into one or more stages.
+4. Each stage contains multiple tasks.
+5. Multiple jobs can run within one Spark application.
+6. The driver coordinates job execution.
+
+**Example:**
+
+```
+df.count()df.show()
+```
+
+These are two separate actions and generally trigger two separate Spark jobs.
+
+## **F. Stage**
+
+A Stage is a group of tasks that Spark can execute without crossing a shuffle boundary.
+
+**6 important points:**
+
+1. A job consists of one or more stages.
+2. Stages are created by the DAG Scheduler.
+3. Shuffle boundaries generally separate stages.
+4. Each stage contains multiple tasks.
+5. Tasks in the same stage can run in parallel.
+6. The next dependent stage generally waits for the required shuffle output from the previous stage.
+
+## **G. Task**
+
+A Task is the smallest unit of execution in Spark.
+
+**6 important points:**
+
+1. A task is an individual unit of work.
+2. A task processes one partition of data for a particular stage.
+3. Tasks are executed by executors.
+4. Multiple tasks can run simultaneously.
+5. The number of tasks in a stage is generally related to the number of partitions being processed.
+6. Task failures can be retried according to Spark's execution and retry settings.
+
+**Important interview relationship:**
+
+## **Spark execution hierarchy**
+
+**Spark Application**
+
+**Job**
+
+**Stages**
+
+**Tasks**
+
+Tasks execute on executors, which are coordinated by the driver.
+
+**Remember this interview line:**
+
+- Application = Complete Spark program.
+- Job = Triggered by an action.
+- Stage = Group of tasks separated by shuffle boundaries.
+- Task = Processes one partition for a stage.
+
+# **2. Spark Master-Slave Architecture**
+
+Spark Standalone uses a Master-Worker architecture. The older term Master-Slave is often used in interview questions.
+
+[Spark Cluster — UCloud](https://images.openai.com/static-rsc-4/RDGAgl6ucgRdDmNdL-gozvWPYbAlAIE6Lk4AFU5sqwWt7Lbre0jQah87STF3oQJdI02G7Unc2KrNGyFl70YXqN3brmAQi06k36dDzPljVQ1xdYwYYr3EI1kpECTBpD_AQcpd_Yqw8cIx7gLgBXEN4r8ztjzVvSyian9H2tanhRw?purpose=inline)
+
+[docs.cloud.sdu.dk](https://docs.cloud.sdu.dk/Apps/spark-cluster.html?utm_source=chatgpt.com)
+
+**6 important points:**
+
+1. **Master:** Coordinates the Standalone cluster and manages available resources.
+2. **Worker:** Provides CPU and memory resources for Spark applications.
+3. **Driver:** Controls an individual Spark application.
+4. **Executor:** Runs tasks and processes data on worker nodes.
+5. **Task execution:** The driver schedules tasks, and executors execute them.
+6. **Resource management:** The master helps allocate resources, but it does not execute DataFrame transformations itself.
+
+**Interview answer:**
+
+"In Spark Standalone architecture, the master manages cluster resources, while worker nodes provide computing resources. The driver coordinates the application, and executors run tasks on worker nodes. This architecture enables distributed and parallel processing."
+
+**Important distinction:** Master and driver are not the same thing. The master manages the cluster; the driver manages an application. In YARN or Kubernetes deployments, the resource manager is not called the Spark Master.
+
+# **3. Data Lake vs Data Warehouse**
+
+## **Data Lake**
+
+A Data Lake stores large amounts of raw and processed data in different formats.
+
+## **Data Warehouse**
+
+A Data Warehouse stores structured, cleaned, and organized data mainly for reporting and analytics.
+
+**Comparison:**
+
+| Data Lake                                                  | Data Warehouse                             |
+| ---------------------------------------------------------- | ------------------------------------------ |
+| Stores raw and processed data                              | Stores structured and curated data         |
+| Supports structured, semi-structured and unstructured data | Primarily structured data                  |
+| Schema-on-read is common                                   | Schema-on-write is common                  |
+| Usually more flexible for data ingestion                   | Designed for consistent analytical queries |
+| Used for data engineering, ML and analytics                | Used for BI and business reporting         |
+| Examples: ADLS, Amazon S3                                  | Examples: Snowflake, Amazon Redshift       |
+
+**6 important points:**
+
+1. A Data Lake can store CSV, JSON, Parquet, images, logs, and other formats.
+2. A Data Warehouse generally stores cleaned and transformed data.
+3. Data Lakes offer flexibility for different workloads.
+4. Data Warehouses provide structured data for analytical queries.
+5. Data Lakes are often used as source storage for Bronze and Silver processing.
+6. A modern Lakehouse combines Data Lake flexibility with warehouse-style reliability and management.
+
+**Interview answer:**
+
+"A Data Lake stores large volumes of raw and processed data in different formats, whereas a Data Warehouse stores structured and curated data for reporting and analytics. In a Data Engineering project, we may ingest source data into a Data Lake and then transform it into trusted datasets for reporting."
+
+# **4. Partition Pruning**
+
+Partition Pruning is a query optimization technique where Spark reads only the required partitions instead of scanning the entire table.
+
+**Example:**
+
+Suppose we have a sales table partitioned by year and month.
+
+```
+df.write \    .format("delta") \    .partitionBy("year", "month") \    .save("/mnt/sales")
+```
+
+Now execute:
+
+```
+SELECT *
+FROM sales
+WHERE year = 2026 AND month = 11;
+```
+
+Spark can skip partitions for other years and months.
+
+**Sales table partitions**
+
+Jan 2026
+
+Skipped
+
+Feb 2026
+
+Skipped
+
+Mar 2026
+
+Skipped
+
+Oct 2026
+
+Skipped
+
+Nov 2026
+
+Read
+
+Dec 2026
+
+Skipped
+
+**6 important points:**
+
+1. It skips unnecessary table partitions.
+2. It reduces the amount of data read.
+3. It improves query performance.
+4. It works when filtering on partition columns.
+5. It is useful for large partitioned datasets.
+6. It can be verified using the Spark UI or query plan.
+
+**Interview answer:**
+
+"Partition pruning means Spark reads only the required partitions based on the filter condition. For example, if a sales table is partitioned by year and month and I query November 2026, Spark can skip other partitions, reducing the amount of data scanned."
+
+# **5. Predicate Pushdown**
+
+Predicate Pushdown is a query optimization technique where filter conditions are pushed closer to the data source so unnecessary records are not read into Spark when the source format supports it.
+
+**Example:**
+
+```
+df = spark.read.parquet("/mnt/sales")df_filtered = df.filter("amount > 1000")
+```
+
+Instead of reading all rows and filtering them later in Spark, Spark can push the filter to the Parquet reader, which can skip irrelevant row groups using statistics.
+
+**6 important points:**
+
+1. It pushes filter conditions closer to the data source.
+2. It reduces unnecessary data reading.
+3. It is supported by formats such as Parquet and ORC for supported predicates.
+4. It can use file and row-group statistics to skip data.
+5. It reduces I/O and can improve query performance.
+6. Not every filter can be pushed down; it depends on the source, expression, and query plan.
+
+**Interview answer:**
+
+"Predicate pushdown means Spark pushes filter conditions to the underlying data source. For example, when reading Parquet data, a condition like amount greater than 1000 can be pushed down to the Parquet reader, allowing it to skip unnecessary data and reduce I/O."
+
+## **Partition Pruning vs Predicate Pushdown**
+
+| Partition Pruning                        | Predicate Pushdown                     |
+| ---------------------------------------- | -------------------------------------- |
+| Skips entire partitions                  | Pushes filters into the data source    |
+| Works with partition columns             | Works with supported data columns      |
+| Skips directories or partition locations | Can skip files, row groups, or records |
+| Example: `year = 2026`                   | Example: `amount > 1000`               |
+
+**Interview tip:** Both can work together in the same query.
+
+# **6. Star Schema vs Snowflake Schema**
+
+These are two common dimensional data modeling approaches used in Data Warehousing.
+
+## **Star Schema**
+
+A Star Schema has one central fact table connected directly to multiple dimension tables.
+
+[Understanding Star Schema in Data Warehouse Modelling](https://images.openai.com/static-rsc-4/Z6YjKFE74ki0pa6EHttOXzIC_FU12GjH8Y5_mqa4u1pB-umu6fnVBQYCFkZf0PtORhpz7tGkwKk1IjlwXulFvq7FU0sH07dEcnCbzItipspN6tvJBxAkBlwPhIX4aE2dLDKHuMLevAbxoWV8W59FNBzz3ZYieBej0wSAbTPxc58?purpose=inline)
+
+[hevodata.com](https://hevodata.com/learn/star-schema-data-modelling/?utm_source=chatgpt.com)
+
+**6 important points:**
+
+1. Contains one central fact table.
+2. Fact table stores measurable values such as sales amount and quantity.
+3. Dimension tables store descriptive information.
+4. Dimension tables are generally denormalized.
+5. Requires fewer joins compared to a snowflake schema.
+6. Easy to understand and commonly used for reporting.
+
+**Example:**
+
+Fact table: `fact_sales`
+
+- sales_id
+- customer_id
+- product_id
+- date_id
+- sales_amount
+
+Dimension tables:
+
+- `dim_customer`
+- `dim_product`
+- `dim_date`
+
+## **Snowflake Schema**
+
+A Snowflake Schema is an extension of the Star Schema where dimension tables are further normalized into related tables.
+
+[Distributed OLAP Databases | Maxnilz🌴](https://images.openai.com/static-rsc-4/HA2ecVApxaxfXcRYlzumBSASPPB0xvpWebB1l8j174W49Sfd36zS_MLGcL48s82segQgVDfhsVamxDkYi9PFcw-C1Hbpa0G1gFLlIF4AB51_a-Zo6NZS7d5PFsysNLOkDeURa48nfTzeOHJahmbDb4YEz1frgteq7zM4aqNz-DM?purpose=inline)
+
+[maxnilz.com](https://maxnilz.com/docs/003-database/023-distributed-olap/?utm_source=chatgpt.com)
+
+**6 important points:**
+
+1. Contains a central fact table.
+2. Dimension tables are divided into multiple related tables.
+3. Uses normalization to reduce data redundancy.
+4. Requires more joins than a Star Schema.
+5. Can be more complex to understand and maintain.
+6. Useful when dimensions have hierarchical or reusable attributes.
+
+**Example:**
+
+Instead of storing city, state, and country together in one customer dimension, we can split them:
+
+- `dim_customer`
+- `dim_city`
+- `dim_state`
+- `dim_country`
+
+**Comparison:**
+
+| Star Schema                                 | Snowflake Schema                        |
+| ------------------------------------------- | --------------------------------------- |
+| Denormalized dimensions                     | Normalized dimensions                   |
+| Fewer joins                                 | More joins                              |
+| Simple design                               | More complex design                     |
+| More data redundancy                        | Less redundancy                         |
+| Often faster for straightforward BI queries | Can require more complex queries        |
+| Easy to understand                          | Requires understanding of relationships |
+
+**Interview answer:**
+
+"In a Star Schema, a central fact table is directly connected to denormalized dimension tables. In a Snowflake Schema, dimension tables are further normalized into multiple related tables. Star Schema is simpler and generally requires fewer joins, while Snowflake reduces redundancy."
+
+# **7. View vs Materialized View vs Stored Procedure vs Trigger**
+
+These are SQL database concepts. They are often asked together in interviews.
+
+## **A. View**
+
+A View is a virtual table created using a SQL query.
+
+**6 important points:**
+
+1. It is created using `CREATE VIEW`.
+2. It generally stores the SQL query definition, not a separate copy of the result data.
+3. Data is fetched from the underlying tables when the view is queried.
+4. It helps simplify complex SQL queries.
+5. It can restrict users to selected columns or rows.
+6. Changes in underlying tables can be reflected when the view is queried, subject to the view definition.
+
+**Example:**
+
+```
+CREATE VIEW high_salary_employees AS
+SELECT emp_id, emp_name, salary
+FROM employees
+WHERE salary > 50000;
+```
+
+Use it:
+
+```
+SELECT *
+FROM high_salary_employees;
+```
+
+**Interview answer:**
+
+"A View is a virtual table created using a SQL query. It generally does not store the result data separately. It helps simplify complex queries and provides controlled access to selected data."
+
+## **B. Materialized View**
+
+A Materialized View stores the result of a query physically, so that the result can be reused.
+
+**6 important points:**
+
+1. It stores precomputed query results.
+2. It can improve performance for repeated and expensive queries.
+3. It requires storage space.
+4. It needs a refresh or maintenance mechanism to reflect source changes.
+5. Refresh can be full or incremental depending on the database platform.
+6. It is useful for reporting and aggregation-heavy workloads.
+
+**Example (database-dependent syntax):**
+
+```
+CREATE MATERIALIZED VIEW department_salary AS
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department;
+```
+
+**Interview answer:**
+
+"A Materialized View stores the result of a query physically. It is useful when we repeatedly execute expensive aggregation queries. Instead of calculating everything each time, we can use the stored result and refresh it when required."
+
+## **C. Stored Procedure**
+
+A Stored Procedure is a group of SQL statements stored in the database that can be executed when required.
+
+**6 important points:**
+
+1. It stores reusable SQL logic.
+2. It can accept input and output parameters, depending on the database.
+3. It can contain conditions, loops, and transaction logic.
+4. It reduces repeated SQL code.
+5. It can perform multiple database operations.
+6. It is commonly used for ETL processing, data validation, and database maintenance.
+
+**Example (SQL Server syntax):**
+
+```
+CREATE PROCEDURE GetEmployees
+AS
+BEGIN
+    SELECT *
+    FROM employees;
+END;
+```
+
+Execute:
+
+```
+EXEC GetEmployees;
+```
+
+**Interview answer:**
+
+"A Stored Procedure is a reusable block of SQL statements stored in the database. We can execute it whenever required, pass parameters, and perform multiple operations such as data insertion, updates, and validation."
+
+## **D. Trigger**
+
+A Trigger is a database object that automatically executes when a specified database event occurs.
+
+**6 important points:**
+
+1. It executes automatically when a configured event occurs.
+2. Common events include INSERT, UPDATE, and DELETE.
+3. It can be used for auditing and maintaining history.
+4. It can validate or enforce certain database rules.
+5. It is not generally called directly like a stored procedure.
+6. Excessive trigger usage can make database behavior harder to understand and debug.
+
+**Example (SQL Server syntax):**
+
+```
+CREATE TRIGGER trg_employee_insert
+ON employees
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO employee_audit
+    SELECT emp_id, GETDATE()
+    FROM inserted;
+END;
+```
+
+Whenever a new employee is inserted, the trigger automatically inserts a record into the audit table.
+
+**Interview answer:**
+
+"A Trigger is a database object that automatically executes when an event like INSERT, UPDATE, or DELETE happens on a table. It is commonly used for auditing, maintaining history, and enforcing database rules."
+
+## **Final comparison**
+
+| Concept           | Main purpose                      | Stores result data? | Execution                            |
+| ----------------- | --------------------------------- | ------------------- | ------------------------------------ |
+| View              | Simplify query and control access | Generally no        | When queried                         |
+| Materialized View | Store precomputed results         | Yes                 | Query result is refreshed/maintained |
+| Stored Procedure  | Reusable SQL logic                | Not necessarily     | Explicitly called                    |
+| Trigger           | Automatic event-based execution   | Not necessarily     | Automatically triggered              |
+
+*Note:* Materialized views, stored procedures, and triggers have database-specific implementations. Databricks SQL, SQL Server, Oracle, and PostgreSQL do not necessarily support identical syntax or behavior.
+
+# **Quick interview revision**
+
+| Topic              | Remember this                             |
+| ------------------ | ----------------------------------------- |
+| Driver             | Coordinates Spark application             |
+| Executor           | Executes tasks                            |
+| Cluster Manager    | Allocates resources                       |
+| DAG                | Execution dependency graph                |
+| Job                | Triggered by action                       |
+| Stage              | Group of tasks between shuffle boundaries |
+| Task               | Processes a partition                     |
+| Master             | Manages Standalone cluster                |
+| Worker             | Provides compute resources                |
+| Data Lake          | Stores raw and processed data             |
+| Data Warehouse     | Stores curated analytical data            |
+| Partition Pruning  | Skips unnecessary partitions              |
+| Predicate Pushdown | Pushes filter closer to source            |
+| Star Schema        | Denormalized dimensions                   |
+| Snowflake Schema   | Normalized dimensions                     |
+| View               | Virtual table                             |
+| Materialized View  | Stored query result                       |
+| Stored Procedure   | Reusable SQL program                      |
+| Trigger            | Automatically executes on an event        |
+
+## **Test your understanding**
+
+**Q1. Who creates and schedules Spark tasks?**
+
+Executor
+
+Driver
+
+Worker
+
+Cluster Manager
+
+
+
+**Q2. What generally separates two Spark stages?**
+
+A filter
+
+A select
+
+A shuffle boundary
+
+A print statement
+
+
+
+**Q3. Which optimization skips entire partitions?**
+
+Predicate Pushdown
+
+Partition Pruning
+
+Caching
+
+Bucketing
+
+
+
+**Q4. Which schema generally requires fewer joins?**
+
+Snowflake
+
+Star
+
+Both always require the same
+
+Neither
+
+
+
+**Q5. Which SQL object executes automatically after a configured INSERT event?**
+
+View
+
+Stored Procedure
+
+Trigger
+
+Materialized View
+
+
+
+Submit answers
