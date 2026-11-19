@@ -18,6 +18,31 @@ Transforms and filters the data, then saves the result to the staging Delta tabl
 
 df = spark.read.format("csv").schema(df_schema).option("header", False).option("nullValue", "NULL").option(
             "delimiter", "\x01").load(source_path)
+
+
+3 -(
+3a)after stage there were two path one  we have written data into ODS
+what we have done in ods layer 
+Parse batch ID and dates
+Generate MBFS organization type
+Add required columns
+)
+Merge staging data with existing MDM/ODS data
+Generate customer-to-vehicle relationships
+Write ods_cust_mbfs
+
+3b)other was reltio
+reads stg_migration_cust_mbfs, converts its rows into Reltio CSV format, and writes files to Azure Blob Storage.
+so reltio was bascially doing this
+Create or update customer entities
+Associate customers with vehicles
+Ingest addresses, email addresses, and phone numbers
+Build a unified master-customer record across MBFS and the other migration sources
+
+
+----------------------------------------------------------------------------------------------------
+
+
 --------------------------------
 “In our legacy environment, ETL processing was built using IBM DataStage, with DB2 in the legacy data landscape. 
 We modernized the relevant pipelines by mapping the existing DataStage jobs, stages, dependencies, and output formats
