@@ -1,3 +1,5 @@
+
+
 cdm
 first i have extracted data from datastage ->for data extraction we have written datastage job which is just doing
 select * from {table_name} and table_name we have passed through parameter
@@ -41,6 +43,211 @@ Build a unified master-customer record across MBFS and the other migration sourc
 
 
 ----------------------------------------------------------------------------------------------------
+Incremental Layer  project explanation
+
+first layer was streaming layer 
+we were using Spark Structured Streaming to read files from Azure Storage
+readStream bascially continuously monitor the source folder
+Whenever a new file arrives, Spark automatically picks it up for processing
+.
+after we have read the table 
+We store the incoming data in streaming Delta tables, lnd_mbfs_streaming
+This streaming table maintains the original source data and schema.
+We also capture file-level metadata (Source file location,Source file name,Batch ID – Identifies the processing batch,
+Partition Date – Date used to organize the data)
+
+
+--------------
+
+landin layer
+Basic Data Cleanup: We remove unwanted control characters and trim column values
+We add additional columns like transaction timestamp
+Before processing, we compare file names with previously loaded files and skip files that have already been processed
+We use JSON configuration files to define the schema and file format
+
+--------------
+Staging Layer
+We read data from landing tables
+here we do 
+Email validation.
+Mandatory field checks.
+Phase-zero filters.
+Data mapping	Match source and target columns
+Validation	Check whether data is correct
+Vehicle and dealer reference checks
+This ensures that incoming records meet business requirements.
+We divide records into two categories:
+- Valid records → Continue to staging.
+- Invalid records → Store in error tables.
+- We rename columns where required.
+- We cast columns into the expected data types.
+- We follow the target DDL structure.
+- We perform deduplication to avoid duplicate records.
+We read records that were previously sent for error correction.
+After corrections, we bring those records back into the processing pipeline.
+
+-----------------------------------------------------
+Reltio / MDM Layer
+
+we have Reltio as mdm layer
+It maintains master records for Customer, Vehicle, Location, and Relationships.
+It helps maintain a unified customer view across different systems.
+
+We take  data from staging
+We transform the data into a Reltio-compatible CSV format.
+We generate separate files for customer entities and customer relationships.
+We use Crosswalk and UCID to identify customer records.
+Crosswalk helps identify records coming from different source systems.
+UCID represents the unified customer identifier.
+We export not only customer data but also relationship data.
+For example:
+- Customer-to-Vehicle relationship.
+- Customer-to-Location relationship.
+
+6. Reltio-to-Databricks Synchronization
+-
+We also read data back from Reltio into Databricks.
+We refresh MDM tables for Customer, Vehicle, Location, Crosswalk, and Relationships.
+We preserve Reltio IDs and source identifiers.
+This keeps Databricks MDM data synchronized with Reltio
+
+-------------------------
+mdm layer
+We read master data from Reltio into Databricks.
+We refresh MDM tables such as:
+- mdm_customer
+- mdm_vehicle
+- mdm_location
+- Customer relationship
+
+(When new data comes from the staging layer, 
+we match it against existing MDM records using Crosswalk, UCID, and Reltio IDs.
+ Based on the matching results, we preserve existing identifiers or assign new ones.
+ )
+
+- Crosswalk: Identifies a record from a particular source system.
+- UCID: Identifies the unified customer across systems.
+- Reltio ID: Identifies the master entity maintained by Reltio.
+
+
+Crosswalk Mapping
+- We use Crosswalk to identify records coming from different source systems.
+- It maintains crosswalk_type and crosswalk_key.
+- These mappings connect source-system records with the Reltio ID.
+- This helps identify whether a customer already exists in MDM.
+-----------------------------
+ODS Layer
+
+It stores source-specific customer data after MDM reconciliation.
+We maintain separate ODS tables for different sources, such as:
+- ods_cust_mbfs
+- ods_cust_pass_ca
+- ods_cust_dms_sales
+
+We enrich source records with Reltio IDs, UCIDs, and Crosswalk information to connect them with the golden customer record.
+
+ Why do we need ODS?
+ We need ODS because multiple downstream systems may consume this reconciled operational data, 
+not just reporting systems.
+
+The DIM layer comes later. It consumes trusted ODS data and builds consolidated dimensions 
+and fact tables for analytical reporting and Power BI.
+
+ODS maintains source-specific operational records after reconciliation with MDM/Reltio. 
+It preserves source information, Reltio IDs, UCIDs, Crosswalk mappings, customer relationships, 
+and handles inserts, updates, and deletes.
+
+1. Preserve Source Information
+-- ODS maintains separate records for MBFS, PASS CA, DMS, etc.
+- It helps identify which source system provided the customer information.
+- DIM generally provides a consolidated business view.
+
+2. MDM Reconciliation
+- ODS matches source records with MDM/Reltio.
+- It maintains Reltio ID, UCID, and Crosswalk information.
+- DIM consumes already reconciled data.
+
+Handle Updates and Deletes
+- ODS compares incoming records with previous ODS records.
+- It handles inserts, updates, and deletions.
+- This ensures that the correct data is passed to DIM
+
+Support Multiple Downstream Systems
+- ODS data can be consumed by APIs, outbound processes, and Reltio workflows.
+- DIM is mainly designed for reporting and analytics
+
+
+------------------------------------------------------
+
+1. DIM as an Analytical Layer
+-It is mainly used for reporting and analytics.
+- These tables provide business-friendly customer and vehicle information.
+Slowly Changing Dimension (SCD)
+- We maintain historical customer information.
+- When customer information changes, we preserve the previous record.
+- We insert the latest customer information with effective dates
+
+Golden Record Synchronization
+- We use UCID and Reltio mappings to identify the latest golden customer.
+- If Reltio merges two customers or changes the master identity, we update the existing DIM records accordingly.
+
+Finally, these DIM tables are consumed by fact tables, APIs, Power BI reports, and outbound processes."
+-------------------
+1. Fact Tables Store Business Transactions
+- Fact tables store actual business transactions and measurable business activities.
+- Examples from our project include:
+  -  finance records.
+  -  vehicle sales.
+  - Service contracts.
+  - Survey responses.
+  - After-sales activities.
+  - Customer cases.
+- Each fact table represents a particular business process.
+
+- We join it with dimension tables such as:
+  - dim_customer
+  - dim_customer_veh
+  - dim_contract
+  - Vehicle and dealer dimensions.
+- This connects business transactions with customer, vehicle, and contract information.
+
+Surrogate Key Mapping
+
+Business Transformations
+We convert dates, calculate contract values, and process vehicle and sales information.
+
+Downstream Consumption
+- We store the processed data in fact Delta tables.
+- These tables are consumed by:
+  - Customer summary APIs.
+  - Finance and sales reporting.
+  - Outbound extracts.
+  - Analytics and downstream customer/vehicle datasets.
+
+DIM	FACT
+Stores descriptive information	Stores business transactions
+Customer, Vehicle, Dealer	Sales, Finance, Service
+Contains attributes	Contains measures and dimension keys
+Answers: Who/What?	Answers: How much/How many
+
+--------------------------------
+
+Outbound Layer
+
+outbound layer sends processed  data to external systems
+- It reads data from DIM, FACT, MDM, ODS, and other source tables.
+- We transform the data according to the requirements of each external partner.
+
+Multiple External Systems
+- We generate data files for different external consumers.
+
+We apply partner-specific business rules before exporting data.
+We filter records based on date ranges and active status.
+We also apply privacy rules, suppression rules, and deduplication.
+We select only the required columns for each external system.
+
+
+-------------
 
 
 --------------------------------
