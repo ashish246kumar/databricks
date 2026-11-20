@@ -38,7 +38,9 @@ how do we migrate from postgress (old ->onpermises system) to (oracle database)
 explode() VS explode_outer()
 How do you migrate a SQL Server database to PostgreSQL?
 why you have used spark in your project ? (project explanation)
-how  do you handle data quality ?
+how  do you handle data quality ?  (project explanation)
+where does aws store secret key?
+what is cardinality?
 
 -----------------------------------------------------
 sa6_merged_merged_merged
@@ -63,8 +65,111 @@ Write a SQL query to display all the name which contains only single "a" in the 
 Cluster, Instance
 ---------------------------------------------------------------------------------------------------------------------
 scenario based question
+(give 5 -6 poiint s in each so that i can explain in interview)
+# **70 Scenario-Based Data Engineering Interview Questions**
 
+### **1. Data Volume & Performance**
 
+1. Your ETL pipeline normally processes 1 GB daily. Suddenly, 10 GB arrives. What will you change?
+2. Your pipeline takes 20 minutes normally, but suddenly takes 2 hours. How will you troubleshoot?
+3. You have 100 GB of data but limited cluster resources. How will you process it?
+4. Your pipeline processes 10 million records daily. Suddenly, 100 million records arrive. What will you do?
+5. Your source sends thousands of small files instead of a few large files. What problems can occur?
+6. Your pipeline works for 1 GB but fails for 50 GB. What could be the reason?
+
+### **2. Data Quality & Validation**
+
+7. Your source has 1 million records, but the target has only 999,500. How will you investigate?
+8. Your source suddenly starts sending duplicate records. What will you do?
+9. Your source contains NULL values in primary key columns. How will you handle them?
+10. The source data type changes unexpectedly. For example, customer_id changes from INT to STRING. What will you do?
+11. Your source sends an extra column that does not exist in the target. What will you do?
+12. Some records are valid and some are invalid. Will you fail the entire pipeline?
+
+### **3. Incremental Loading & CDC**
+
+13. Your pipeline processes the entire 100 GB dataset every day. How will you optimize it?
+14. Yesterday's data arrives today. How will you handle it?
+15. Your pipeline fails halfway through processing. How will you restart it?
+16. The same input file arrives twice. How will you prevent duplicate data?
+17. Your source system deletes a customer record. How will you reflect that deletion in Delta?
+18. Your source sends updates for old records, but your target contains newer records. What will you do?
+19. How will you handle a situation where the same batch is processed multiple times?
+20. How will you backfill data for the previous 30 days without affecting the current pipeline?
+
+### **4. PySpark Joins & Transformations**
+
+21. You are joining two large tables, and the join takes one hour. How will you optimize it?
+22. One partition takes 30 minutes, but other partitions finish in 2 minutes. Why?
+23. You have a 100 GB fact table and a 10 MB lookup table. How will you join them?
+24. Your DataFrame contains 100 columns, but you need only 5 columns. What will you do?
+25. You have 10 million records, but after a join only 5 million remain. What will you check?
+26. Your Spark job has too many stages and very small tasks. What would you do?
+27. When would you use repartition() versus coalesce()?
+28. Your pipeline uses collect() on a large DataFrame and crashes. Why?
+
+### **5. Delta Lake Scenarios**
+
+29. Your Delta table has millions of small files. How will you solve this?
+30. Your query scans the entire table even though you need only one month's data. What will you do?
+31. Someone accidentally deletes all records from a Delta table. How will you recover them?
+32. Two pipelines are writing to the same Delta table simultaneously. What problems can occur?
+33. Your Delta table is growing continuously. How will you manage storage?
+34. Your MERGE operation is taking too long. How will you optimize it?
+35. A business user wants to know what changed in the Delta table yesterday. How will you provide it?
+
+### **6. Schema Evolution**
+
+36. Your source changes its column name from customer_name to cust_name. What will you do?
+37. Yesterday, the source sent CSV files. Today, it sends JSON. What will you do?
+38. Your source sends 10 files, but one file is corrupted. Will you stop the entire pipeline?
+39. A new column is added to the source every week. How will you manage schema changes?
+40. The source sends a column with mixed values such as 123, 456 and ABC, but the target expects an integer. What will you do?
+
+### **7. Streaming & Auto Loader**
+
+41. Your pipeline receives files continuously throughout the day. Will you use batch or streaming?
+42. Your streaming pipeline processes the same records twice. How will you prevent duplicates?
+43. Your streaming job stops unexpectedly. What happens when you restart it?
+44. Your streaming data arrives two days late. How will you handle it?
+45. Your Auto Loader pipeline receives 1,000 files at once. How will you handle them?
+46. Your streaming pipeline is falling behind because data arrives faster than it processes. What will you do?
+
+### **8. ETL Production Support**
+
+47. Your source system is unavailable when the pipeline starts. What will you do?
+48. Your pipeline succeeds, but the target table contains incorrect data. What will you do?
+49. Your pipeline runs successfully in development but fails in production. Why?
+50. Your pipeline depends on three upstream pipelines. One fails. What will you do?
+51. Your pipeline creates duplicate records whenever you rerun a failed job. How will you fix it?
+52. Your daily pipeline must finish within 30 minutes, but now it takes 45 minutes. What will you do?
+53. Your pipeline has 10 steps. Step 8 fails. Will you execute all 10 steps again?
+54. Your pipeline completed successfully, but the notification was not sent. Is the ETL successful?
+
+### **9. SQL & Business Logic**
+
+55. You need to find the latest record for every customer. How will you do it?
+56. A customer changes their address. How will you maintain historical and current records?
+57. Your source contains five records for the same customer with different timestamps. Which record will you load?
+58. You need to find records present in source but missing in target. How will you do it?
+59. Your target has 10 million records. You need to update only 5,000 changed records. What will you do?
+60. You need to delete customer data older than 20 years. How will you do it?
+
+### **10. Data Migration & Cloud**
+
+61. You are migrating 500 GB of data from an on-premises database to Azure. How will you approach it?
+62. During migration, source data keeps changing. How will you ensure no records are missed?
+63. You migrated 100 million records, but source and target counts don't match. What will you do?
+64. You need to migrate a 1 TB table. Will you load it in a single operation?
+65. Your source database is PostgreSQL on-premises and your target is Oracle in the cloud. How will you migrate?
+66. Your ADLS contains Parquet files, and you need to load them into Bronze Delta. How will you do it?
+
+### **11. Security & Governance**
+
+67. Your source contains sensitive customer information such as email and phone numbers. How will you protect it?
+68. A developer accidentally gets access to production customer data. What will you do?
+69. Your pipeline needs database credentials. Where will you store them?
+70. Business users want access to only their own department's records. How will you implement this?
 
 
 
