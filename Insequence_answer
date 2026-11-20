@@ -1845,3 +1845,45 @@ Materialized View
 
 
 Submit answers
+-----------------------------------------------------------------------------
+By  default how many partion is created when spark job run  if there is one gb of data then how much partion will be created
+then what is default partition size 200
+
+No. **200 is not the default partition size. It is the default number of shuffle partitions.**
+
+There are two different Spark configurations:
+
+| Configuration                       | Default value | Meaning                                             |
+| ----------------------------------- | ------------- | --------------------------------------------------- |
+| `spark.sql.files.maxPartitionBytes` | 128 MB        | Maximum split size when reading file-based data     |
+| `spark.sql.shuffle.partitions`      | 200           | Number of partitions created for shuffle operations |
+
+### **Example 1: Reading 1 GB of Parquet data**
+
+Assuming 128 MB split size:
+
+\\[ 1024 / 128 = 8 \text{ partitions} \\]
+
+Approximately 8 input partitions.
+
+### **Example 2: Performing a JOIN**
+
+```
+df1.join(df2, "customer_id", "inner")
+```
+
+After a shuffle operation, Spark SQL generally uses **200 shuffle partitions** by default.
+
+### **How to check both values?**
+
+```
+# Default file partition sizespark.conf.get("spark.sql.files.maxPartitionBytes")# Default shuffle partitionsspark.conf.get("spark.sql.shuffle.partitions")
+```
+
+### **Remember for interviews**
+
+- **128 MB** = Default maximum file split size.
+- **200** = Default shuffle partition count.
+- **Neither value means every DataFrame always has that many partitions.**
+
+One more important point: In Databricks, AQE (Adaptive Query Execution) can dynamically coalesce shuffle partitions at runtime, so the final number of shuffle partitions may be lower than 200.
