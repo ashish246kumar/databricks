@@ -41,6 +41,8 @@ why you have used spark in your project ? (project explanation)
 how  do you handle data quality ?  (project explanation)
 where does aws store secret key?
 what is cardinality?
+by  default how many partion is created when spark job run  if there is one gb of data then how much partion will be created
+then what is default partition size 200
 
 -----------------------------------------------------
 sa6_merged_merged_merged
