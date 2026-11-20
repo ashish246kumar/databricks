@@ -176,8 +176,42 @@ scenario based question
 
 
 
+# **Databricks Cluster – Important Scenario-Based Interview Questions**
 
+## **Very High Priority**
 
+1. Your ETL pipeline normally processes 1 GB of data, but suddenly 10 GB arrives. How will you change your Databricks cluster configuration?
+2. Your cluster has 2 workers, but your pipeline is taking too much time. What will you change?
+3. When would you increase worker size instead of increasing the number of workers?
+4. Your Databricks job fails with a Driver Out Of Memory error. How will you troubleshoot it?
+5. Your job fails with Executor Out Of Memory. What will you do?
+
+6) Your driver CPU utilization is high, but executor CPU utilization is low. Why?
+7) Your executors are running out of memory during a join operation. How will you solve it?
+8) How will you identify whether a problem is related to the driver or executors?
+9) Your Databricks job was completing in 20 minutes, but now it takes 2 hours. How will you troubleshoot the cluster?
+10) Your cluster is processing data slowly even after increasing the workers. Why?
+
+11. What is the difference between an All-Purpose Cluster and a Job Cluster?
+12. Your team has 10 scheduled ETL pipelines. Would you use one shared cluster or separate job clusters?
+13. Your scheduled Databricks job creates a new cluster every time. How will you optimize the execution cost?
+14. Your company wants to reduce Databricks DBU costs. What cluster-level changes would you recommend?
+15. Your cluster has autoscaling enabled, but it is not adding workers even though the job is slow. Why?
+
+## **High Priority**
+
+16. Your cluster is idle for several hours. How will you reduce unnecessary costs?
+17. Would you always enable autoscaling for production ETL pipelines? Why or why not?
+18. Your Databricks cluster suddenly terminates during ETL execution. What will you check?
+19. Your cluster shows an Out Of Disk Space error. How will you troubleshoot it?
+20. Your cluster is running, but the Spark job is not progressing. What will you check?
+
+21) What is AQE, and how can it help when your cluster processes large datasets?
+22) How does Photon improve Spark query performance?
+23) How do you decide the executor memory and cores for a Spark workload?
+24) How does the number of Spark partitions relate to the number of available executor cores
+
+By default how many partion is created when spark job run  if there is one gb of data then how much partion will be created
 
 
 
