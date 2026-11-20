@@ -60,8 +60,25 @@ Associate customers with vehicles
 Ingest addresses, email addresses, and phone numbers
 Build a unified master-customer record across MBFS and the other migration sources
 
+----------------------
+why you have used spark in your project ?
+"Pandas is good for small datasets, but our project involved large volumes of data from multiple source systems. Processing everything on a single machine could create memory and performance limitations. 
+Spark allowed us to distribute processing across multiple executors, so it was more suitable for our workload."
 
+One important point: Don't say Spark is always faster than Python or SQL. Explain that Spark was suitable because of your project's data volume, distributed processing requirements, and transformation/join workload.
 ----------------------------------------------------------------------------------------------------
+how  do you handle data quality ?
+
+We handled data quality through mandatory-field validation, data type checks, 
+duplicate checks, source-to-target count reconciliation, and join validation. Invalid records were 
+separated for investigation and reprocessing rather than allowing bad data into downstream tables
+
+
+How do you handle duplicates?	Identify business keys and apply deduplication rules.
+How do you validate record counts?	Compare source and target counts.
+How do you handle bad records?	Store them separately for investigation and reprocessing.
+How do you check join issues?	Check unmatched records and unexpected row multiplication.
+---------------------------------------------------------------------------------------------------------------------------
 Incremental Layer  project explanation
 
 first layer was streaming layer 
