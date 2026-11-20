@@ -1,5 +1,24 @@
+What problem was the project solving?
+"Basically, our project was solving the problem of fragmented customer data in the automotive industry.
 
+The company had customer data coming from multiple source systems.
 
+The problem was that the same customer could exist in multiple systems, but their information was stored differently.
+
+For example:
+- One system might have the customer's old address.
+- Another system might have the updated phone number.
+- Another system might contain vehicle ownership details.
+- Some systems might have duplicate or incomplete customer records.
+Because of this, it was difficult to identify the same customer across all systems and get a complete picture of that customer.
+
+So, our main goal was to bring all this data together, clean it, validate it, identify duplicate customers, and create one trusted customer record, also called a Golden Record.
+
+We used Azure Databricks for data processing and Reltio MDM for customer matching and golden record management.
+
+Finally, we made this trusted data available for reporting, APIs, and external partner systems.
+
+-----------------------------------------------------------------
 cdm
 first i have extracted data from datastage ->for data extraction we have written datastage job which is just doing
 select * from {table_name} and table_name we have passed through parameter
