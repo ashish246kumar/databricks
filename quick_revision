@@ -37,6 +37,8 @@ Transformations vs action
 how do we migrate from postgress (old ->onpermises system) to (oracle database)
 explode() VS explode_outer()
 How do you migrate a SQL Server database to PostgreSQL?
+why you have used spark in your project ? (project explanation)
+how  do you handle data quality ?
 
 -----------------------------------------------------
 sa6_merged_merged_merged
@@ -60,6 +62,7 @@ Write a query to delete the duplicate records from the table
 Write a SQL query to display all the name which contains only single "a" in the name.
 Cluster, Instance
 ---------------------------------------------------------------------------------------------------------------------
+scenario based question
 
 
 
