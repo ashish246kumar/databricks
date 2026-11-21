@@ -43,7 +43,7 @@ where does aws store secret key?
 what is cardinality?
 by  default how many partion is created when spark job run  if there is one gb of data then how much partion will be created
 then what is default partition size 200
-
+what step are in the ci/cd
 -----------------------------------------------------
 sa6_merged_merged_merged
 spark store data in memory and caching also store date in memory then how it is improving the performance (databricks | PG 5 PDF SA6_MERGED)
