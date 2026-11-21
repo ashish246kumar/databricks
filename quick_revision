@@ -65,7 +65,19 @@ MERGE INTO
 Write a query to delete the duplicate records from the table
 Write a SQL query to display all the name which contains only single "a" in the name.
 Cluster, Instance
--------------------------------
+------------------------------------------------------------------------------------------------------
+match_id    player_name         runs
+1           harbeer             23
+1           kuldeep             0
+2           harbeer             52
+2           ]             55
+3           harbeer             105"
+Return the total number of runs scored by each player along with that the total number 
+of half_centuries and the player shouldn’t have a duck (zero score).
+
+
+
+--------------------------------------------------------------------------------
 Question:				
 Dept wise emp with second highest salary with their name, empid, depId and salary				
 				
