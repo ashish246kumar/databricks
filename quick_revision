@@ -65,6 +65,23 @@ MERGE INTO
 Write a query to delete the duplicate records from the table
 Write a SQL query to display all the name which contains only single "a" in the name.
 Cluster, Instance
+-------------------------------
+Question:				
+Dept wise emp with second highest salary with their name, empid, depId and salary				
+				
+CSV file data: 				
+emp_id	name	salary	dep_id	
+1	a	10	21	
+2	b	11	21	
+3	c	9	22	
+4	d	10	22	
+				
+Create spakr script and perform below steps 				
+1	Import statement			
+2	create session			
+3	create df from csv			
+4	transformations			
+5	save into table whrere emp_id is as PK
 ---------------------------------------------------------------------------------------------------------------------
 scenario based question
 (give 5 -6 poiint s in each so that i can explain in interview)
