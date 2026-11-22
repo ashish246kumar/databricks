@@ -481,7 +481,12 @@ import base64def encode_image(image_path):    with open(image_path, "rb") as ima
 ### **Complete TTS Code**
 
 ```
-from openai import OpenAIclient = OpenAI()text = "Peter is a software engineer living in France."response = client.audio.speech.create(    model="tts-1",    voice="alloy",    input=text)with open("output.mp3", "wb") as audio_file:    for chunk in response.iter_bytes():        audio_file.write(chunk)print("Audio generated successfully")
+from openai import OpenAIclient = OpenAI()
+text = "Peter is a software engineer living in France."
+response = client.audio.speech.create(    model="tts-1",    voice="alloy",    input=text)
+with open("output.mp3", "wb") as audio_file:    
+    for chunk in response.iter_bytes():        
+         audio_file.write(chunk)print("Audio generated successfully")
 ```
 
 ## **11. Real-World TTS Applications**
