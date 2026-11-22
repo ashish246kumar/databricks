@@ -1481,5 +1481,246 @@ Save AI response in Session State
 Display complete chat history
 
 **Most important takeaway:** Streaming improves the response experience; Session State preserves conversation history; Structured Outputs ensures responses follow a defined data structure.
+--------------------------------------------------------------------------------------------------------------------------
+# **LangChain – L10 & L11 Short Notes**
 
+These lessons cover LangChain architecture, Hugging Face open-source models, model loading, message types, and prompt templates.
+
+## **1. What is LangChain?**
+
+LangChain is a framework used to build LLM applications by connecting language models with prompts, tools, memory, and external data sources.
+
+**Main components:**
+
+| Component        | Purpose                                     |
+| ---------------- | ------------------------------------------- |
+| Models           | Connect and interact with different LLMs    |
+| Prompts          | Create and manage model instructions        |
+| Chains           | Connect multiple operations into a workflow |
+| Memory           | Maintain previous conversation context      |
+| Agents           | Allow LLMs to decide and use external tools |
+| Indexes          | Organize external documents for retrieval   |
+| Document Loaders | Load data from different sources            |
+| Vector Stores    | Store embeddings for similarity search      |
+
+## **2. LangChain Ecosystem**
+
+| Package               | Purpose                                        |
+| --------------------- | ---------------------------------------------- |
+| `langchain-core`      | Base abstractions and LCEL                     |
+| `langchain-community` | Community integrations                         |
+| `langchain`           | Chains, agents, and retrieval                  |
+| `langgraph`           | Stateful, multi-step LLM applications          |
+| `langserve`           | Deploy LangChain applications as REST APIs     |
+| `langsmith`           | Debugging, testing, evaluation, and monitoring |
+
+**Remember:** LCEL stands for LangChain Expression Language. It connects components using the `|` operator.
+
+## **3. Open-Source Models**
+
+The lessons demonstrate using open-source models through Hugging Face and LangChain.
+
+**Models covered:**
+
+- Microsoft Phi-3-mini-4k-instruct
+- Meta Llama 3 8B
+- Meta Llama 3 70B
+
+**Model naming example:**
+
+`microsoft/Phi-3-mini-4k-instruct`
+
+| Part        | Meaning                                      |
+| ----------- | -------------------------------------------- |
+| `microsoft` | Organization                                 |
+| `Phi-3`     | Model family                                 |
+| `mini`      | Model size / variant                         |
+| `4k`        | Context length of approximately 4,000 tokens |
+| `instruct`  | Fine-tuned to follow instructions            |
+
+## **4. Loading Models Using Hugging Face**
+
+**Step 1: Install libraries**
+
+```
+pip install -q langchain
+pip install -q langchain-community
+pip install -q langchain-huggingface
+pip install -q langchainhub
+pip install -q langchain-chroma
+```
+
+**Step 2: Import libraries**
+
+```
+import torchfrom transformers import (    AutoModelForCausalLM,    AutoTokenizer,    pipeline,    BitsAndBytesConfig)from langchain_huggingface import HuggingFacePipeline
+```
+
+**Step 3: Configure 4-bit quantization**
+
+Quantization reduces model memory requirements, making it easier to load large models on GPUs with limited memory.
+
+```
+model_id = "microsoft/Phi-3-mini-4k-instruct"quantization_config = BitsAndBytesConfig(    load_in_4bit=True,    bnb_4bit_compute_dtype=torch.float16,    bnb_4bit_quant_type="nf4",    bnb_4bit_use_double_quant=True)
+```
+
+**Step 4: Load model and tokenizer**
+
+```
+model = AutoModelForCausalLM.from_pretrained(    model_id,    device_map="auto",    quantization_config=quantization_config)tokenizer = AutoTokenizer.from_pretrained(model_id)
+```
+
+**Step 5: Create Hugging Face pipeline**
+
+```
+pipe = pipeline(    task="text-generation",    model=model,    tokenizer=tokenizer,    temperature=0.1,    max_new_tokens=500,    do_sample=True,    repetition_penalty=1.1)
+```
+
+**Important parameters:**
+
+| Parameter            | Purpose                                |
+| -------------------- | -------------------------------------- |
+| `temperature`        | Controls randomness in responses       |
+| `max_new_tokens`     | Maximum number of new tokens generated |
+| `do_sample`          | Enables sampling-based generation      |
+| `repetition_penalty` | Discourages repeated text              |
+| `device_map="auto"`  | Automatically selects device placement |
+| `load_in_4bit=True`  | Loads model using 4-bit quantization   |
+
+**Step 6: Connect Hugging Face with LangChain**
+
+```
+llm = HuggingFacePipeline(pipeline=pipe)output = llm.invoke("What is AI?")print(output)
+```
+
+**Key point:** `HuggingFacePipeline` wraps the Hugging Face pipeline so it can be used through LangChain's standard `.invoke()` method.
+
+## **5. Model-Specific Special Tokens**
+
+Some models expect messages in a particular format using special tokens.
+
+For example, Llama uses tokens such as:
+
+| Token                     | Purpose                               |
+| ------------------------- | ------------------------------------- |
+| `<\\|begin_of_text\\|>`   | Starts the text sequence              |
+| `<\\|start_header_id\\|>` | Starts a message header               |
+| `<\\|end_header_id\\|>`   | Separates header from message content |
+| `<\\|eot_id\\|>`          | Marks the end of a message turn       |
+| `<\\|end_of_text\\|>`     | Marks the end of the text sequence    |
+
+**Manual prompt formatting:**
+
+```
+template = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>{system_prompt}<|eot_id|><|start_header_id|>user<|end_header_id|>{user_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""prompt = template.format(    system_prompt="You are a helpful assistant.",    user_prompt="What is AI?")output = llm.invoke(prompt)print(output)
+```
+
+**Why use templates?**
+
+- Maintain a consistent input format.
+- Separate system instructions from user messages.
+- Reduce unstructured responses.
+
+## **6. ChatHuggingFace and Message Types**
+
+Instead of manually writing special tokens, LangChain provides message abstractions.
+
+| Message         | Purpose                              |
+| --------------- | ------------------------------------ |
+| `SystemMessage` | Defines AI behavior and instructions |
+| `HumanMessage`  | Represents user input                |
+| `AIMessage`     | Represents AI response               |
+
+**Code:**
+
+```
+from langchain_core.messages import (    HumanMessage,    SystemMessage)from langchain_huggingface import ChatHuggingFacechat_model = ChatHuggingFace(llm=llm)messages = [    SystemMessage(        content="You are a helpful assistant."    ),    HumanMessage(        content="Explain AI briefly."    )]response = chat_model.invoke(messages)print(response.content)
+```
+
+**Remember:** `ChatHuggingFace` converts the underlying Hugging Face model into a conversational interface.
+
+## **7. PromptTemplate**
+
+`PromptTemplate` is used to create reusable prompts with dynamic variables.
+
+**Example:**
+
+```
+from langchain_core.prompts import PromptTemplateprompt = PromptTemplate.from_template(    "Write a poem about {topic}")result = prompt.invoke({    "topic": "artificial intelligence"})print(result)
+```
+
+Important methods:
+
+- `from_template()` – Creates a prompt with placeholders.
+- `input_variables` – Displays required variables.
+- `invoke()` – Supplies values to the template.
+
+## **8. ChatPromptTemplate**
+
+`ChatPromptTemplate` creates prompts containing multiple message roles, such as system and user.
+
+```
+from langchain_core.prompts import ChatPromptTemplateprompt = ChatPromptTemplate.from_messages([    ("system", "You are a helpful assistant."),    ("human", "Explain {topic} in one paragraph.")])result = prompt.invoke({    "topic": "artificial intelligence"})print(result)
+```
+
+**Difference between PromptTemplate and ChatPromptTemplate:**
+
+| PromptTemplate                      | ChatPromptTemplate                          |
+| ----------------------------------- | ------------------------------------------- |
+| Creates a single string prompt      | Creates multiple chat messages              |
+| Uses text with placeholders         | Uses system, human, and other message roles |
+| Suitable for text-generation models | Suitable for conversational models          |
+
+## **9. Multiple Dynamic Parameters**
+
+A prompt can accept multiple variables.
+
+```
+from langchain_core.prompts import PromptTemplatetemplate = """Explain {topic} in a simple way.Write {size}."""prompt = PromptTemplate.from_template(template)result = prompt.invoke({    "topic": "artificial intelligence",    "size": "20 words"})print(result)
+```
+
+Output prompt:
+
+```
+Explain artificial intelligence in a simple way.
+Write 20 words.
+```
+
+## **10. Important Interview Questions**
+
+1. What is LangChain and why do we use it?
+2. Explain the main components of LangChain.
+3. What is LCEL?
+4. What is the difference between LangChain and LangGraph?
+5. What is Hugging Face?
+6. What is the difference between open-source and proprietary LLMs?
+7. What is quantization and why do we use 4-bit quantization?
+8. What is the purpose of `BitsAndBytesConfig`?
+9. What is the difference between `AutoTokenizer` and `AutoModelForCausalLM`?
+10. What is a Hugging Face pipeline?
+11. What is `HuggingFacePipeline` in LangChain?
+12. What is the difference between `PromptTemplate` and `ChatPromptTemplate`?
+13. What is the difference between `HumanMessage` and `SystemMessage`?
+14. What is `ChatHuggingFace`?
+15. Why do different LLMs use special prompt tokens?
+
+## **11. Quick Revision**
+
+| Concept             | Remember                                    |
+| ------------------- | ------------------------------------------- |
+| LangChain           | Framework for building LLM applications     |
+| Hugging Face        | Platform and libraries for accessing models |
+| Phi-3 / Llama 3     | Open-source model families                  |
+| Quantization        | Reduces model memory requirements           |
+| Tokenizer           | Converts text into tokens                   |
+| Pipeline            | Runs model generation                       |
+| HuggingFacePipeline | Connects HF pipeline with LangChain         |
+| ChatHuggingFace     | Conversational model wrapper                |
+| SystemMessage       | AI instructions                             |
+| HumanMessage        | User input                                  |
+| PromptTemplate      | Reusable single-text prompt                 |
+| ChatPromptTemplate  | Reusable multi-message prompt               |
+| LCEL                | Connects components using `\\|`             |
+
+**Most important concepts to understand practically:** Hugging Face model loading, 4-bit quantization, `HuggingFacePipeline`, `ChatHuggingFace`, `PromptTemplate`, and `ChatPromptTemplate`.
 
