@@ -309,3 +309,229 @@ ChatPromptTemplate
 FewShotChatMessagePromptTemplate
 
 Notes consolidated from your uploaded lessons. Duplicate explanations and repeated concepts have been removed.
+---------------------------------------------------------------------------------------------------
+# **OpenAI Developer Platform – Short Notes (L1, L3 & L4)**
+
+## **1. OpenAI Developer Platform**
+
+- **OpenAI API:** Allows applications to access AI models programmatically.
+- **HTTP Requests:** Send requests to OpenAI and receive model responses.
+- **SDK:** Official libraries available for Python and JavaScript.
+- **Client Application:** Python or JavaScript application connects to OpenAI API.
+- **Playground:** Test models and prompts without writing code.
+
+## **2. OpenAI Models & Capabilities**
+
+| Model / Feature | Purpose                              |
+| --------------- | ------------------------------------ |
+| GPT-4           | Complex reasoning                    |
+| GPT-4 Mini      | Faster, affordable tasks             |
+| GPT-3.5 Turbo   | Older chat model                     |
+| DALL·E 3        | Image generation                     |
+| Whisper         | Speech-to-text                       |
+| TTS             | Text-to-speech                       |
+| Embeddings      | Converts text into numerical vectors |
+| Moderation      | Detects unsafe content               |
+
+**Advanced capabilities:**
+
+- Vision – Understands images.
+- Function Calling – Connects AI with external tools and APIs.
+- Structured Outputs – Generates predefined JSON structures.
+- Video – Experimental capability discussed in the recording.
+
+## **3. API Account & Billing**
+
+- Create an OpenAI Developer Platform account.
+- Generate an API key.
+- Add payment method and API credits.
+- Monitor usage through the Usage dashboard.
+- API billing is separate from ChatGPT subscription.
+- API usage depends on model-specific pricing and consumption.
+
+## **4. Image Generation – DALL·E 3**
+
+- `client.images.generate()` generates images from text prompts.
+- `model`: Selects image model.
+- `prompt`: Describes required image.
+- `size`: Defines image dimensions.
+- `quality`: `standard` or `hd`.
+- `response.data[0].url`: Retrieves generated image URL.
+
+```
+from openai import OpenAIclient = OpenAI()response = client.images.generate(    model="dall-e-3",    prompt="A dog and cat sitting together",    size="1024x1024",    quality="standard")image_url = response.data[0].urlprint(image_url)
+```
+
+## **5. Image Variation – DALL·E 2**
+
+- Generates alternative images using an existing image.
+- Uses `client.images.create_variation()`.
+- Original image must be opened in binary read mode (`rb`).
+- Returns a generated image URL.
+
+```
+from openai import OpenAIclient = OpenAI()with open("image.png", "rb") as image_file:    response = client.images.create_variation(        image=image_file,        model="dall-e-2",        size="1024x1024"    )print(response.data[0].url)
+```
+
+## **6. Vision Models – Image Analysis**
+
+- Vision models understand both text and images.
+- Can extract information from invoices and documents.
+- Supports text and image in the same message.
+- Can convert extracted information into JSON.
+
+**Example: Invoice extraction**
+
+- Company name and address.
+- Customer details.
+- Invoice number.
+- Product descriptions.
+- Tax and total amount.
+- Payment terms.
+
+**Image message structure:**
+
+```
+{    "type": "text",    "text": "Extract invoice information into JSON"}{    "type": "image_url",    "image_url": {        "url": image_url    }}
+```
+
+## **7. Image URL vs Base64 Encoding**
+
+| Feature        | Image URL              | Base64               |
+| -------------- | ---------------------- | -------------------- |
+| Image location | Online                 | Local file           |
+| Input          | Image URL              | Encoded string       |
+| Public access  | URL must be accessible | No public URL needed |
+| Encoding       | Not required           | Required             |
+| Use case       | Online images          | Local/private images |
+
+**Base64 process:**
+
+1. Open local image using `rb`.
+2. Read image bytes.
+3. Convert bytes using `base64.b64encode()`.
+4. Convert encoded bytes into string using `.decode("utf-8")`.
+5. Send image through API using Data URI.
+
+```
+import base64def encode_image(image_path):    with open(image_path, "rb") as image_file:        return base64.b64encode(            image_file.read()        ).decode("utf-8")base64_image = encode_image("invoice.png")image_url = f"data:image/png;base64,{base64_image}"
+```
+
+## **8. Important Python Functions**
+
+| Function             | Purpose                                |
+| -------------------- | -------------------------------------- |
+| `base64.b64encode()` | Converts image bytes into Base64       |
+| `.decode("utf-8")`   | Converts bytes into string             |
+| `requests.post()`    | Sends HTTP POST request                |
+| `response.json()`    | Converts HTTP response into dictionary |
+| `json.loads()`       | JSON string → Python dictionary        |
+| `json.dumps()`       | Python dictionary → JSON string        |
+| `open("file", "rb")` | Reads binary file                      |
+| `open("file", "wb")` | Writes binary file                     |
+
+## **9. Vision Model Limitations**
+
+- Medical images: Not reliable for specialised diagnosis.
+- Non-Latin scripts: May struggle with some languages.
+- Small text: Difficult to recognise.
+- Rotated images: May misinterpret content.
+- Spatial reasoning: Can struggle with complex relationships.
+- Object counting: May provide approximate results.
+- Panoramic images: May struggle with fisheye images.
+- CAPTCHAs: Solving requests are restricted.
+
+**Best practices:**
+
+- Use clear, high-resolution images.
+- Avoid unnecessary rotation.
+- Ensure text is readable.
+- Validate extracted information.
+- Do not depend on models for exact object counting.
+
+## **10. Text-to-Speech (TTS)**
+
+- Converts written text into spoken audio.
+- `client.audio.speech.create()` generates audio.
+- `tts-1`: Speech generation model used in the lesson.
+- `voice`: Selects the voice.
+- `input`: Text to convert into speech.
+- `.iter_bytes()`: Reads audio in chunks.
+- `wb`: Saves audio in binary write mode.
+
+**Available voices:**
+
+| Voice   | Description |
+| ------- | ----------- |
+| alloy   | Balanced    |
+| echo    | Distinct    |
+| fable   | Expressive  |
+| onyx    | Deep        |
+| nova    | Natural     |
+| shimmer | Soft        |
+
+**Supported audio formats:**
+
+- MP3
+- Opus
+- AAC
+- FLAC
+- PCM
+
+### **Complete TTS Code**
+
+```
+from openai import OpenAIclient = OpenAI()text = "Peter is a software engineer living in France."response = client.audio.speech.create(    model="tts-1",    voice="alloy",    input=text)with open("output.mp3", "wb") as audio_file:    for chunk in response.iter_bytes():        audio_file.write(chunk)print("Audio generated successfully")
+```
+
+## **11. Real-World TTS Applications**
+
+- Accessibility for visually impaired users.
+- Converting blogs into audio.
+- Educational audio lessons.
+- Virtual assistants.
+- Multilingual applications.
+- Automated customer support.
+
+## **12. Important Interview Questions**
+
+1. What is the difference between OpenAI API and ChatGPT?
+2. What is an OpenAI SDK?
+3. What is the difference between DALL·E 2 and DALL·E 3 in these examples?
+4. What is image variation?
+5. What is a Vision model?
+6. What is multimodal input?
+7. What is Base64 encoding and why is it used?
+8. What is the difference between Image URL and Base64?
+9. What is the difference between `json.loads()` and `json.dumps()`?
+10. What are the limitations of Vision models?
+11. What is Text-to-Speech?
+12. What is the difference between Speech-to-Text and Text-to-Speech?
+13. What is the purpose of `iter_bytes()`?
+14. Why do we use `rb` and `wb`?
+15. What are embeddings and how are they used in RAG?
+
+## **Quick Revision**
+
+| Concept        | Remember                             |
+| -------------- | ------------------------------------ |
+| OpenAI API     | Connects applications with AI models |
+| SDK            | Python/JavaScript libraries          |
+| DALL·E 3       | Generates images                     |
+| DALL·E 2       | Image variation example              |
+| Vision         | Understands images                   |
+| Base64         | Encodes local image data             |
+| Multimodal     | Text + Image input                   |
+| Embeddings     | Text into numerical vectors          |
+| TTS            | Text → Audio                         |
+| Whisper        | Audio → Text                         |
+| `iter_bytes()` | Reads audio chunks                   |
+| `json.loads()` | JSON → Dictionary                    |
+| `json.dumps()` | Dictionary → JSON                    |
+
+Notes consolidated from your uploaded L1, L3 and L4 material. Repeated concepts have been removed and explanations shortened.
+---------------------------------------------------------------------------------------------------------------
+
+
+
+
