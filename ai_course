@@ -1,0 +1,311 @@
+# **OpenAI API & LangChain – Short Notes**
+
+## **1. OpenAI API Fundamentals**
+
+- **OpenAI API:** Connects Python applications with OpenAI models.
+- **API Key:** Authenticates API requests.
+- `%env`: Sets environment variables in Jupyter Notebook.
+- `os.getenv()`: Reads environment variables.
+- `OpenAI()`: Initializes the API client.
+- `client.chat.completions.create()`: Generates responses.
+- **Model:** Selects the AI model, e.g. `gpt-4o-mini`.
+
+## **2. Message Roles**
+
+| Role        | Purpose                          |
+| ----------- | -------------------------------- |
+| `system`    | Defines model behaviour          |
+| `user`      | Contains user input              |
+| `assistant` | Contains AI response or examples |
+| `tool`      | Contains external tool results   |
+
+## **3. Few-Shot Prompting**
+
+- Provides examples to guide the LLM.
+- Helps the model understand the expected output format.
+- Example: Sentiment classification (positive, negative, neutral).
+- `AIMessage` can represent example AI responses.
+
+## **4. API Response & Tokens**
+
+- `choices`: List of generated responses.
+- `choices[0]`: First response.
+- `message.content`: Actual generated text.
+- `n=3`: Generates three response candidates.
+
+**Token usage:**
+
+- `prompt_tokens`: Input tokens.
+- `completion_tokens`: Output tokens.
+- `total_tokens`: Input + output tokens.
+- API billing depends on token usage.
+- ChatGPT subscription and API billing are separate.
+
+## **5. Important API Parameters**
+
+| Parameter               | Purpose                         |
+| ----------------------- | ------------------------------- |
+| `temperature=0`         | More predictable output         |
+| `seed=365`              | Helps produce consistent output |
+| `max_completion_tokens` | Limits output length            |
+| `stream=True`           | Returns response in chunks      |
+| `n`                     | Generates multiple responses    |
+
+**Streaming concepts:**
+
+- `stream`: Iterable response.
+- `chunk`: Individual response part.
+- `delta.content`: Contains generated text.
+- `flush=True`: Displays output immediately.
+
+**Normal vs Streaming:**
+
+- Normal: Complete response at once.
+- Streaming: Response arrives chunk by chunk.
+
+# **Part 2: Introduction to LangChain**
+
+## **6. What is LangChain?**
+
+- Open-source framework for building LLM-powered applications.
+- Connects LLMs with prompts, external data, tools and APIs.
+- Used for chatbots, RAG applications and AI agents.
+
+## **7. Main Modules of LangChain**
+
+**1. Model I/O**
+
+- Prompts
+- Prompt Templates
+- Models
+- Output Parsers
+
+**2. Retrieval**
+
+- Document Loaders
+- Text Splitters
+- Embedding Models
+- Vector Stores
+- Retrievers
+
+**3. Agents**
+
+- Tools
+- Toolkits
+- Autonomous tool selection
+
+## **8. Retrieval Pipeline (RAG)**
+
+1. **Document Loader:** Loads PDF, CSV, TXT, etc.
+2. **Text Splitter:** Divides documents into chunks.
+3. **Embedding Model:** Converts text into numerical vectors.
+4. **Vector Store:** Stores embeddings.
+5. **Retriever:** Finds relevant information.
+6. **LLM:** Generates answers using retrieved context.
+
+## **9. Agents, Tools & Toolkits**
+
+- **Agent:** Decides which tool to use and when.
+- **Tool:** Individual function or API.
+- **Toolkit:** Collection of related tools.
+
+Example: Weather question → Agent selects weather API → Gets result → Generates answer.
+
+## **10. LCEL (LangChain Expression Language)**
+
+- Connects LangChain components using `|` (pipe operator).
+- `.invoke()` executes the chain.
+
+Example:
+
+```
+chain = prompt_template | chatresponse = chain.invoke({    "pet": "dog"})print(response.content)
+```
+
+# **Part 3: LangChain Setup & Implementation**
+
+## **11. Environment Setup**
+
+```
+conda activate langchain
+
+pip install langchain
+pip install langchain-openai
+pip install python-dotenv
+```
+
+## **12. API Key Configuration**
+
+Create `.env` file:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
+Load API key:
+
+```
+from dotenv import load_dotenvload_dotenv()
+```
+
+## **13. Initialize ChatOpenAI**
+
+\- `ChatOpenAI` connects LangChain with OpenAI models.
+
+```
+from langchain_openai import ChatOpenAIchat = ChatOpenAI(    model="gpt-4o",    temperature=0)
+```
+
+# **Part 4: LangChain Message Types (L3)**
+
+## **14. Three Important Message Types**
+
+| Message         | Purpose                   |
+| --------------- | ------------------------- |
+| `SystemMessage` | Defines chatbot behaviour |
+| `HumanMessage`  | Represents user input     |
+| `AIMessage`     | Represents AI response    |
+
+## **15. Invoke Using a String**
+
+```
+response = chat.invoke(    "What is Python?")print(response.content)
+```
+
+- `.invoke()` sends input to the model.
+- Returns an `AIMessage`.
+- `.content` extracts the response.
+
+## **16. Few-Shot Using Messages**
+
+- Provide previous input-output examples.
+- Model follows the demonstrated response pattern.
+
+```
+from langchain_core.messages import (    HumanMessage,    AIMessage)messages = [    HumanMessage(content="Suggest dog names"),    AIMessage(content="Bark Twain"),    HumanMessage(content="Suggest cat names")]response = chat.invoke(messages)print(response.content)
+```
+
+# **Part 5: PromptTemplate**
+
+## **17. What is PromptTemplate?**
+
+- Creates reusable prompts.
+- Uses placeholders `{}`.
+- Avoids writing separate prompts for different inputs.
+
+```
+from langchain_core.prompts import PromptTemplatetemplate = """You are a helpful assistant.Suggest some names for a {pet}."""prompt_template = PromptTemplate.from_template(template)response = prompt_template.invoke({    "pet": "dog"})print(response.text)
+```
+
+**Important methods:**
+
+| Method            | Purpose               |
+| ----------------- | --------------------- |
+| `from_template()` | Creates template      |
+| `input_variables` | Displays placeholders |
+| `invoke()`        | Fills placeholders    |
+| `.text`           | Extracts prompt text  |
+
+## **18. PromptTemplate vs ChatPromptTemplate**
+
+| PromptTemplate             | ChatPromptTemplate          |
+| -------------------------- | --------------------------- |
+| Text-based prompt          | Chat-based prompt           |
+| Mainly returns prompt text | Returns structured messages |
+| Simple inputs              | Multiple message roles      |
+| Supports placeholders      | Supports placeholders       |
+
+# **Part 6: ChatPromptTemplate (L4)**
+
+## **19. What is ChatPromptTemplate?**
+
+- Creates reusable chat prompts.
+- Supports System, Human and AI message templates.
+- Uses placeholders for dynamic inputs.
+- Makes multiple message management easier.
+
+**Important components:**
+
+- `SystemMessagePromptTemplate`
+- `HumanMessagePromptTemplate`
+- `AIMessagePromptTemplate`
+- `ChatPromptTemplate`
+
+### **Complete Code**
+
+```
+from langchain_openai import ChatOpenAIfrom langchain_core.prompts import (    SystemMessagePromptTemplate,    HumanMessagePromptTemplate,    ChatPromptTemplate)chat = ChatOpenAI(    model="gpt-4o",    temperature=0)# Define templatessystem_template = "{description}"human_template = "Suggest some names for a {pet}."# Create message templatessystem_prompt = SystemMessagePromptTemplate.from_template(    system_template)human_prompt = HumanMessagePromptTemplate.from_template(    human_template)# Combine templateschat_template = ChatPromptTemplate.from_messages([    system_prompt,    human_prompt])# Generate messageschat_value = chat_template.invoke({    "description": "You are a helpful assistant.",    "pet": "dog"
+```
+
+**Execution flow:**
+
+ChatPromptTemplate → `invoke()` → ChatPromptValue → ChatOpenAI → AI Response.
+
+# **Part 7: FewShotChatMessagePromptTemplate (L5)**
+
+## **20. What is FewShotChatMessagePromptTemplate?**
+
+- Automates few-shot prompting.
+- Stores examples in a list of dictionaries.
+- Converts examples into chat messages automatically.
+- Useful when working with multiple examples.
+
+**Important components:**
+
+| Component                          | Purpose                          |
+| ---------------------------------- | -------------------------------- |
+| `examples`                         | Stores input-output examples     |
+| `example_prompt`                   | Defines example structure        |
+| `FewShotChatMessagePromptTemplate` | Generates example messages       |
+| `ChatPromptTemplate`               | Combines examples with new input |
+
+### **Complete Code**
+
+```
+from langchain_openai import ChatOpenAIfrom langchain_core.prompts import (    HumanMessagePromptTemplate,    AIMessagePromptTemplate,    ChatPromptTemplate,    FewShotChatMessagePromptTemplate)# Initialize modelchat = ChatOpenAI(    model="gpt-4o",    temperature=0)# Define templateshuman_template = "Suggest some names for a {pet}."ai_template = "{response}"# Create message templateshuman_prompt = HumanMessagePromptTemplate.from_template(    human_template)ai_prompt = AIMessagePromptTemplate.from_template(    ai_template)# Example structureexample_template = ChatPromptTemplate.from_messages([    human_prompt,    ai_prompt])# Examples datasetexamples = [
+```
+
+# **Part 8: L3 vs L4 vs L5**
+
+| Feature        | L3                   | L4                   | L5                                 |
+| -------------- | -------------------- | -------------------- | ---------------------------------- |
+| Approach       | Manual messages      | Chat templates       | Few-shot templates                 |
+| Main component | `HumanMessage`       | `ChatPromptTemplate` | `FewShotChatMessagePromptTemplate` |
+| Reusability    | Limited              | Yes                  | Yes                                |
+| Examples       | Manually created     | Message templates    | List of dictionaries               |
+| Use case       | Simple conversations | Reusable prompts     | Multiple examples                  |
+
+## **Final Revision – Most Important Concepts**
+
+1. **OpenAI API:** Connects Python with AI models.
+2. **API Key:** Authenticates API requests.
+3. **Temperature:** Controls response randomness.
+4. **Seed:** Helps maintain consistent output.
+5. **Streaming:** Receives output chunk by chunk.
+6. **Tokens:** Units used to process input and output.
+7. **LangChain:** Framework for building LLM applications.
+8. **RAG:** Answers questions using external documents.
+9. **Agent:** Selects and uses tools.
+10. **LCEL:** Connects components using `|`.
+11. **SystemMessage:** Defines model behaviour.
+12. **HumanMessage:** Contains user input.
+13. **AIMessage:** Represents AI response or examples.
+14. **PromptTemplate:** Creates reusable text prompts.
+15. **ChatPromptTemplate:** Creates reusable multi-role prompts.
+16. **FewShotChatMessagePromptTemplate:** Automates example-based prompting.
+
+**Remember the learning progression:**
+
+**L3 – Manual Messages**
+
+HumanMessage, AIMessage, SystemMessage
+
+**L4 – Reusable Chat Prompts**
+
+ChatPromptTemplate
+
+**L5 – Automated Few-Shot Examples**
+
+FewShotChatMessagePromptTemplate
+
+Notes consolidated from your uploaded lessons. Duplicate explanations and repeated concepts have been removed.
